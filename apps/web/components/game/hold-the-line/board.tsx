@@ -14,6 +14,7 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
   const [engine] = useState(() => new HoldTheLineEngine(4));
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pathOffsets] = useState(() => {
     // Precompute random offsets for hand-drawn effect
     const offsets: Record<string, { x: number; y: number }> = {};
@@ -32,9 +33,26 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
     }
   }, [gameState.status, gameState.winner, onGameEnd]);
 
+  // Clear error message after 3 seconds
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   const handleDotClick = (pos: Position) => {
+    if (!engine.isValidMove(pos)) {
+      // Provide feedback for invalid move
+      setErrorMessage('Invalid move: Lines cannot intersect with existing lines.');
+      return;
+    }
+    
     if (engine.makeMove(pos)) {
       setGameState(engine.getState());
+      setErrorMessage(null); // Clear any previous error
       playSound();
     }
   };
@@ -89,6 +107,17 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
 
   return (
     <div className="flex flex-col items-center gap-6">
+      {/* Error message with accessibility support */}
+      {errorMessage && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="rounded-lg border-2 border-red-500 bg-red-100 px-4 py-2 text-red-800 dark:bg-red-900 dark:text-red-200"
+        >
+          {errorMessage}
+        </div>
+      )}
+
       {/* Game status */}
       <div className="text-center">
         {gameState.status === 'playing' ? (
