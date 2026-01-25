@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { HoldTheLineEngine, Position } from './engine';
+import { HoldTheLineEngine } from './engine';
 
 describe('HoldTheLineEngine', () => {
   let engine: HoldTheLineEngine;
@@ -118,8 +118,6 @@ describe('HoldTheLineEngine', () => {
       engine.makeMove({ row: 0, col: 1 });
       engine.makeMove({ row: 1, col: 1 });
       
-      const state = engine.getState();
-      
       // Continue until no moves left
       let moves = engine.getValidMoves();
       while (moves.length > 0) {
@@ -137,8 +135,7 @@ describe('HoldTheLineEngine', () => {
       // Simulate a game where player 1 makes the last move
       engine.makeMove({ row: 0, col: 0 }); // Player 1
       
-      const state = engine.getState();
-      let currentPlayer = state.currentPlayer;
+      let currentPlayer = engine.getState().currentPlayer;
       
       // Continue game
       let moves = engine.getValidMoves();

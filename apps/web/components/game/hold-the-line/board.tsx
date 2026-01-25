@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HoldTheLineEngine, Position, Player } from '@/lib/games/hold-the-line/engine';
 import { PLAYER_COLORS, PlayerColor } from '@/lib/games/hold-the-line/types';
 
@@ -14,7 +14,17 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
   const [engine] = useState(() => new HoldTheLineEngine(4));
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [pathOffsets] = useState(() => {
+    // Precompute random offsets for hand-drawn effect
+    const offsets: Record<string, { x: number; y: number }> = {};
+    for (let i = 0; i < 16; i++) {
+      offsets[i] = {
+        x: (Math.random() - 0.5) * 3,
+        y: (Math.random() - 0.5) * 3,
+      };
+    }
+    return offsets;
+  });
 
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
@@ -32,7 +42,7 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
   const playSound = () => {
     // Create a simple pencil scratch sound effect using Web Audio API
     if (typeof window !== 'undefined') {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -84,7 +94,7 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
         {gameState.status === 'playing' ? (
           <div className="flex flex-col gap-2">
             <p className="text-lg font-semibold">
-              Player {gameState.currentPlayer}'s Turn
+              Player {gameState.currentPlayer}&apos;s Turn
             </p>
             <div
               className="mx-auto h-4 w-4 rounded-full"
@@ -165,9 +175,10 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
             const start = getDotPosition(prevPos.row, prevPos.col);
             const end = getDotPosition(pos.row, pos.col);
 
-            // Add slight curve for hand-drawn effect
-            const midX = (start.x + end.x) / 2 + (Math.random() - 0.5) * 3;
-            const midY = (start.y + end.y) / 2 + (Math.random() - 0.5) * 3;
+            // Use precomputed offset for hand-drawn effect
+            const offset = pathOffsets[index] || { x: 0, y: 0 };
+            const midX = (start.x + end.x) / 2 + offset.x;
+            const midY = (start.y + end.y) / 2 + offset.y;
 
             const playerColor = index % 2 === 1 ? PLAYER_COLORS[player1Color] : PLAYER_COLORS[player2Color];
 

@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/games/layout,_N_T_/games/hold-the-line/layout,_N_T_/games/hold-the-line/page,_N_T_/games/hold-the-line"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/games/hold-the-line/__PAGE__",
+    "/games/hold-the-line",
+    "/games",
+    "/_index",
+    "/_head"
+  ]
+}

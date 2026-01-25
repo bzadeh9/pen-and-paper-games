@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
 import { PlayerColor } from '@/lib/games/hold-the-line/types';
@@ -38,7 +39,7 @@ export default function HoldTheLinePage() {
         <div className="mb-8 text-center">
           <h1 className="mb-2 text-4xl font-bold tracking-tight">Hold The Line</h1>
           <p className="text-lg text-foreground/60">
-            Connect the dots, but don't make the last move!
+            Connect the dots, but don&apos;t make the last move!
           </p>
         </div>
 
@@ -49,7 +50,7 @@ export default function HoldTheLinePage() {
             <li>• Players take turns drawing lines between adjacent dots (horizontal, vertical, or diagonal)</li>
             <li>• Each line must connect to one of the two ends of the existing path</li>
             <li>• You cannot visit a dot that has already been used</li>
-            <li>• <strong>Winning Condition:</strong> The player who makes the last move <strong>LOSES</strong> (Misère play)</li>
+            <li>• The player who makes the last move <strong>LOSES</strong> (Misère play)</li>
           </ul>
         </div>
 
@@ -86,12 +87,12 @@ export default function HoldTheLinePage() {
 
         {/* Back to home */}
         <div className="mt-8 text-center">
-          <a
+          <Link
             href="/"
             className="inline-block rounded-lg border border-foreground/20 px-6 py-2 transition-colors hover:bg-foreground/10"
           >
             ← Back to Home
-          </a>
+          </Link>
         </div>
       </div>
 
