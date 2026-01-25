@@ -10,7 +10,12 @@ interface GameStatsProps {
   onReset?: () => void;
 }
 
-export function GameStats({ stats, player1Name = 'Player 1', player2Name = 'Player 2', onReset }: GameStatsProps) {
+export function GameStats({
+  stats,
+  player1Name = 'Player 1',
+  player2Name = 'Player 2',
+  onReset,
+}: GameStatsProps) {
   return (
     <div
       className="rounded-lg border border-foreground/20 bg-background p-4"
@@ -21,19 +26,28 @@ export function GameStats({ stats, player1Name = 'Player 1', player2Name = 'Play
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-foreground/60">Total Games:</span>
-          <span className="font-semibold" aria-label={`${stats.totalGames} games played`}>
+          <span
+            className="font-semibold"
+            aria-label={`${stats.totalGames} games played`}
+          >
             {stats.totalGames}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-foreground/60">{player1Name} Wins:</span>
-          <span className="font-semibold" aria-label={`${player1Name} has won ${stats.player1Wins} games`}>
+          <span
+            className="font-semibold"
+            aria-label={`${player1Name} has won ${stats.player1Wins} games`}
+          >
             {stats.player1Wins}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-foreground/60">{player2Name} Wins:</span>
-          <span className="font-semibold" aria-label={`${player2Name} has won ${stats.player2Wins} games`}>
+          <span
+            className="font-semibold"
+            aria-label={`${player2Name} has won ${stats.player2Wins} games`}
+          >
             {stats.player2Wins}
           </span>
         </div>

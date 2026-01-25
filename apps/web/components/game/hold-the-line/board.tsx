@@ -32,7 +32,7 @@ export function GameBoard({
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
+
   // Generate offsets dynamically based on max possible grid size
   const [pathOffsets] = useState(() => {
     // Precompute random offsets for hand-drawn effect
@@ -74,7 +74,7 @@ export function GameBoard({
 
   const handleDotClick = (pos: Position) => {
     if (gameState.status !== 'playing') return;
-    
+
     if (!engine.isValidMove(pos)) {
       // Provide feedback for invalid move
       // Note: Move can be invalid for multiple reasons (not adjacent, already visited, or would intersect)
@@ -87,11 +87,6 @@ export function GameBoard({
       setErrorMessage(null); // Clear any previous error
       playSound();
     }
-  };
-
-  const handlePlayerReady = (player: Player) => {
-    engine.setPlayerReady(player);
-    setGameState(engine.getState());
   };
 
   const playSound = () => {
@@ -146,7 +141,8 @@ export function GameBoard({
 
   const DOT_SIZE = 12;
   // Make grid spacing responsive - smaller spacing for larger grids
-  const GRID_SPACING = gameState.gridSize <= 5 ? 80 : gameState.gridSize <= 7 ? 60 : 50;
+  const GRID_SPACING =
+    gameState.gridSize <= 5 ? 80 : gameState.gridSize <= 7 ? 60 : 50;
   const PADDING = 40;
   const SVG_WIDTH = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
   const SVG_HEIGHT = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
@@ -159,39 +155,44 @@ export function GameBoard({
   const positionKey = (pos: Position) => `${pos.row},${pos.col}`;
   const isVisited = (pos: Position) =>
     gameState.visitedDots.has(positionKey(pos));
-  
+
   // Helper function to find which path end a move would connect to
   const getConnectedPathEnd = (pos: Position): Position | null => {
     if (!gameState.pathEnds || !isValidMove(pos)) return null;
-    
+
     const [end1, end2] = gameState.pathEnds;
     const rowDiff1 = Math.abs(pos.row - end1.row);
     const colDiff1 = Math.abs(pos.col - end1.col);
     const rowDiff2 = Math.abs(pos.row - end2.row);
     const colDiff2 = Math.abs(pos.col - end2.col);
-    
+
     // Check adjacency to end1
     if (rowDiff1 <= 1 && colDiff1 <= 1 && (rowDiff1 > 0 || colDiff1 > 0)) {
       return end1;
     }
-    
+
     // Check adjacency to end2
     if (rowDiff2 <= 1 && colDiff2 <= 1 && (rowDiff2 > 0 || colDiff2 > 0)) {
       return end2;
     }
-    
+
     return null;
   };
 
   // Memoize hover preview line data
   const hoverPreviewLine = useMemo(() => {
-    if (!hoveredDot || gameState.status !== 'playing' || !isValidMove(hoveredDot) || isVisited(hoveredDot)) {
+    if (
+      !hoveredDot ||
+      gameState.status !== 'playing' ||
+      !isValidMove(hoveredDot) ||
+      isVisited(hoveredDot)
+    ) {
       return null;
     }
-    
+
     const connectedEnd = getConnectedPathEnd(hoveredDot);
     if (!connectedEnd) return null;
-    
+
     return {
       start: getDotPosition(connectedEnd.row, connectedEnd.col),
       end: getDotPosition(hoveredDot.row, hoveredDot.col),
@@ -211,36 +212,20 @@ export function GameBoard({
         </div>
       )}
 
-      {/* Setup phase - Ready buttons */}
+      {/* Setup phase - Start Game button */}
       {gameState.status === 'setup' && (
         <div className="text-center">
-          <p className="mb-4 text-lg font-semibold">Get Ready to Play!</p>
-          <div className="flex gap-4">
-            <button
-              onClick={() => handlePlayerReady(1)}
-              disabled={gameState.player1Ready}
-              className={`rounded-lg px-6 py-3 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                gameState.player1Ready
-                  ? 'cursor-not-allowed bg-green-600 text-white'
-                  : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
-              }`}
-              aria-label={gameState.player1Ready ? `${player1Name} is ready` : `${player1Name} ready button`}
-            >
-              {gameState.player1Ready ? `✓ ${player1Name} Ready` : `${player1Name} Ready`}
-            </button>
-            <button
-              onClick={() => handlePlayerReady(2)}
-              disabled={gameState.player2Ready}
-              className={`rounded-lg px-6 py-3 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                gameState.player2Ready
-                  ? 'cursor-not-allowed bg-green-600 text-white'
-                  : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
-              }`}
-              aria-label={gameState.player2Ready ? `${player2Name} is ready` : `${player2Name} ready button`}
-            >
-              {gameState.player2Ready ? `✓ ${player2Name} Ready` : `${player2Name} Ready`}
-            </button>
-          </div>
+          <p className="mb-4 text-lg font-semibold">Ready to Play?</p>
+          <button
+            onClick={() => {
+              engine.startGame();
+              setGameState(engine.getState());
+            }}
+            className="rounded-lg bg-foreground px-8 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+            aria-label="Start Game"
+          >
+            Start Game
+          </button>
         </div>
       )}
 
@@ -249,7 +234,8 @@ export function GameBoard({
         <div className="text-center">
           <div className="flex flex-col gap-2">
             <p className="text-lg font-semibold">
-              {gameState.currentPlayer === 1 ? player1Name : player2Name}&apos;s Turn
+              {gameState.currentPlayer === 1 ? player1Name : player2Name}&apos;s
+              Turn
             </p>
             <div
               className="mx-auto h-4 w-4 rounded-full"
@@ -271,7 +257,8 @@ export function GameBoard({
             Game Over!
           </p>
           <p className="text-lg text-green-700 dark:text-green-300">
-            {gameState.winner === 1 ? player1Name : player2Name} Wins! Well done!
+            {gameState.winner === 1 ? player1Name : player2Name} Wins! Well
+            done!
           </p>
           <div
             className="mx-auto mt-2 h-4 w-4 rounded-full"

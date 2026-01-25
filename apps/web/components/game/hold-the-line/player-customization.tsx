@@ -130,7 +130,8 @@ export function PlayerCustomization({
                 isSelected && 'border-foreground shadow-lg',
                 !isSelected && !isDisabled && 'border-foreground/20',
                 !isDisabled && 'hover:scale-110',
-                isDisabled && 'cursor-not-allowed opacity-40 border-foreground/10'
+                isDisabled &&
+                  'cursor-not-allowed opacity-40 border-foreground/10'
               )}
               style={{ backgroundColor: PLAYER_COLORS[option.value] }}
               title={

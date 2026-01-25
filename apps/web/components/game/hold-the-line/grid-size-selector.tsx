@@ -31,8 +31,12 @@ export function GridSizeSelector({
         aria-label={`Grid size slider, current value ${gridSize}x${gridSize}`}
       />
       <div className="flex justify-between text-xs text-foreground/60">
-        <span>{MIN_GRID_SIZE}x{MIN_GRID_SIZE}</span>
-        <span>{MAX_GRID_SIZE}x{MAX_GRID_SIZE}</span>
+        <span>
+          {MIN_GRID_SIZE}x{MIN_GRID_SIZE}
+        </span>
+        <span>
+          {MAX_GRID_SIZE}x{MAX_GRID_SIZE}
+        </span>
       </div>
       {disabled && (
         <p className="text-xs text-foreground/60">

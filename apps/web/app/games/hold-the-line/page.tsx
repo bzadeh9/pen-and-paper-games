@@ -26,9 +26,11 @@ export default function HoldTheLinePage() {
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState(4);
-  const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>('setup');
+  const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>(
+    'setup'
+  );
   const [stats, setStats] = useState(() => getGameStatistics());
-  
+
   // Use media query to detect mobile
   const isMobile = useMediaQuery('(max-width: 767px)');
 
@@ -79,8 +81,8 @@ export default function HoldTheLinePage() {
                   (horizontal, vertical, or diagonal)
                 </li>
                 <li>
-                  • Each line must connect to one of the two ends of the existing
-                  path
+                  • Each line must connect to one of the two ends of the
+                  existing path
                 </li>
                 <li>• You cannot visit a dot that has already been used</li>
                 <li>
@@ -186,7 +188,12 @@ export default function HoldTheLinePage() {
           {/* Right pane: Game over message (when ended) and stats */}
           <div className="flex flex-col gap-4">
             {/* Game over message will be rendered by the board component but we keep stats here */}
-            <GameStats stats={stats} player1Name={player1Name} player2Name={player2Name} onReset={handleResetStats} />
+            <GameStats
+              stats={stats}
+              player1Name={player1Name}
+              player2Name={player2Name}
+              onReset={handleResetStats}
+            />
           </div>
         </div>
       </div>
