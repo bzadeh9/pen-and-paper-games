@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/dialog';
 
 export default function HoldTheLinePage() {
-  const [player1Color, setPlayer1Color] = useState<PlayerColor>('cherryBlossom');
+  const [player1Color, setPlayer1Color] =
+    useState<PlayerColor>('cherryBlossom');
   const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
   const [showWinDialog, setShowWinDialog] = useState(false);
   const [winner, setWinner] = useState<Player | null>(null);
@@ -36,7 +37,9 @@ export default function HoldTheLinePage() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold tracking-tight">Hold The Line</h1>
+          <h1 className="mb-2 text-4xl font-bold tracking-tight">
+            Hold The Line
+          </h1>
           <p className="text-lg text-foreground/60">
             Connect the dots, but don&apos;t make the last move!
           </p>
@@ -46,10 +49,19 @@ export default function HoldTheLinePage() {
         <div className="mb-8 rounded-lg border border-foreground/20 bg-background p-6">
           <h2 className="mb-3 text-xl font-semibold">How to Play</h2>
           <ul className="space-y-2 text-foreground/80">
-            <li>• Players take turns drawing lines between adjacent dots (horizontal, vertical, or diagonal)</li>
-            <li>• Each line must connect to one of the two ends of the existing path</li>
+            <li>
+              • Players take turns drawing lines between adjacent dots
+              (horizontal, vertical, or diagonal)
+            </li>
+            <li>
+              • Each line must connect to one of the two ends of the existing
+              path
+            </li>
             <li>• You cannot visit a dot that has already been used</li>
-            <li>• The player who makes the last move <strong>LOSES</strong> (Misère play)</li>
+            <li>
+              • The player who makes the last move <strong>LOSES</strong>{' '}
+              (Misère play)
+            </li>
           </ul>
         </div>
 

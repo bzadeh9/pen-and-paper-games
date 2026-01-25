@@ -38,7 +38,9 @@ export default function Home() {
             </p>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
-              <span className="transition-transform group-hover:translate-x-1">→</span>
+              <span className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
             </div>
           </Link>
 

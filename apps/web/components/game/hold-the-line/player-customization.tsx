@@ -1,7 +1,11 @@
 'use client';
 
 import React from 'react';
-import { PLAYER_COLORS, PlayerColor, PLAYER_COLOR_OPTIONS } from '@/lib/games/hold-the-line/types';
+import {
+  PLAYER_COLORS,
+  PlayerColor,
+  PLAYER_COLOR_OPTIONS,
+} from '@/lib/games/hold-the-line/types';
 
 interface PlayerCustomizationProps {
   playerNumber: 1 | 2;
