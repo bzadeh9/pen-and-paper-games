@@ -11,12 +11,16 @@ import { PLAYER_COLORS, PlayerColor } from '@/lib/games/hold-the-line/types';
 interface GameBoardProps {
   player1Color: PlayerColor;
   player2Color: PlayerColor;
+  player1Name?: string;
+  player2Name?: string;
   onGameEnd?: (winner: Player) => void;
 }
 
 export function GameBoard({
   player1Color,
   player2Color,
+  player1Name = 'Player 1',
+  player2Name = 'Player 2',
   onGameEnd,
 }: GameBoardProps) {
   const [engine] = useState(() => new HoldTheLineEngine(4));
@@ -161,9 +165,9 @@ export function GameBoard({
                   ? 'cursor-not-allowed bg-green-600 text-white'
                   : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
               }`}
-              aria-label={gameState.player1Ready ? 'Player 1 is ready' : 'Player 1 ready button'}
+              aria-label={gameState.player1Ready ? `${player1Name} is ready` : `${player1Name} ready button`}
             >
-              {gameState.player1Ready ? '✓ Player 1 Ready' : 'Player 1 Ready'}
+              {gameState.player1Ready ? `✓ ${player1Name} Ready` : `${player1Name} Ready`}
             </button>
             <button
               onClick={() => handlePlayerReady(2)}
@@ -173,9 +177,9 @@ export function GameBoard({
                   ? 'cursor-not-allowed bg-green-600 text-white'
                   : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
               }`}
-              aria-label={gameState.player2Ready ? 'Player 2 is ready' : 'Player 2 ready button'}
+              aria-label={gameState.player2Ready ? `${player2Name} is ready` : `${player2Name} ready button`}
             >
-              {gameState.player2Ready ? '✓ Player 2 Ready' : 'Player 2 Ready'}
+              {gameState.player2Ready ? `✓ ${player2Name} Ready` : `${player2Name} Ready`}
             </button>
           </div>
         </div>
@@ -186,12 +190,12 @@ export function GameBoard({
         <div className="text-center">
           <div className="flex flex-col gap-2">
             <p className="text-lg font-semibold">
-              Player {gameState.currentPlayer}&apos;s Turn
+              {gameState.currentPlayer === 1 ? player1Name : player2Name}&apos;s Turn
             </p>
             <div
               className="mx-auto h-4 w-4 rounded-full"
               style={{ backgroundColor: currentPlayerColor }}
-              aria-label={`Player ${gameState.currentPlayer}'s turn indicator`}
+              aria-label={`${gameState.currentPlayer === 1 ? player1Name : player2Name}'s turn indicator`}
             />
           </div>
         </div>
@@ -208,7 +212,7 @@ export function GameBoard({
             Game Over!
           </p>
           <p className="text-lg text-green-700 dark:text-green-300">
-            Player {gameState.winner} Wins! Well done!
+            {gameState.winner === 1 ? player1Name : player2Name} Wins! Well done!
           </p>
           <div
             className="mx-auto mt-2 h-4 w-4 rounded-full"
@@ -218,7 +222,7 @@ export function GameBoard({
                   ? PLAYER_COLORS[player1Color]
                   : PLAYER_COLORS[player2Color],
             }}
-            aria-label={`Player ${gameState.winner} won`}
+            aria-label={`${gameState.winner === 1 ? player1Name : player2Name} won`}
           />
         </div>
       )}

@@ -5,10 +5,12 @@ import { GameStatistics } from '@/lib/games/hold-the-line/stats';
 
 interface GameStatsProps {
   stats: GameStatistics;
+  player1Name?: string;
+  player2Name?: string;
   onReset?: () => void;
 }
 
-export function GameStats({ stats, onReset }: GameStatsProps) {
+export function GameStats({ stats, player1Name = 'Player 1', player2Name = 'Player 2', onReset }: GameStatsProps) {
   return (
     <div
       className="rounded-lg border border-foreground/20 bg-background p-4"
@@ -24,14 +26,14 @@ export function GameStats({ stats, onReset }: GameStatsProps) {
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-foreground/60">Player 1 Wins:</span>
-          <span className="font-semibold" aria-label={`Player 1 has won ${stats.player1Wins} games`}>
+          <span className="text-foreground/60">{player1Name} Wins:</span>
+          <span className="font-semibold" aria-label={`${player1Name} has won ${stats.player1Wins} games`}>
             {stats.player1Wins}
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-foreground/60">Player 2 Wins:</span>
-          <span className="font-semibold" aria-label={`Player 2 has won ${stats.player2Wins} games`}>
+          <span className="text-foreground/60">{player2Name} Wins:</span>
+          <span className="font-semibold" aria-label={`${player2Name} has won ${stats.player2Wins} games`}>
             {stats.player2Wins}
           </span>
         </div>
