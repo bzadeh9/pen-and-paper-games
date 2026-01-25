@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { HoldTheLineEngine, Position, Player } from '@/lib/games/hold-the-line/engine';
+import {
+  HoldTheLineEngine,
+  Position,
+  Player,
+} from '@/lib/games/hold-the-line/engine';
 import { PLAYER_COLORS, PlayerColor } from '@/lib/games/hold-the-line/types';
 
 interface GameBoardProps {
@@ -10,7 +14,11 @@ interface GameBoardProps {
   onGameEnd?: (winner: Player) => void;
 }
 
-export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardProps) {
+export function GameBoard({
+  player1Color,
+  player2Color,
+  onGameEnd,
+}: GameBoardProps) {
   const [engine] = useState(() => new HoldTheLineEngine(4));
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
@@ -21,8 +29,8 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
     const offsets: Record<string, { x: number; y: number }> = {};
     for (let i = 0; i < 16; i++) {
       offsets[i] = {
-        x: (Math.random() - 0.5) * 0.5,  // Reduced from 3 to 0.5 pixels
-        y: (Math.random() - 0.5) * 0.5,  // Reduced from 3 to 0.5 pixels
+        x: (Math.random() - 0.5) * 0.5, // Reduced from 3 to 0.5 pixels
+        y: (Math.random() - 0.5) * 0.5, // Reduced from 3 to 0.5 pixels
       };
     }
     return offsets;
@@ -51,7 +59,7 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
       setErrorMessage('Invalid move: This move is not allowed.');
       return;
     }
-    
+
     if (engine.makeMove(pos)) {
       setGameState(engine.getState());
       setErrorMessage(null); // Clear any previous error
@@ -62,7 +70,11 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
   const playSound = () => {
     // Create a simple pencil scratch sound effect using Web Audio API
     if (typeof window !== 'undefined') {
-      const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const audioContext = new (
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext
+      )();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -71,10 +83,16 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
 
       oscillator.type = 'sawtooth';
       oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.1);
+      oscillator.frequency.exponentialRampToValueAtTime(
+        100,
+        audioContext.currentTime + 0.1
+      );
 
       gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.1
+      );
 
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.1);
@@ -91,7 +109,9 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
     validMoves.some((move) => move.row === pos.row && move.col === pos.col);
 
   const currentPlayerColor =
-    gameState.currentPlayer === 1 ? PLAYER_COLORS[player1Color] : PLAYER_COLORS[player2Color];
+    gameState.currentPlayer === 1
+      ? PLAYER_COLORS[player1Color]
+      : PLAYER_COLORS[player2Color];
 
   const DOT_SIZE = 12;
   const GRID_SPACING = 80;
@@ -105,7 +125,8 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
   });
 
   const positionKey = (pos: Position) => `${pos.row},${pos.col}`;
-  const isVisited = (pos: Position) => gameState.visitedDots.has(positionKey(pos));
+  const isVisited = (pos: Position) =>
+    gameState.visitedDots.has(positionKey(pos));
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -200,18 +221,19 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
           ))}
 
           {/* Draw path lines with hand-drawn style */}
-          {gameState.moveHistory.map((pos, index) => {
-            if (index === 0) return null;
-            const prevPos = gameState.moveHistory[index - 1];
-            const start = getDotPosition(prevPos.row, prevPos.col);
-            const end = getDotPosition(pos.row, pos.col);
+          {gameState.lines.map((line, index) => {
+            const start = getDotPosition(line.start.row, line.start.col);
+            const end = getDotPosition(line.end.row, line.end.col);
 
             // Use precomputed offset for hand-drawn effect
             const offset = pathOffsets[index] || { x: 0, y: 0 };
             const midX = (start.x + end.x) / 2 + offset.x;
             const midY = (start.y + end.y) / 2 + offset.y;
 
-            const playerColor = index % 2 === 1 ? PLAYER_COLORS[player1Color] : PLAYER_COLORS[player2Color];
+            const playerColor =
+              line.player === 1
+                ? PLAYER_COLORS[player1Color]
+                : PLAYER_COLORS[player2Color];
 
             return (
               <path

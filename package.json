@@ -10,7 +10,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "release": "turbo run build && changeset publish",
+    "precommit": "pnpm run format && pnpm run lint && pnpm run test"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
