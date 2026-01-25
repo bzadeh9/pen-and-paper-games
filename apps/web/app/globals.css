@@ -39,8 +39,15 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+/* Dark mode */
+.dark {
+  --background: var(--ink-black);
+  --foreground: var(--alabaster-grey);
+}
+
+/* System preference dark mode */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: var(--ink-black);
     --foreground: var(--alabaster-grey);
   }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center bg-background p-4">
       <main className="w-full max-w-4xl text-center">
         <h1 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl">
           Pen & Paper Games

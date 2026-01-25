@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
 import { PlayerColor } from '@/lib/games/hold-the-line/types';
@@ -33,7 +32,7 @@ export default function HoldTheLinePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-background p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -83,16 +82,6 @@ export default function HoldTheLinePage() {
               onColorChange={setPlayer2Color}
             />
           </div>
-        </div>
-
-        {/* Back to home */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/"
-            className="inline-block rounded-lg border border-foreground/20 px-6 py-2 transition-colors hover:bg-foreground/10"
-          >
-            ← Back to Home
-          </Link>
         </div>
       </div>
 
