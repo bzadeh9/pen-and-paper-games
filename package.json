@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prettify": "prettier --write .",
+    "test": "vitest",
+    "precommit": "pnpm run lint && pnpm run prettify && pnpm run test"
   },
   "dependencies": {
     "next": "16.1.1",
