@@ -263,9 +263,9 @@ export class HoldTheLineEngine {
     const nextPlayerValidMoves = this.getValidMoves();
 
     if (nextPlayerValidMoves.length === 0) {
-      // No valid moves left - current player loses (misere play)
+      // No valid moves left - current player wins (normal play)
       this.state.status = 'ended';
-      this.state.winner = this.state.currentPlayer === 1 ? 2 : 1;
+      this.state.winner = this.state.currentPlayer;
     } else {
       // Switch to next player
       this.state.currentPlayer = this.state.currentPlayer === 1 ? 2 : 1;

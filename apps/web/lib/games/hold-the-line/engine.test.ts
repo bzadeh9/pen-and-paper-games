@@ -138,7 +138,7 @@ describe('HoldTheLineEngine', () => {
     });
   });
 
-  describe('winning condition (misere play)', () => {
+  describe('winning condition (normal play)', () => {
     beforeEach(() => {
       // Start the game
       engine.startGame();
@@ -164,7 +164,7 @@ describe('HoldTheLineEngine', () => {
       expect(finalState.winner).not.toBeNull();
     });
 
-    it('should declare the other player as winner (misere)', () => {
+    it('should declare the last player as winner (normal play)', () => {
       // Simulate a game where player 1 makes the last move
       engine.makeMove({ row: 0, col: 0 }); // Player 1
 
@@ -180,10 +180,9 @@ describe('HoldTheLineEngine', () => {
 
       const finalState = engine.getState();
       if (finalState.status === 'ended') {
-        // The player who made the last move should be the loser
-        // So the winner should be the opposite player
+        // The player who made the last move should be the winner
         const lastMovePlayer = currentPlayer;
-        const expectedWinner = lastMovePlayer === 1 ? 2 : 1;
+        const expectedWinner = lastMovePlayer;
         expect(finalState.winner).toBe(expectedWinner);
       }
     });

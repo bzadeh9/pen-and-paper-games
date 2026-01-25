@@ -6,11 +6,11 @@ A collection of classic pen and paper games, re-imagined for the web.
 
 ### Hold the Line
 
-"Connect the dots, but don't make the last move!"
+"Connect the dots, and be the last one to move!"
 
 **How to Play:**
 
-1.  **Objective:** The player who makes the last legal move **LOSES** (Misère play). To win, you must force your opponent into a position where they cannot make a valid move.
+1.  **Objective:** The player who makes the last legal move **WINS** (Normal play). If you cannot make a legal move on your turn, you lose.
 2.  **Setup:** Choose grid size (default 4x4, up to 10x10). Click "Start Game".
 3.  **Moves:**
     - Players take turns drawing lines between adjacent dots (horizontal, vertical, or diagonal).

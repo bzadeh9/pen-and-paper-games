@@ -56,7 +56,7 @@ export default function HoldTheLinePage() {
             Hold The Line
           </h1>
           <p className="text-lg text-foreground/60">
-            Connect the dots, but don&apos;t make the last move!
+            Connect the dots, and be the last one to move!
           </p>
         </div>
 
@@ -86,8 +86,8 @@ export default function HoldTheLinePage() {
                 </li>
                 <li>• You cannot visit a dot that has already been used</li>
                 <li>
-                  • The player who makes the last move <strong>LOSES</strong>{' '}
-                  (Misère play)
+                  • The player who makes the last legal move{' '}
+                  <strong>WINS</strong> (Normal play)
                 </li>
               </ul>
             </div>
