@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   HoldTheLineEngine,
   Position,
@@ -27,7 +27,8 @@ export function GameBoard({
   onGameEnd,
   onGameStateChange,
 }: GameBoardProps) {
-  const [engine] = useState(() => new HoldTheLineEngine(gridSize));
+  // Memoize engine creation based on gridSize - only recreates when gridSize changes
+  const engine = useMemo(() => new HoldTheLineEngine(gridSize), [gridSize]);
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -47,18 +48,10 @@ export function GameBoard({
     return offsets;
   });
 
-  // Handle grid size changes
+  // Sync game state when engine changes
   useEffect(() => {
-    if (gameState.gridSize !== gridSize) {
-      try {
-        engine.setGridSize(gridSize);
-        setGameState(engine.getState());
-      } catch (error) {
-        // Grid size can only change during setup
-        console.error('Cannot change grid size:', error);
-      }
-    }
-  }, [gridSize, gameState.gridSize, engine]);
+    setGameState(engine.getState());
+  }, [engine]);
 
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {

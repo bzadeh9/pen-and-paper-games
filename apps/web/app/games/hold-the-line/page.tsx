@@ -26,7 +26,7 @@ export default function HoldTheLinePage() {
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState(4);
-  const [gameStarted, setGameStarted] = useState(false);
+  const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>('setup');
   const [stats, setStats] = useState(() => getGameStatistics());
   
   // Use media query to detect mobile
@@ -111,7 +111,7 @@ export default function HoldTheLinePage() {
                   <GridSizeSelector
                     gridSize={gridSize}
                     onGridSizeChange={setGridSize}
-                    disabled={gameStarted}
+                    disabled={gameStatus !== 'setup'}
                   />
                 </div>
               </CollapsibleContent>
@@ -179,6 +179,7 @@ export default function HoldTheLinePage() {
               player2Name={player2Name}
               gridSize={gridSize}
               onGameEnd={handleGameEnd}
+              onGameStateChange={setGameStatus}
             />
           </div>
 
