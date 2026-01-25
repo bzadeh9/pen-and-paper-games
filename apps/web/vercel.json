@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "cd ../.. && pnpm turbo run build --filter=@pen-and-paper-games/web",
   "devCommand": "pnpm dev",
-  "installCommand": "corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm install",
+  "installCommand": "npm install -g pnpm@9.15.4 && pnpm install",
   "framework": "nextjs",
   "outputDirectory": ".next"
 }
