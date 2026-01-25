@@ -392,18 +392,6 @@ export function GameBoard({
 
               return (
                 <g key={`dot-${row}-${col}`}>
-                  {/* Highlight valid moves */}
-                  {valid && !visited && gameState.status === 'playing' && (
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r={DOT_SIZE + 6}
-                      fill={currentPlayerColor}
-                      opacity={hovered ? 0.4 : 0.2}
-                      className="transition-opacity"
-                    />
-                  )}
-
                   {/* The dot itself - using neutral color consistently */}
                   <circle
                     cx={x}
@@ -430,6 +418,19 @@ export function GameBoard({
                           : 'none',
                     }}
                   />
+
+                  {/* Highlight valid moves - drawn after dot so it doesn't block clicks */}
+                  {valid && !visited && gameState.status === 'playing' && (
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r={DOT_SIZE + 6}
+                      fill={currentPlayerColor}
+                      opacity={hovered ? 0.4 : 0.2}
+                      className="transition-opacity"
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
 
                   {/* Show move order number on visited dots */}
                   {visited && (
