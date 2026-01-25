@@ -34,8 +34,7 @@ export function Collapsible({
   className,
   ...props
 }: CollapsibleProps) {
-  const [uncontrolledOpen, setUncontrolledOpen] =
-    React.useState(defaultOpen);
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : uncontrolledOpen;
@@ -51,7 +50,9 @@ export function Collapsible({
   );
 
   return (
-    <CollapsibleContext.Provider value={{ open, onOpenChange: handleOpenChange }}>
+    <CollapsibleContext.Provider
+      value={{ open, onOpenChange: handleOpenChange }}
+    >
       <div className={cn(className)} {...props}>
         {children}
       </div>

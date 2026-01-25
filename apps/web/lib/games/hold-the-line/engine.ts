@@ -2,6 +2,10 @@ export type Position = { row: number; col: number };
 export type Player = 1 | 2;
 export type GameStatus = 'setup' | 'playing' | 'ended';
 
+// Grid size constraints to prevent impractical grids and ensure playability
+export const MIN_GRID_SIZE = 3;
+export const MAX_GRID_SIZE = 10;
+
 export interface GameState {
   gridSize: number;
   visitedDots: Set<string>;
@@ -11,16 +15,20 @@ export interface GameState {
   winner: Player | null;
   moveHistory: Position[];
   lines: { start: Position; end: Position; player: Player }[];
-  player1Ready: boolean;
-  player2Ready: boolean;
 }
 
 export class HoldTheLineEngine {
   private state: GameState;
 
   constructor(gridSize: number = 4) {
+    // Validate and clamp grid size to prevent impractical grids
+    const validatedGridSize = Math.max(
+      MIN_GRID_SIZE,
+      Math.min(MAX_GRID_SIZE, gridSize)
+    );
+
     this.state = {
-      gridSize,
+      gridSize: validatedGridSize,
       visitedDots: new Set<string>(),
       pathEnds: null,
       currentPlayer: 1,
@@ -28,8 +36,6 @@ export class HoldTheLineEngine {
       winner: null,
       moveHistory: [],
       lines: [],
-      player1Ready: false,
-      player2Ready: false,
     };
   }
 
@@ -164,39 +170,28 @@ export class HoldTheLineEngine {
     }
 
     // Check for line intersection
-    // If adjacent to both ends, check both possible connections
-    // If adjacent to only one end, check that connection
+    // If adjacent to both ends, check valid connections to either
+    // A move is valid if it can connect to AT LEAST one end without intersection
+    let validConnection1 = false;
     if (adjacentToEnd1) {
-      if (this.wouldIntersectExistingLines(this.state.pathEnds[0], pos)) {
-        return false;
+      if (!this.wouldIntersectExistingLines(this.state.pathEnds[0], pos)) {
+        validConnection1 = true;
       }
     }
 
+    let validConnection2 = false;
     if (adjacentToEnd2) {
-      if (this.wouldIntersectExistingLines(this.state.pathEnds[1], pos)) {
-        return false;
+      if (!this.wouldIntersectExistingLines(this.state.pathEnds[1], pos)) {
+        validConnection2 = true;
       }
     }
 
-    return true;
+    return validConnection1 || validConnection2;
   }
 
-  setPlayerReady(player: Player): void {
+  startGame(): void {
     if (this.state.status !== 'setup') return;
-    if (player !== 1 && player !== 2) {
-      throw new Error('Player must be 1 or 2');
-    }
-
-    if (player === 1) {
-      this.state.player1Ready = true;
-    } else {
-      this.state.player2Ready = true;
-    }
-
-    // Start the game when both players are ready
-    if (this.state.player1Ready && this.state.player2Ready) {
-      this.state.status = 'playing';
-    }
+    this.state.status = 'playing';
   }
 
   getValidMoves(): Position[] {
@@ -231,11 +226,25 @@ export class HoldTheLineEngine {
 
       let connectedEnd: Position | null = null;
 
-      if (this.isAdjacent(pos, end1)) {
+      // Check which connections are valid (non-intersecting)
+      const adjacentToEnd1 = this.isAdjacent(pos, end1);
+      const adjacentToEnd2 = this.isAdjacent(pos, end2);
+
+      let canConnectToEnd1 = false;
+      if (adjacentToEnd1) {
+        canConnectToEnd1 = !this.wouldIntersectExistingLines(end1, pos);
+      }
+
+      let canConnectToEnd2 = false;
+      if (adjacentToEnd2) {
+        canConnectToEnd2 = !this.wouldIntersectExistingLines(end2, pos);
+      }
+
+      if (canConnectToEnd1) {
         // Replace end1 with the new position
         this.state.pathEnds = [pos, end2];
         connectedEnd = end1;
-      } else if (this.isAdjacent(pos, end2)) {
+      } else if (canConnectToEnd2) {
         // Replace end2 with the new position
         this.state.pathEnds = [end1, pos];
         connectedEnd = end2;
@@ -254,12 +263,22 @@ export class HoldTheLineEngine {
     const nextPlayerValidMoves = this.getValidMoves();
 
     if (nextPlayerValidMoves.length === 0) {
-      // No valid moves left - current player loses (misere play)
-      this.state.status = 'ended';
-      this.state.winner = this.state.currentPlayer === 1 ? 2 : 1;
+      if (this.state.lines.length === 0) {
+        // Edge case: No valid moves after first dot placement (should be impossible with grid >= 3x3)
+        // But if impossible, the game is ended
+        this.state.status = 'ended';
+        this.state.winner = this.state.currentPlayer === 1 ? 2 : 1; // Current player loses if they can't even start
+      } else {
+        // No valid moves left - current player wins (normal play)
+        this.state.status = 'ended';
+        this.state.winner = this.state.currentPlayer;
+      }
     } else {
-      // Switch to next player
-      this.state.currentPlayer = this.state.currentPlayer === 1 ? 2 : 1;
+      // Switch to next player ONLY if a line was created or we just finished a turn that involved lines
+      // If we just placed the FIRST dot (no lines yet), we stay on the current player
+      if (this.state.lines.length > 0) {
+        this.state.currentPlayer = this.state.currentPlayer === 1 ? 2 : 1;
+      }
     }
 
     return true;
@@ -275,8 +294,31 @@ export class HoldTheLineEngine {
       winner: null,
       moveHistory: [],
       lines: [],
-      player1Ready: false,
-      player2Ready: false,
+    };
+  }
+
+  setGridSize(gridSize: number): void {
+    // Only allow changing grid size during setup
+    if (this.state.status !== 'setup') {
+      throw new Error('Grid size can only be changed during setup phase');
+    }
+
+    // Validate and clamp grid size
+    const validatedGridSize = Math.max(
+      MIN_GRID_SIZE,
+      Math.min(MAX_GRID_SIZE, gridSize)
+    );
+
+    // Reset the game with new grid size
+    this.state = {
+      gridSize: validatedGridSize,
+      visitedDots: new Set<string>(),
+      pathEnds: null,
+      currentPlayer: 1,
+      status: 'setup',
+      winner: null,
+      moveHistory: [],
+      lines: [],
     };
   }
 }

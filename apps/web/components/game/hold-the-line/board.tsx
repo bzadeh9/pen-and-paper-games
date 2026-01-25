@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   HoldTheLineEngine,
   Position,
@@ -13,7 +13,9 @@ interface GameBoardProps {
   player2Color: PlayerColor;
   player1Name?: string;
   player2Name?: string;
+  gridSize?: number;
   onGameEnd?: (winner: Player) => void;
+  onGameStateChange?: (status: 'setup' | 'playing' | 'ended') => void;
 }
 
 export function GameBoard({
@@ -21,30 +23,44 @@ export function GameBoard({
   player2Color,
   player1Name = 'Player 1',
   player2Name = 'Player 2',
+  gridSize = 4,
   onGameEnd,
+  onGameStateChange,
 }: GameBoardProps) {
-  const [engine] = useState(() => new HoldTheLineEngine(4));
+  // Memoize engine creation based on gridSize - only recreates when gridSize changes
+  const engine = useMemo(() => new HoldTheLineEngine(gridSize), [gridSize]);
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Generate offsets dynamically based on max possible grid size
   const [pathOffsets] = useState(() => {
     // Precompute random offsets for hand-drawn effect
     // Using small offsets to prevent visual intersections
     const offsets: Record<string, { x: number; y: number }> = {};
-    for (let i = 0; i < 16; i++) {
+    // Max possible lines in a 10x10 grid would be 100 (very conservative estimate)
+    for (let i = 0; i < 200; i++) {
       offsets[i] = {
-        x: (Math.random() - 0.5) * 0.5, // Reduced from 3 to 0.5 pixels
-        y: (Math.random() - 0.5) * 0.5, // Reduced from 3 to 0.5 pixels
+        x: (Math.random() - 0.5) * 0.5,
+        y: (Math.random() - 0.5) * 0.5,
       };
     }
     return offsets;
   });
 
+  // Sync game state when engine changes
+  useEffect(() => {
+    setGameState(engine.getState());
+  }, [engine]);
+
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
       onGameEnd(gameState.winner);
     }
-  }, [gameState.status, gameState.winner, onGameEnd]);
+    if (onGameStateChange) {
+      onGameStateChange(gameState.status);
+    }
+  }, [gameState.status, gameState.winner, onGameEnd, onGameStateChange]);
 
   // Clear error message after 3 seconds
   useEffect(() => {
@@ -58,7 +74,7 @@ export function GameBoard({
 
   const handleDotClick = (pos: Position) => {
     if (gameState.status !== 'playing') return;
-    
+
     if (!engine.isValidMove(pos)) {
       // Provide feedback for invalid move
       // Note: Move can be invalid for multiple reasons (not adjacent, already visited, or would intersect)
@@ -71,11 +87,6 @@ export function GameBoard({
       setErrorMessage(null); // Clear any previous error
       playSound();
     }
-  };
-
-  const handlePlayerReady = (player: Player) => {
-    engine.setPlayerReady(player);
-    setGameState(engine.getState());
   };
 
   const playSound = () => {
@@ -119,16 +130,22 @@ export function GameBoard({
   const isValidMove = (pos: Position) =>
     validMoves.some((move) => move.row === pos.row && move.col === pos.col);
 
+  // Current player's color for turn indicator
   const currentPlayerColor =
     gameState.currentPlayer === 1
       ? PLAYER_COLORS[player1Color]
       : PLAYER_COLORS[player2Color];
 
+  // Use a consistent neutral color for the grid, not changing with turns
+  const NEUTRAL_DOT_COLOR = 'currentColor';
+
   const DOT_SIZE = 12;
-  const GRID_SPACING = 80;
+  // Make grid spacing responsive - smaller spacing for larger grids
+  const GRID_SPACING =
+    gameState.gridSize <= 5 ? 80 : gameState.gridSize <= 7 ? 60 : 50;
   const PADDING = 40;
-  const SVG_WIDTH = GRID_SPACING * 3 + PADDING * 2;
-  const SVG_HEIGHT = GRID_SPACING * 3 + PADDING * 2;
+  const SVG_WIDTH = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
+  const SVG_HEIGHT = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
 
   const getDotPosition = (row: number, col: number) => ({
     x: PADDING + col * GRID_SPACING,
@@ -138,6 +155,49 @@ export function GameBoard({
   const positionKey = (pos: Position) => `${pos.row},${pos.col}`;
   const isVisited = (pos: Position) =>
     gameState.visitedDots.has(positionKey(pos));
+
+  // Helper function to find which path end a move would connect to
+  const getConnectedPathEnd = (pos: Position): Position | null => {
+    if (!gameState.pathEnds || !isValidMove(pos)) return null;
+
+    const [end1, end2] = gameState.pathEnds;
+    const rowDiff1 = Math.abs(pos.row - end1.row);
+    const colDiff1 = Math.abs(pos.col - end1.col);
+    const rowDiff2 = Math.abs(pos.row - end2.row);
+    const colDiff2 = Math.abs(pos.col - end2.col);
+
+    // Check adjacency to end1
+    if (rowDiff1 <= 1 && colDiff1 <= 1 && (rowDiff1 > 0 || colDiff1 > 0)) {
+      return end1;
+    }
+
+    // Check adjacency to end2
+    if (rowDiff2 <= 1 && colDiff2 <= 1 && (rowDiff2 > 0 || colDiff2 > 0)) {
+      return end2;
+    }
+
+    return null;
+  };
+
+  // Memoize hover preview line data
+  const hoverPreviewLine = useMemo(() => {
+    if (
+      !hoveredDot ||
+      gameState.status !== 'playing' ||
+      !isValidMove(hoveredDot) ||
+      isVisited(hoveredDot)
+    ) {
+      return null;
+    }
+
+    const connectedEnd = getConnectedPathEnd(hoveredDot);
+    if (!connectedEnd) return null;
+
+    return {
+      start: getDotPosition(connectedEnd.row, connectedEnd.col),
+      end: getDotPosition(hoveredDot.row, hoveredDot.col),
+    };
+  }, [hoveredDot, gameState.status, gameState.pathEnds, validMoves]);
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -152,36 +212,20 @@ export function GameBoard({
         </div>
       )}
 
-      {/* Setup phase - Ready buttons */}
+      {/* Setup phase - Start Game button */}
       {gameState.status === 'setup' && (
         <div className="text-center">
-          <p className="mb-4 text-lg font-semibold">Get Ready to Play!</p>
-          <div className="flex gap-4">
-            <button
-              onClick={() => handlePlayerReady(1)}
-              disabled={gameState.player1Ready}
-              className={`rounded-lg px-6 py-3 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                gameState.player1Ready
-                  ? 'cursor-not-allowed bg-green-600 text-white'
-                  : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
-              }`}
-              aria-label={gameState.player1Ready ? `${player1Name} is ready` : `${player1Name} ready button`}
-            >
-              {gameState.player1Ready ? `✓ ${player1Name} Ready` : `${player1Name} Ready`}
-            </button>
-            <button
-              onClick={() => handlePlayerReady(2)}
-              disabled={gameState.player2Ready}
-              className={`rounded-lg px-6 py-3 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                gameState.player2Ready
-                  ? 'cursor-not-allowed bg-green-600 text-white'
-                  : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
-              }`}
-              aria-label={gameState.player2Ready ? `${player2Name} is ready` : `${player2Name} ready button`}
-            >
-              {gameState.player2Ready ? `✓ ${player2Name} Ready` : `${player2Name} Ready`}
-            </button>
-          </div>
+          <p className="mb-4 text-lg font-semibold">Ready to Play?</p>
+          <button
+            onClick={() => {
+              engine.startGame();
+              setGameState(engine.getState());
+            }}
+            className="rounded-lg bg-foreground px-8 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+            aria-label="Start Game"
+          >
+            Start Game
+          </button>
         </div>
       )}
 
@@ -190,7 +234,8 @@ export function GameBoard({
         <div className="text-center">
           <div className="flex flex-col gap-2">
             <p className="text-lg font-semibold">
-              {gameState.currentPlayer === 1 ? player1Name : player2Name}&apos;s Turn
+              {gameState.currentPlayer === 1 ? player1Name : player2Name}&apos;s
+              Turn
             </p>
             <div
               className="mx-auto h-4 w-4 rounded-full"
@@ -212,7 +257,8 @@ export function GameBoard({
             Game Over!
           </p>
           <p className="text-lg text-green-700 dark:text-green-300">
-            {gameState.winner === 1 ? player1Name : player2Name} Wins! Well done!
+            {gameState.winner === 1 ? player1Name : player2Name} Wins! Well
+            done!
           </p>
           <div
             className="mx-auto mt-2 h-4 w-4 rounded-full"
@@ -236,9 +282,9 @@ export function GameBoard({
           style={{ touchAction: 'none' }}
         >
           {/* Draw grid lines (faint) */}
-          {Array.from({ length: 4 }).map((_, row) => (
+          {Array.from({ length: gameState.gridSize }).map((_, row) => (
             <React.Fragment key={`grid-row-${row}`}>
-              {Array.from({ length: 3 }).map((_, col) => {
+              {Array.from({ length: gameState.gridSize - 1 }).map((_, col) => {
                 const start = getDotPosition(row, col);
                 const end = getDotPosition(row, col + 1);
                 return (
@@ -256,9 +302,9 @@ export function GameBoard({
               })}
             </React.Fragment>
           ))}
-          {Array.from({ length: 4 }).map((_, col) => (
+          {Array.from({ length: gameState.gridSize }).map((_, col) => (
             <React.Fragment key={`grid-col-${col}`}>
-              {Array.from({ length: 3 }).map((_, row) => {
+              {Array.from({ length: gameState.gridSize - 1 }).map((_, row) => {
                 const start = getDotPosition(row, col);
                 const end = getDotPosition(row + 1, col);
                 return (
@@ -305,9 +351,25 @@ export function GameBoard({
             );
           })}
 
+          {/* Draw hover preview line (dashed) */}
+          {hoverPreviewLine && (
+            <line
+              key="hover-preview"
+              x1={hoverPreviewLine.start.x}
+              y1={hoverPreviewLine.start.y}
+              x2={hoverPreviewLine.end.x}
+              y2={hoverPreviewLine.end.y}
+              stroke={currentPlayerColor}
+              strokeWidth="2"
+              strokeDasharray="5,5"
+              opacity="0.5"
+              strokeLinecap="round"
+            />
+          )}
+
           {/* Draw dots */}
-          {Array.from({ length: 4 }).map((_, row) =>
-            Array.from({ length: 4 }).map((_, col) => {
+          {Array.from({ length: gameState.gridSize }).map((_, row) =>
+            Array.from({ length: gameState.gridSize }).map((_, col) => {
               const pos = { row, col };
               const { x, y } = getDotPosition(row, col);
               const visited = isVisited(pos);
@@ -317,24 +379,12 @@ export function GameBoard({
 
               return (
                 <g key={`dot-${row}-${col}`}>
-                  {/* Highlight valid moves */}
-                  {valid && !visited && gameState.status === 'playing' && (
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r={DOT_SIZE + 6}
-                      fill={currentPlayerColor}
-                      opacity={hovered ? 0.4 : 0.2}
-                      className="transition-opacity"
-                    />
-                  )}
-
-                  {/* The dot itself */}
+                  {/* The dot itself - using neutral color consistently */}
                   <circle
                     cx={x}
                     cy={y}
                     r={DOT_SIZE}
-                    fill={visited ? currentPlayerColor : 'currentColor'}
+                    fill={NEUTRAL_DOT_COLOR}
                     opacity={visited ? 0.8 : 0.5}
                     className={`transition-all ${
                       valid && !visited && gameState.status === 'playing'
@@ -355,6 +405,19 @@ export function GameBoard({
                           : 'none',
                     }}
                   />
+
+                  {/* Highlight valid moves - drawn after dot so it doesn't block clicks */}
+                  {valid && !visited && gameState.status === 'playing' && (
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r={DOT_SIZE + 6}
+                      fill={currentPlayerColor}
+                      opacity={hovered ? 0.4 : 0.2}
+                      className="transition-opacity"
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
 
                   {/* Show move order number on visited dots */}
                   {visited && (

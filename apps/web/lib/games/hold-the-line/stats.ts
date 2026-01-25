@@ -49,7 +49,7 @@ export function saveGameStatistics(stats: GameStatistics): void {
 export function recordGame(winner: Player): GameStatistics {
   const stats = getGameStatistics();
   stats.totalGames += 1;
-  
+
   if (winner === 1) {
     stats.player1Wins += 1;
   } else {

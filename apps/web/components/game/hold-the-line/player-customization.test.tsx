@@ -12,9 +12,7 @@ describe('PlayerCustomization', () => {
   };
 
   it('should render player name', () => {
-    render(
-      <PlayerCustomization {...defaultProps} playerName="Test Player" />
-    );
+    render(<PlayerCustomization {...defaultProps} playerName="Test Player" />);
 
     expect(screen.getByText('Test Player')).toBeInTheDocument();
   });
@@ -36,7 +34,9 @@ describe('PlayerCustomization', () => {
       />
     );
 
-    const nameButton = screen.getByRole('button', { name: /Edit player 1 name/ });
+    const nameButton = screen.getByRole('button', {
+      name: /Edit player 1 name/,
+    });
     fireEvent.click(nameButton);
 
     const input = screen.getByRole('textbox');
@@ -63,7 +63,9 @@ describe('PlayerCustomization', () => {
       />
     );
 
-    const nameButton = screen.getByRole('button', { name: /Edit player 1 name/ });
+    const nameButton = screen.getByRole('button', {
+      name: /Edit player 1 name/,
+    });
     fireEvent.click(nameButton);
 
     const input = screen.getByDisplayValue('Player 1');
@@ -74,7 +76,9 @@ describe('PlayerCustomization', () => {
     expect(handleNameChange).not.toHaveBeenCalled();
 
     // Open editor again and try valid name
-    const nameButtonAgain = screen.getByRole('button', { name: /Edit player 1 name/ });
+    const nameButtonAgain = screen.getByRole('button', {
+      name: /Edit player 1 name/,
+    });
     fireEvent.click(nameButtonAgain);
     const inputAgain = screen.getByDisplayValue('Player 1');
     fireEvent.change(inputAgain, { target: { value: 'Bob' } });
@@ -93,7 +97,9 @@ describe('PlayerCustomization', () => {
       />
     );
 
-    const nameButton = screen.getByRole('button', { name: /Edit player 1 name/ });
+    const nameButton = screen.getByRole('button', {
+      name: /Edit player 1 name/,
+    });
     fireEvent.click(nameButton);
 
     const input = screen.getByRole('textbox');
@@ -110,11 +116,13 @@ describe('PlayerCustomization', () => {
 
     // Should have 5 color buttons (based on PLAYER_COLOR_OPTIONS)
     const colorButtons = screen.getAllByRole('button').filter((button) => {
-      return button.title?.includes('Alabaster') ||
+      return (
+        button.title?.includes('Alabaster') ||
         button.title?.includes('Powder') ||
         button.title?.includes('Pastel') ||
         button.title?.includes('Cherry') ||
-        button.title?.includes('Dusty');
+        button.title?.includes('Dusty')
+      );
     });
 
     expect(colorButtons.length).toBe(5);
@@ -178,10 +186,7 @@ describe('PlayerCustomization', () => {
 
   it('should show checkmark on selected color', () => {
     render(
-      <PlayerCustomization
-        {...defaultProps}
-        selectedColor="cherryBlossom"
-      />
+      <PlayerCustomization {...defaultProps} selectedColor="cherryBlossom" />
     );
 
     const cherryBlossomButton = screen.getByRole('button', {
@@ -221,9 +226,7 @@ describe('PlayerCustomization', () => {
   });
 
   it('should not show name edit UI when onNameChange is not provided', () => {
-    render(
-      <PlayerCustomization {...defaultProps} playerName="Player 1" />
-    );
+    render(<PlayerCustomization {...defaultProps} playerName="Player 1" />);
 
     const nameElement = screen.getByText('Player 1');
     // Should not have click handler attributes when onNameChange is not provided

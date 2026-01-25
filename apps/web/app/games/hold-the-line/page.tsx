@@ -4,6 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
 import { GameStats } from '@/components/game/hold-the-line/game-stats';
+import { GridSizeSelector } from '@/components/game/hold-the-line/grid-size-selector';
 import { PlayerColor } from '@/lib/games/hold-the-line/types';
 import { Player } from '@/lib/games/hold-the-line/engine';
 import {
@@ -24,8 +25,12 @@ export default function HoldTheLinePage() {
   const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
+  const [gridSize, setGridSize] = useState(4);
+  const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>(
+    'setup'
+  );
   const [stats, setStats] = useState(() => getGameStatistics());
-  
+
   // Use media query to detect mobile
   const isMobile = useMediaQuery('(max-width: 767px)');
 
@@ -51,7 +56,7 @@ export default function HoldTheLinePage() {
             Hold The Line
           </h1>
           <p className="text-lg text-foreground/60">
-            Connect the dots, but don&apos;t make the last move!
+            Connect the dots, and be the last one to move!
           </p>
         </div>
 
@@ -76,13 +81,13 @@ export default function HoldTheLinePage() {
                   (horizontal, vertical, or diagonal)
                 </li>
                 <li>
-                  • Each line must connect to one of the two ends of the existing
-                  path
+                  • Each line must connect to one of the two ends of the
+                  existing path
                 </li>
                 <li>• You cannot visit a dot that has already been used</li>
                 <li>
-                  • The player who makes the last move <strong>LOSES</strong>{' '}
-                  (Misère play)
+                  • The player who makes the last legal move{' '}
+                  <strong>WINS</strong> (Normal play)
                 </li>
               </ul>
             </div>
@@ -91,8 +96,30 @@ export default function HoldTheLinePage() {
 
         {/* Main game area */}
         <div className="grid gap-6 md:grid-cols-[1fr_2fr_1fr]">
-          {/* Player 1 customization */}
+          {/* Left pane: Player options and settings */}
           <div className="flex flex-col gap-4">
+            {/* Grid Size Selector */}
+            <Collapsible
+              defaultOpen={!isMobile}
+              className="rounded-lg border border-foreground/20 bg-background"
+            >
+              <div className="px-4 pt-4 pb-2">
+                <CollapsibleTrigger>
+                  <h3 className="text-lg font-semibold">Grid Size</h3>
+                </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent>
+                <div className="px-4 pb-4">
+                  <GridSizeSelector
+                    gridSize={gridSize}
+                    onGridSizeChange={setGridSize}
+                    disabled={gameStatus !== 'setup'}
+                  />
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+
+            {/* Player 1 customization */}
             <Collapsible
               defaultOpen={!isMobile}
               className="rounded-lg border border-foreground/20 bg-background"
@@ -100,7 +127,7 @@ export default function HoldTheLinePage() {
               <div className="px-4 pt-4 pb-2">
                 <CollapsibleTrigger>
                   <h3 className="text-lg font-semibold">
-                    Choose {player1Name} Colour
+                    {player1Name} Options
                   </h3>
                 </CollapsibleTrigger>
               </div>
@@ -117,21 +144,8 @@ export default function HoldTheLinePage() {
                 </div>
               </CollapsibleContent>
             </Collapsible>
-          </div>
 
-          {/* Game board */}
-          <div className="flex items-center justify-center">
-            <GameBoard
-              player1Color={player1Color}
-              player2Color={player2Color}
-              player1Name={player1Name}
-              player2Name={player2Name}
-              onGameEnd={handleGameEnd}
-            />
-          </div>
-
-          {/* Player 2 customization and stats */}
-          <div className="flex flex-col gap-4">
+            {/* Player 2 customization */}
             <Collapsible
               defaultOpen={!isMobile}
               className="rounded-lg border border-foreground/20 bg-background"
@@ -139,7 +153,7 @@ export default function HoldTheLinePage() {
               <div className="px-4 pt-4 pb-2">
                 <CollapsibleTrigger>
                   <h3 className="text-lg font-semibold">
-                    Choose {player2Name} Colour
+                    {player2Name} Options
                   </h3>
                 </CollapsibleTrigger>
               </div>
@@ -156,7 +170,30 @@ export default function HoldTheLinePage() {
                 </div>
               </CollapsibleContent>
             </Collapsible>
-            <GameStats stats={stats} player1Name={player1Name} player2Name={player2Name} onReset={handleResetStats} />
+          </div>
+
+          {/* Center: Game board */}
+          <div className="flex items-center justify-center">
+            <GameBoard
+              player1Color={player1Color}
+              player2Color={player2Color}
+              player1Name={player1Name}
+              player2Name={player2Name}
+              gridSize={gridSize}
+              onGameEnd={handleGameEnd}
+              onGameStateChange={setGameStatus}
+            />
+          </div>
+
+          {/* Right pane: Game over message (when ended) and stats */}
+          <div className="flex flex-col gap-4">
+            {/* Game over message will be rendered by the board component but we keep stats here */}
+            <GameStats
+              stats={stats}
+              player1Name={player1Name}
+              player2Name={player2Name}
+              onReset={handleResetStats}
+            />
           </div>
         </div>
       </div>
