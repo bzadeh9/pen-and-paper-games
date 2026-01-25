@@ -156,7 +156,7 @@ export default function HoldTheLinePage() {
                 </div>
               </CollapsibleContent>
             </Collapsible>
-            <GameStats stats={stats} onReset={handleResetStats} />
+            <GameStats stats={stats} player1Name={player1Name} player2Name={player2Name} onReset={handleResetStats} />
           </div>
         </div>
       </div>

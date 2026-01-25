@@ -165,9 +165,9 @@ export function GameBoard({
                   ? 'cursor-not-allowed bg-green-600 text-white'
                   : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
               }`}
-              aria-label={gameState.player1Ready ? 'Player 1 is ready' : 'Player 1 ready button'}
+              aria-label={gameState.player1Ready ? `${player1Name} is ready` : `${player1Name} ready button`}
             >
-              {gameState.player1Ready ? '✓ Player 1 Ready' : 'Player 1 Ready'}
+              {gameState.player1Ready ? `✓ ${player1Name} Ready` : `${player1Name} Ready`}
             </button>
             <button
               onClick={() => handlePlayerReady(2)}
@@ -177,9 +177,9 @@ export function GameBoard({
                   ? 'cursor-not-allowed bg-green-600 text-white'
                   : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
               }`}
-              aria-label={gameState.player2Ready ? 'Player 2 is ready' : 'Player 2 ready button'}
+              aria-label={gameState.player2Ready ? `${player2Name} is ready` : `${player2Name} ready button`}
             >
-              {gameState.player2Ready ? '✓ Player 2 Ready' : 'Player 2 Ready'}
+              {gameState.player2Ready ? `✓ ${player2Name} Ready` : `${player2Name} Ready`}
             </button>
           </div>
         </div>
