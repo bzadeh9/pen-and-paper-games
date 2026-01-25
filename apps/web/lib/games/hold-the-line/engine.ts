@@ -309,8 +309,6 @@ export class HoldTheLineEngine {
       winner: null,
       moveHistory: [],
       lines: [],
-      player1Ready: false,
-      player2Ready: false,
     };
   }
 }
