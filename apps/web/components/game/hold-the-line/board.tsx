@@ -145,7 +145,8 @@ export function GameBoard({
   const NEUTRAL_DOT_COLOR = 'currentColor';
 
   const DOT_SIZE = 12;
-  const GRID_SPACING = 60; // Slightly smaller to fit larger grids better
+  // Make grid spacing responsive - smaller spacing for larger grids
+  const GRID_SPACING = gameState.gridSize <= 5 ? 80 : gameState.gridSize <= 7 ? 60 : 50;
   const PADDING = 40;
   const SVG_WIDTH = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
   const SVG_HEIGHT = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
@@ -181,6 +182,21 @@ export function GameBoard({
     
     return null;
   };
+
+  // Memoize hover preview line data
+  const hoverPreviewLine = useMemo(() => {
+    if (!hoveredDot || gameState.status !== 'playing' || !isValidMove(hoveredDot) || isVisited(hoveredDot)) {
+      return null;
+    }
+    
+    const connectedEnd = getConnectedPathEnd(hoveredDot);
+    if (!connectedEnd) return null;
+    
+    return {
+      start: getDotPosition(connectedEnd.row, connectedEnd.col),
+      end: getDotPosition(hoveredDot.row, hoveredDot.col),
+    };
+  }, [hoveredDot, gameState.status, gameState.pathEnds, validMoves]);
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -349,28 +365,20 @@ export function GameBoard({
           })}
 
           {/* Draw hover preview line (dashed) */}
-          {hoveredDot && gameState.status === 'playing' && isValidMove(hoveredDot) && !isVisited(hoveredDot) && (() => {
-            const connectedEnd = getConnectedPathEnd(hoveredDot);
-            if (!connectedEnd) return null;
-            
-            const start = getDotPosition(connectedEnd.row, connectedEnd.col);
-            const end = getDotPosition(hoveredDot.row, hoveredDot.col);
-            
-            return (
-              <line
-                key="hover-preview"
-                x1={start.x}
-                y1={start.y}
-                x2={end.x}
-                y2={end.y}
-                stroke={currentPlayerColor}
-                strokeWidth="2"
-                strokeDasharray="5,5"
-                opacity="0.5"
-                strokeLinecap="round"
-              />
-            );
-          })()}
+          {hoverPreviewLine && (
+            <line
+              key="hover-preview"
+              x1={hoverPreviewLine.start.x}
+              y1={hoverPreviewLine.start.y}
+              x2={hoverPreviewLine.end.x}
+              y2={hoverPreviewLine.end.y}
+              stroke={currentPlayerColor}
+              strokeWidth="2"
+              strokeDasharray="5,5"
+              opacity="0.5"
+              strokeLinecap="round"
+            />
+          )}
 
           {/* Draw dots */}
           {Array.from({ length: gameState.gridSize }).map((_, row) =>
