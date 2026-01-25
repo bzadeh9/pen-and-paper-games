@@ -16,7 +16,14 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-foreground/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <>
+      {/* Early Development Disclaimer Banner */}
+      <div className="w-full bg-cherry-blossom/20 py-2 text-center">
+        <p className="text-sm font-medium text-foreground/80">
+          ⚠️ We&apos;re still developing this, we&apos;re kids.
+        </p>
+      </div>
+      <header className="sticky top-0 z-50 w-full border-b border-foreground/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link
@@ -123,5 +130,6 @@ export function Header() {
         </div>
       )}
     </header>
+    </>
   );
 }

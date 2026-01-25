@@ -86,8 +86,8 @@ export default function HoldTheLinePage() {
                 </li>
                 <li>• You cannot visit a dot that has already been used</li>
                 <li>
-                  • The player who makes the last legal move{' '}
-                  <strong>WINS</strong> (Normal play)
+                  • The player who has no more legal moves left is the loser
+                  (the other player <strong>WINS</strong>)
                 </li>
               </ul>
             </div>
