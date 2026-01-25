@@ -13,7 +13,9 @@ interface GameBoardProps {
   player2Color: PlayerColor;
   player1Name?: string;
   player2Name?: string;
+  gridSize?: number;
   onGameEnd?: (winner: Player) => void;
+  onGameStateChange?: (status: 'setup' | 'playing' | 'ended') => void;
 }
 
 export function GameBoard({
@@ -21,30 +23,51 @@ export function GameBoard({
   player2Color,
   player1Name = 'Player 1',
   player2Name = 'Player 2',
+  gridSize = 4,
   onGameEnd,
+  onGameStateChange,
 }: GameBoardProps) {
-  const [engine] = useState(() => new HoldTheLineEngine(4));
+  const [engine] = useState(() => new HoldTheLineEngine(gridSize));
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  // Generate offsets dynamically based on max possible grid size
   const [pathOffsets] = useState(() => {
     // Precompute random offsets for hand-drawn effect
     // Using small offsets to prevent visual intersections
     const offsets: Record<string, { x: number; y: number }> = {};
-    for (let i = 0; i < 16; i++) {
+    // Max possible lines in a 10x10 grid would be 100 (very conservative estimate)
+    for (let i = 0; i < 200; i++) {
       offsets[i] = {
-        x: (Math.random() - 0.5) * 0.5, // Reduced from 3 to 0.5 pixels
-        y: (Math.random() - 0.5) * 0.5, // Reduced from 3 to 0.5 pixels
+        x: (Math.random() - 0.5) * 0.5,
+        y: (Math.random() - 0.5) * 0.5,
       };
     }
     return offsets;
   });
 
+  // Handle grid size changes
+  useEffect(() => {
+    if (gameState.gridSize !== gridSize) {
+      try {
+        engine.setGridSize(gridSize);
+        setGameState(engine.getState());
+      } catch (error) {
+        // Grid size can only change during setup
+        console.error('Cannot change grid size:', error);
+      }
+    }
+  }, [gridSize, gameState.gridSize, engine]);
+
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
       onGameEnd(gameState.winner);
     }
-  }, [gameState.status, gameState.winner, onGameEnd]);
+    if (onGameStateChange) {
+      onGameStateChange(gameState.status);
+    }
+  }, [gameState.status, gameState.winner, onGameEnd, onGameStateChange]);
 
   // Clear error message after 3 seconds
   useEffect(() => {
@@ -119,16 +142,20 @@ export function GameBoard({
   const isValidMove = (pos: Position) =>
     validMoves.some((move) => move.row === pos.row && move.col === pos.col);
 
+  // Current player's color for turn indicator
   const currentPlayerColor =
     gameState.currentPlayer === 1
       ? PLAYER_COLORS[player1Color]
       : PLAYER_COLORS[player2Color];
 
+  // Use a consistent neutral color for the grid, not changing with turns
+  const NEUTRAL_DOT_COLOR = 'currentColor';
+
   const DOT_SIZE = 12;
-  const GRID_SPACING = 80;
+  const GRID_SPACING = 60; // Slightly smaller to fit larger grids better
   const PADDING = 40;
-  const SVG_WIDTH = GRID_SPACING * 3 + PADDING * 2;
-  const SVG_HEIGHT = GRID_SPACING * 3 + PADDING * 2;
+  const SVG_WIDTH = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
+  const SVG_HEIGHT = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
 
   const getDotPosition = (row: number, col: number) => ({
     x: PADDING + col * GRID_SPACING,
@@ -138,6 +165,29 @@ export function GameBoard({
   const positionKey = (pos: Position) => `${pos.row},${pos.col}`;
   const isVisited = (pos: Position) =>
     gameState.visitedDots.has(positionKey(pos));
+  
+  // Helper function to find which path end a move would connect to
+  const getConnectedPathEnd = (pos: Position): Position | null => {
+    if (!gameState.pathEnds || !isValidMove(pos)) return null;
+    
+    const [end1, end2] = gameState.pathEnds;
+    const rowDiff1 = Math.abs(pos.row - end1.row);
+    const colDiff1 = Math.abs(pos.col - end1.col);
+    const rowDiff2 = Math.abs(pos.row - end2.row);
+    const colDiff2 = Math.abs(pos.col - end2.col);
+    
+    // Check adjacency to end1
+    if (rowDiff1 <= 1 && colDiff1 <= 1 && (rowDiff1 > 0 || colDiff1 > 0)) {
+      return end1;
+    }
+    
+    // Check adjacency to end2
+    if (rowDiff2 <= 1 && colDiff2 <= 1 && (rowDiff2 > 0 || colDiff2 > 0)) {
+      return end2;
+    }
+    
+    return null;
+  };
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -236,9 +286,9 @@ export function GameBoard({
           style={{ touchAction: 'none' }}
         >
           {/* Draw grid lines (faint) */}
-          {Array.from({ length: 4 }).map((_, row) => (
+          {Array.from({ length: gameState.gridSize }).map((_, row) => (
             <React.Fragment key={`grid-row-${row}`}>
-              {Array.from({ length: 3 }).map((_, col) => {
+              {Array.from({ length: gameState.gridSize - 1 }).map((_, col) => {
                 const start = getDotPosition(row, col);
                 const end = getDotPosition(row, col + 1);
                 return (
@@ -256,9 +306,9 @@ export function GameBoard({
               })}
             </React.Fragment>
           ))}
-          {Array.from({ length: 4 }).map((_, col) => (
+          {Array.from({ length: gameState.gridSize }).map((_, col) => (
             <React.Fragment key={`grid-col-${col}`}>
-              {Array.from({ length: 3 }).map((_, row) => {
+              {Array.from({ length: gameState.gridSize - 1 }).map((_, row) => {
                 const start = getDotPosition(row, col);
                 const end = getDotPosition(row + 1, col);
                 return (
@@ -305,9 +355,33 @@ export function GameBoard({
             );
           })}
 
+          {/* Draw hover preview line (dashed) */}
+          {hoveredDot && gameState.status === 'playing' && isValidMove(hoveredDot) && !isVisited(hoveredDot) && (() => {
+            const connectedEnd = getConnectedPathEnd(hoveredDot);
+            if (!connectedEnd) return null;
+            
+            const start = getDotPosition(connectedEnd.row, connectedEnd.col);
+            const end = getDotPosition(hoveredDot.row, hoveredDot.col);
+            
+            return (
+              <line
+                key="hover-preview"
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                stroke={currentPlayerColor}
+                strokeWidth="2"
+                strokeDasharray="5,5"
+                opacity="0.5"
+                strokeLinecap="round"
+              />
+            );
+          })()}
+
           {/* Draw dots */}
-          {Array.from({ length: 4 }).map((_, row) =>
-            Array.from({ length: 4 }).map((_, col) => {
+          {Array.from({ length: gameState.gridSize }).map((_, row) =>
+            Array.from({ length: gameState.gridSize }).map((_, col) => {
               const pos = { row, col };
               const { x, y } = getDotPosition(row, col);
               const visited = isVisited(pos);
@@ -329,12 +403,12 @@ export function GameBoard({
                     />
                   )}
 
-                  {/* The dot itself */}
+                  {/* The dot itself - using neutral color consistently */}
                   <circle
                     cx={x}
                     cy={y}
                     r={DOT_SIZE}
-                    fill={visited ? currentPlayerColor : 'currentColor'}
+                    fill={NEUTRAL_DOT_COLOR}
                     opacity={visited ? 0.8 : 0.5}
                     className={`transition-all ${
                       valid && !visited && gameState.status === 'playing'

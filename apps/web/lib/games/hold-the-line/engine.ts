@@ -2,6 +2,10 @@ export type Position = { row: number; col: number };
 export type Player = 1 | 2;
 export type GameStatus = 'setup' | 'playing' | 'ended';
 
+// Grid size constraints to prevent impractical grids and ensure playability
+export const MIN_GRID_SIZE = 3;
+export const MAX_GRID_SIZE = 10;
+
 export interface GameState {
   gridSize: number;
   visitedDots: Set<string>;
@@ -19,8 +23,11 @@ export class HoldTheLineEngine {
   private state: GameState;
 
   constructor(gridSize: number = 4) {
+    // Validate and clamp grid size to prevent impractical grids
+    const validatedGridSize = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, gridSize));
+    
     this.state = {
-      gridSize,
+      gridSize: validatedGridSize,
       visitedDots: new Set<string>(),
       pathEnds: null,
       currentPlayer: 1,
@@ -268,6 +275,30 @@ export class HoldTheLineEngine {
   reset(): void {
     this.state = {
       gridSize: this.state.gridSize,
+      visitedDots: new Set<string>(),
+      pathEnds: null,
+      currentPlayer: 1,
+      status: 'setup',
+      winner: null,
+      moveHistory: [],
+      lines: [],
+      player1Ready: false,
+      player2Ready: false,
+    };
+  }
+
+  setGridSize(gridSize: number): void {
+    // Only allow changing grid size during setup
+    if (this.state.status !== 'setup') {
+      throw new Error('Grid size can only be changed during setup phase');
+    }
+    
+    // Validate and clamp grid size
+    const validatedGridSize = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, gridSize));
+    
+    // Reset the game with new grid size
+    this.state = {
+      gridSize: validatedGridSize,
       visitedDots: new Set<string>(),
       pathEnds: null,
       currentPlayer: 1,

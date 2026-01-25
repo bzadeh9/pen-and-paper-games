@@ -734,4 +734,82 @@ describe('HoldTheLineEngine', () => {
       expect(canMoveToIntersecting).toBe(false);
     });
   });
+
+  describe('grid size configuration', () => {
+    it('should support custom grid sizes', () => {
+      const engine5x5 = new HoldTheLineEngine(5);
+      const state = engine5x5.getState();
+      expect(state.gridSize).toBe(5);
+    });
+
+    it('should clamp grid size to minimum of 3', () => {
+      const engineSmall = new HoldTheLineEngine(1);
+      const state = engineSmall.getState();
+      expect(state.gridSize).toBe(3);
+    });
+
+    it('should clamp grid size to maximum of 10', () => {
+      const engineLarge = new HoldTheLineEngine(20);
+      const state = engineLarge.getState();
+      expect(state.gridSize).toBe(10);
+    });
+
+    it('should allow changing grid size during setup', () => {
+      engine.setGridSize(6);
+      const state = engine.getState();
+      expect(state.gridSize).toBe(6);
+      expect(state.status).toBe('setup');
+    });
+
+    it('should not allow changing grid size after game starts', () => {
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
+      
+      expect(() => engine.setGridSize(6)).toThrow(
+        'Grid size can only be changed during setup phase'
+      );
+    });
+
+    it('should reset game state when changing grid size', () => {
+      engine.setPlayerReady(1);
+      engine.reset();
+      engine.setGridSize(5);
+      
+      const state = engine.getState();
+      expect(state.gridSize).toBe(5);
+      expect(state.player1Ready).toBe(false);
+      expect(state.player2Ready).toBe(false);
+      expect(state.visitedDots.size).toBe(0);
+    });
+
+    it('should work correctly with larger grid sizes', () => {
+      const engine8x8 = new HoldTheLineEngine(8);
+      engine8x8.setPlayerReady(1);
+      engine8x8.setPlayerReady(2);
+      
+      // Should allow first move anywhere
+      expect(engine8x8.isValidMove({ row: 0, col: 0 })).toBe(true);
+      expect(engine8x8.isValidMove({ row: 7, col: 7 })).toBe(true);
+      
+      // Make a move
+      engine8x8.makeMove({ row: 3, col: 3 });
+      
+      // Should have 8 adjacent moves from center
+      const validMoves = engine8x8.getValidMoves();
+      expect(validMoves.length).toBe(8);
+    });
+
+    it('should work correctly with minimum grid size (3x3)', () => {
+      const engine3x3 = new HoldTheLineEngine(3);
+      engine3x3.setPlayerReady(1);
+      engine3x3.setPlayerReady(2);
+      
+      const state = engine3x3.getState();
+      expect(state.gridSize).toBe(3);
+      
+      // Total of 9 dots (3x3)
+      const allMoves = engine3x3.getValidMoves();
+      expect(allMoves.length).toBe(9);
+    });
+  });
 });
