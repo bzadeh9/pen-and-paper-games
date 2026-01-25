@@ -17,11 +17,12 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pathOffsets] = useState(() => {
     // Precompute random offsets for hand-drawn effect
+    // Using small offsets to prevent visual intersections
     const offsets: Record<string, { x: number; y: number }> = {};
     for (let i = 0; i < 16; i++) {
       offsets[i] = {
-        x: (Math.random() - 0.5) * 3,
-        y: (Math.random() - 0.5) * 3,
+        x: (Math.random() - 0.5) * 0.5,  // Reduced from 3 to 0.5 pixels
+        y: (Math.random() - 0.5) * 0.5,  // Reduced from 3 to 0.5 pixels
       };
     }
     return offsets;

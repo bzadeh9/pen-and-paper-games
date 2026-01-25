@@ -513,6 +513,34 @@ describe('HoldTheLineEngine', () => {
       expect(isValid).toBe(false);
     });
 
+    it('should detect X pattern intersection - screenshot bug', () => {
+      // Reproduce the bug from the screenshot
+      // Creating an X pattern: (0,0)-(1,0) crossing with (0,1)-(1,1)
+      engine.reset();
+      
+      // Build path: (0,1) -> (1,1) -> (0,0)
+      engine.makeMove({ row: 0, col: 1 }); // Move 1
+      engine.makeMove({ row: 1, col: 1 }); // Move 2
+      engine.makeMove({ row: 0, col: 0 }); // Move 3
+      
+      // Path ends: (0,1) and (0,0)
+      // Segments: (0,1)-(1,1) and (1,1)-(0,0)
+      
+      // Now try to add (1,0)
+      // This would create segment (0,0)-(1,0)
+      // which should intersect with (0,1)-(1,1) forming an X
+      const isValid = engine.isValidMove({ row: 1, col: 0 });
+      expect(isValid).toBe(false);
+      
+      // Verify the move is actually rejected
+      const result = engine.makeMove({ row: 1, col: 0 });
+      expect(result).toBe(false);
+      
+      // Verify only 3 moves were made
+      const state = engine.getState();
+      expect(state.moveHistory.length).toBe(3);
+    });
+
     it('should properly use intersection detection algorithm', () => {
       // Direct test: create a scenario where intersection MUST occur
       // In a 4x4 grid, create line from (0,1) to (2,1) [vertical through middle]
