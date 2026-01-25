@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  /* Site Theme Colors */
+  --ink-black: #1a1a1a;
+  --prussian-blue: #003153;
+  --dusk-blue: #2b4570;
+  --dusty-denim: #6b8cae;
+  --alabaster-grey: #e8e8e8;
+
+  /* Game Palette Colors */
+  --powder-petal: #f8e5e5;
+  --pastel-pink: #ffcccc;
+  --cherry-blossom: #ffb3c1;
+  --dusty-mauve: #c9a0dc;
+
+  --background: #ffffff;
+  --foreground: var(--ink-black);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  /* Site Theme */
+  --color-ink-black: var(--ink-black);
+  --color-prussian-blue: var(--prussian-blue);
+  --color-dusk-blue: var(--dusk-blue);
+  --color-dusty-denim: var(--dusty-denim);
+  --color-alabaster-grey: var(--alabaster-grey);
+  
+  /* Game Palette */
+  --color-powder-petal: var(--powder-petal);
+  --color-pastel-pink: var(--pastel-pink);
+  --color-cherry-blossom: var(--cherry-blossom);
+  --color-dusty-mauve: var(--dusty-mauve);
+  
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Dark mode */
+.dark {
+  --background: var(--ink-black);
+  --foreground: var(--alabaster-grey);
+}
+
+/* System preference dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: var(--ink-black);
+    --foreground: var(--alabaster-grey);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+
