@@ -5,6 +5,7 @@ import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
 import { GameStats } from '@/components/game/hold-the-line/game-stats';
 import { GridSizeSelector } from '@/components/game/hold-the-line/grid-size-selector';
+import { RoundsSelector } from '@/components/game/hold-the-line/rounds-selector';
 import { PlayerColor } from '@/lib/games/hold-the-line/types';
 import { Player } from '@/lib/games/hold-the-line/engine';
 import {
@@ -26,19 +27,48 @@ export default function HoldTheLinePage() {
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState(4);
+  const [totalRounds, setTotalRounds] = useState(1);
+  const [currentRound, setCurrentRound] = useState(1);
+  const [roundWins, setRoundWins] = useState({ player1: 0, player2: 0 });
   const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>(
     'setup'
   );
+  const [tournamentStatus, setTournamentStatus] = useState<
+    'inactive' | 'active' | 'ended'
+  >('inactive');
   const [stats, setStats] = useState(() => getGameStatistics());
 
   // Use media query to detect mobile
   const isMobile = useMediaQuery('(max-width: 767px)');
 
-  const handleGameEnd = useCallback((winningPlayer: Player) => {
-    // Record the game and update stats
-    const newStats = recordGame(winningPlayer);
-    setStats(newStats);
-  }, []);
+  const handleGameEnd = useCallback(
+    (winningPlayer: Player) => {
+      // Record the game and update stats
+      const newStats = recordGame(winningPlayer);
+      setStats(newStats);
+
+      // Update tournament tracking
+      if (totalRounds > 1 && tournamentStatus === 'active') {
+        const newRoundWins = { ...roundWins };
+        if (winningPlayer === 1) {
+          newRoundWins.player1 += 1;
+        } else {
+          newRoundWins.player2 += 1;
+        }
+        setRoundWins(newRoundWins);
+
+        // Check if tournament is complete
+        const requiredWins = Math.ceil(totalRounds / 2);
+        if (
+          newRoundWins.player1 >= requiredWins ||
+          newRoundWins.player2 >= requiredWins
+        ) {
+          setTournamentStatus('ended');
+        }
+      }
+    },
+    [totalRounds, tournamentStatus, roundWins]
+  );
 
   const handleResetStats = () => {
     if (confirm('Are you sure you want to reset all statistics?')) {
@@ -119,6 +149,27 @@ export default function HoldTheLinePage() {
               </CollapsibleContent>
             </Collapsible>
 
+            {/* Rounds Selector */}
+            <Collapsible
+              defaultOpen={!isMobile}
+              className="rounded-lg border border-foreground/20 bg-background"
+            >
+              <div className="px-4 pt-4 pb-2">
+                <CollapsibleTrigger>
+                  <h3 className="text-lg font-semibold">Tournament Mode</h3>
+                </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent>
+                <div className="px-4 pb-4">
+                  <RoundsSelector
+                    rounds={totalRounds}
+                    onRoundsChange={setTotalRounds}
+                    disabled={gameStatus !== 'setup'}
+                  />
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+
             {/* Player 1 customization */}
             <Collapsible
               defaultOpen={!isMobile}
@@ -182,6 +233,24 @@ export default function HoldTheLinePage() {
               gridSize={gridSize}
               onGameEnd={handleGameEnd}
               onGameStateChange={setGameStatus}
+              onGameStart={() => {
+                if (totalRounds > 1 && tournamentStatus === 'inactive') {
+                  setTournamentStatus('active');
+                  setCurrentRound(1);
+                  setRoundWins({ player1: 0, player2: 0 });
+                }
+              }}
+              onNewGameRequest={() => {
+                if (totalRounds > 1 && tournamentStatus === 'active') {
+                  // Start next round
+                  setCurrentRound((prev) => prev + 1);
+                }
+              }}
+              tournamentMode={totalRounds > 1}
+              currentRound={currentRound}
+              totalRounds={totalRounds}
+              roundWins={roundWins}
+              tournamentEnded={tournamentStatus === 'ended'}
             />
           </div>
 
