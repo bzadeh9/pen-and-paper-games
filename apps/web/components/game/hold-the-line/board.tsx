@@ -53,6 +53,8 @@ export function GameBoard({
   }, [errorMessage]);
 
   const handleDotClick = (pos: Position) => {
+    if (gameState.status !== 'playing') return;
+    
     if (!engine.isValidMove(pos)) {
       // Provide feedback for invalid move
       // Note: Move can be invalid for multiple reasons (not adjacent, already visited, or would intersect)
@@ -65,6 +67,11 @@ export function GameBoard({
       setErrorMessage(null); // Clear any previous error
       playSound();
     }
+  };
+
+  const handlePlayerReady = (player: Player) => {
+    engine.setPlayerReady(player);
+    setGameState(engine.getState());
   };
 
   const playSound = () => {
@@ -141,9 +148,42 @@ export function GameBoard({
         </div>
       )}
 
+      {/* Setup phase - Ready buttons */}
+      {gameState.status === 'setup' && (
+        <div className="text-center">
+          <p className="mb-4 text-lg font-semibold">Get Ready to Play!</p>
+          <div className="flex gap-4">
+            <button
+              onClick={() => handlePlayerReady(1)}
+              disabled={gameState.player1Ready}
+              className={`rounded-lg px-6 py-3 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                gameState.player1Ready
+                  ? 'cursor-not-allowed bg-green-600 text-white'
+                  : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
+              }`}
+              aria-label={gameState.player1Ready ? 'Player 1 is ready' : 'Player 1 ready button'}
+            >
+              {gameState.player1Ready ? '✓ Player 1 Ready' : 'Player 1 Ready'}
+            </button>
+            <button
+              onClick={() => handlePlayerReady(2)}
+              disabled={gameState.player2Ready}
+              className={`rounded-lg px-6 py-3 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                gameState.player2Ready
+                  ? 'cursor-not-allowed bg-green-600 text-white'
+                  : 'bg-foreground text-background hover:bg-foreground/90 focus:ring-foreground'
+              }`}
+              aria-label={gameState.player2Ready ? 'Player 2 is ready' : 'Player 2 ready button'}
+            >
+              {gameState.player2Ready ? '✓ Player 2 Ready' : 'Player 2 Ready'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Game status */}
-      <div className="text-center">
-        {gameState.status === 'playing' ? (
+      {gameState.status === 'playing' && (
+        <div className="text-center">
           <div className="flex flex-col gap-2">
             <p className="text-lg font-semibold">
               Player {gameState.currentPlayer}&apos;s Turn
@@ -151,24 +191,37 @@ export function GameBoard({
             <div
               className="mx-auto h-4 w-4 rounded-full"
               style={{ backgroundColor: currentPlayerColor }}
+              aria-label={`Player ${gameState.currentPlayer}'s turn indicator`}
             />
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <p className="text-2xl font-bold">Game Over!</p>
-            <p className="text-lg">Player {gameState.winner} Wins!</p>
-            <div
-              className="mx-auto h-4 w-4 rounded-full"
-              style={{
-                backgroundColor:
-                  gameState.winner === 1
-                    ? PLAYER_COLORS[player1Color]
-                    : PLAYER_COLORS[player2Color],
-              }}
-            />
-          </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Game over message - non-intrusive, above the board */}
+      {gameState.status === 'ended' && (
+        <div
+          className="rounded-lg border-2 border-green-600 bg-green-100 px-6 py-4 text-center dark:bg-green-900/30 dark:border-green-500"
+          role="status"
+          aria-live="polite"
+        >
+          <p className="mb-2 text-2xl font-bold text-green-800 dark:text-green-200">
+            Game Over!
+          </p>
+          <p className="text-lg text-green-700 dark:text-green-300">
+            Player {gameState.winner} Wins! Well done!
+          </p>
+          <div
+            className="mx-auto mt-2 h-4 w-4 rounded-full"
+            style={{
+              backgroundColor:
+                gameState.winner === 1
+                  ? PLAYER_COLORS[player1Color]
+                  : PLAYER_COLORS[player2Color],
+            }}
+            aria-label={`Player ${gameState.winner} won`}
+          />
+        </div>
+      )}
 
       {/* Game board */}
       <div className="relative rounded-lg border-2 border-foreground/20 bg-background p-4 shadow-lg">
@@ -323,10 +376,11 @@ export function GameBoard({
       </div>
 
       {/* Reset button */}
-      {gameState.moveHistory.length > 0 && (
+      {(gameState.moveHistory.length > 0 || gameState.status === 'ended') && (
         <button
           onClick={handleReset}
-          className="rounded-lg bg-foreground px-6 py-2 text-background transition-colors hover:bg-foreground/90"
+          className="rounded-lg bg-foreground px-6 py-2 text-background transition-colors hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+          aria-label="Start a new game"
         >
           New Game
         </button>

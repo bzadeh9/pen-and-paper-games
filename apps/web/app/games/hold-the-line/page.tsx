@@ -1,35 +1,34 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
+import { GameStats } from '@/components/game/hold-the-line/game-stats';
 import { PlayerColor } from '@/lib/games/hold-the-line/types';
 import { Player } from '@/lib/games/hold-the-line/engine';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+  getGameStatistics,
+  recordGame,
+  resetStatistics,
+} from '@/lib/games/hold-the-line/stats';
 
 export default function HoldTheLinePage() {
   const [player1Color, setPlayer1Color] =
     useState<PlayerColor>('cherryBlossom');
   const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
-  const [showWinDialog, setShowWinDialog] = useState(false);
-  const [winner, setWinner] = useState<Player | null>(null);
-  const [gameKey, setGameKey] = useState(0);
+  const [stats, setStats] = useState(() => getGameStatistics());
 
-  const handleGameEnd = (winningPlayer: Player) => {
-    setWinner(winningPlayer);
-    setShowWinDialog(true);
-  };
+  const handleGameEnd = useCallback((winningPlayer: Player) => {
+    // Record the game and update stats
+    const newStats = recordGame(winningPlayer);
+    setStats(newStats);
+  }, []);
 
-  const handleNewGame = () => {
-    setShowWinDialog(false);
-    setWinner(null);
-    setGameKey((prev) => prev + 1); // Force remount of GameBoard
+  const handleResetStats = () => {
+    if (confirm('Are you sure you want to reset all statistics?')) {
+      resetStatistics();
+      setStats(getGameStatistics());
+    }
   };
 
   return (
@@ -49,6 +48,9 @@ export default function HoldTheLinePage() {
         <div className="mb-8 rounded-lg border border-foreground/20 bg-background p-6">
           <h2 className="mb-3 text-xl font-semibold">How to Play</h2>
           <ul className="space-y-2 text-foreground/80">
+            <li>
+              • Both players must press &quot;Ready&quot; to start the game
+            </li>
             <li>
               • Players take turns drawing lines between adjacent dots
               (horizontal, vertical, or diagonal)
@@ -79,49 +81,23 @@ export default function HoldTheLinePage() {
           {/* Game board */}
           <div className="flex items-center justify-center">
             <GameBoard
-              key={gameKey}
               player1Color={player1Color}
               player2Color={player2Color}
               onGameEnd={handleGameEnd}
             />
           </div>
 
-          {/* Player 2 customization */}
+          {/* Player 2 customization and stats */}
           <div className="flex flex-col gap-4">
             <PlayerCustomization
               playerNumber={2}
               selectedColor={player2Color}
               onColorChange={setPlayer2Color}
             />
+            <GameStats stats={stats} onReset={handleResetStats} />
           </div>
         </div>
       </div>
-
-      {/* Win dialog */}
-      <Dialog open={showWinDialog} onOpenChange={setShowWinDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Game Over!</DialogTitle>
-            <DialogDescription>
-              Player {winner} wins the game!
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={handleNewGame}
-              className="flex-1 rounded-lg bg-foreground px-4 py-2 text-background transition-colors hover:bg-foreground/90"
-            >
-              New Game
-            </button>
-            <button
-              onClick={() => setShowWinDialog(false)}
-              className="flex-1 rounded-lg border border-foreground/20 px-4 py-2 transition-colors hover:bg-foreground/10"
-            >
-              Close
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
