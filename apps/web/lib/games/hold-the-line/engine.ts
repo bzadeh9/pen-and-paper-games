@@ -1,6 +1,6 @@
 export type Position = { row: number; col: number };
 export type Player = 1 | 2;
-export type GameStatus = 'playing' | 'ended';
+export type GameStatus = 'setup' | 'playing' | 'ended';
 
 export interface GameState {
   gridSize: number;
@@ -11,6 +11,8 @@ export interface GameState {
   winner: Player | null;
   moveHistory: Position[];
   lines: { start: Position; end: Position; player: Player }[];
+  player1Ready: boolean;
+  player2Ready: boolean;
 }
 
 export class HoldTheLineEngine {
@@ -22,10 +24,12 @@ export class HoldTheLineEngine {
       visitedDots: new Set<string>(),
       pathEnds: null,
       currentPlayer: 1,
-      status: 'playing',
+      status: 'setup',
       winner: null,
       moveHistory: [],
       lines: [],
+      player1Ready: false,
+      player2Ready: false,
     };
   }
 
@@ -177,6 +181,21 @@ export class HoldTheLineEngine {
     return true;
   }
 
+  setPlayerReady(player: Player): void {
+    if (this.state.status !== 'setup') return;
+
+    if (player === 1) {
+      this.state.player1Ready = true;
+    } else {
+      this.state.player2Ready = true;
+    }
+
+    // Start the game when both players are ready
+    if (this.state.player1Ready && this.state.player2Ready) {
+      this.state.status = 'playing';
+    }
+  }
+
   getValidMoves(): Position[] {
     const validMoves: Position[] = [];
 
@@ -249,10 +268,12 @@ export class HoldTheLineEngine {
       visitedDots: new Set<string>(),
       pathEnds: null,
       currentPlayer: 1,
-      status: 'playing',
+      status: 'setup',
       winner: null,
       moveHistory: [],
       lines: [],
+      player1Ready: false,
+      player2Ready: false,
     };
   }
 }

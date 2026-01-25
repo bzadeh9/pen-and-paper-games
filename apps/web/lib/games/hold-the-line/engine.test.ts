@@ -15,13 +15,63 @@ describe('HoldTheLineEngine', () => {
       expect(state.visitedDots.size).toBe(0);
       expect(state.pathEnds).toBeNull();
       expect(state.currentPlayer).toBe(1);
-      expect(state.status).toBe('playing');
+      expect(state.status).toBe('setup');
       expect(state.winner).toBeNull();
       expect(state.moveHistory).toEqual([]);
+      expect(state.player1Ready).toBe(false);
+      expect(state.player2Ready).toBe(false);
+    });
+  });
+
+  describe('setup phase', () => {
+    it('should start in setup phase', () => {
+      const state = engine.getState();
+      expect(state.status).toBe('setup');
+    });
+
+    it('should mark player 1 as ready when setPlayerReady is called', () => {
+      engine.setPlayerReady(1);
+      const state = engine.getState();
+      expect(state.player1Ready).toBe(true);
+      expect(state.player2Ready).toBe(false);
+      expect(state.status).toBe('setup');
+    });
+
+    it('should mark player 2 as ready when setPlayerReady is called', () => {
+      engine.setPlayerReady(2);
+      const state = engine.getState();
+      expect(state.player1Ready).toBe(false);
+      expect(state.player2Ready).toBe(true);
+      expect(state.status).toBe('setup');
+    });
+
+    it('should start the game when both players are ready', () => {
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
+      const state = engine.getState();
+      expect(state.player1Ready).toBe(true);
+      expect(state.player2Ready).toBe(true);
+      expect(state.status).toBe('playing');
+    });
+
+    it('should not allow moves during setup phase', () => {
+      expect(engine.isValidMove({ row: 0, col: 0 })).toBe(false);
+    });
+
+    it('should allow moves after both players are ready', () => {
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
+      expect(engine.isValidMove({ row: 0, col: 0 })).toBe(true);
     });
   });
 
   describe('first move', () => {
+    beforeEach(() => {
+      // Start the game by marking both players ready
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
+    });
+
     it('should allow any valid position on the grid', () => {
       expect(engine.isValidMove({ row: 0, col: 0 })).toBe(true);
       expect(engine.isValidMove({ row: 3, col: 3 })).toBe(true);
@@ -53,7 +103,9 @@ describe('HoldTheLineEngine', () => {
 
   describe('subsequent moves', () => {
     beforeEach(() => {
-      // Make first move at (1, 1)
+      // Start the game and make first move at (1, 1)
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
       engine.makeMove({ row: 1, col: 1 });
     });
 
@@ -111,6 +163,12 @@ describe('HoldTheLineEngine', () => {
   });
 
   describe('winning condition (misere play)', () => {
+    beforeEach(() => {
+      // Start the game
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
+    });
+
     it('should end the game when no valid moves remain', () => {
       // Create a scenario where the game ends
       // Fill the grid in a way that traps the next player
@@ -158,6 +216,8 @@ describe('HoldTheLineEngine', () => {
 
   describe('game reset', () => {
     it('should reset the game to initial state', () => {
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
       engine.makeMove({ row: 1, col: 1 });
       engine.makeMove({ row: 1, col: 2 });
 
@@ -167,13 +227,21 @@ describe('HoldTheLineEngine', () => {
       expect(state.visitedDots.size).toBe(0);
       expect(state.pathEnds).toBeNull();
       expect(state.currentPlayer).toBe(1);
-      expect(state.status).toBe('playing');
+      expect(state.status).toBe('setup');
       expect(state.winner).toBeNull();
       expect(state.moveHistory).toEqual([]);
+      expect(state.player1Ready).toBe(false);
+      expect(state.player2Ready).toBe(false);
     });
   });
 
   describe('getValidMoves', () => {
+    beforeEach(() => {
+      // Start the game
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
+    });
+
     it('should return all positions on first move', () => {
       const moves = engine.getValidMoves();
       expect(moves.length).toBe(16); // 4x4 grid
@@ -207,6 +275,12 @@ describe('HoldTheLineEngine', () => {
   });
 
   describe('line intersection detection', () => {
+    beforeEach(() => {
+      // Start the game
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
+    });
+
     it('should prevent moves that would cause lines to intersect', () => {
       // Create a scenario where lines would intersect
       // Draw a line from (0,0) to (0,2)
@@ -253,6 +327,8 @@ describe('HoldTheLineEngine', () => {
 
       // Let me create a clearer test case
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Create a diagonal line from top-left to bottom-right
       engine.makeMove({ row: 0, col: 0 }); // Player 1
@@ -294,6 +370,8 @@ describe('HoldTheLineEngine', () => {
 
       // Let's create a clearer crossing scenario
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Build path: (0,0) -> (0,1) -> (0,2) [horizontal line at top]
       engine.makeMove({ row: 0, col: 0 });
@@ -341,6 +419,8 @@ describe('HoldTheLineEngine', () => {
       // The game maintains a SINGLE continuous path, so all moves are connected.
 
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Let's create the scenario step by step:
       // 1. Start at (1,1)
@@ -396,6 +476,8 @@ describe('HoldTheLineEngine', () => {
     it('should detect true line crossing in a specific pattern', () => {
       // Start fresh with a controlled scenario
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Create path going right then down: (0,0) -> (0,1) -> (1,1)
       engine.makeMove({ row: 0, col: 0 });
@@ -422,6 +504,8 @@ describe('HoldTheLineEngine', () => {
 
       // Let me try yet another approach - testing the actual intersection algorithm
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Create a Z or N pattern that forces intersection
       // Go from (0,0) to (0,2) horizontally
@@ -460,6 +544,8 @@ describe('HoldTheLineEngine', () => {
       // In a 4x4 grid, let's create:
       // Diagonal from (0,0) to (2,2): (0,0) -> (1,1) -> (2,2)
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
       engine.makeMove({ row: 0, col: 0 });
       engine.makeMove({ row: 1, col: 1 });
       engine.makeMove({ row: 2, col: 2 });
@@ -492,6 +578,8 @@ describe('HoldTheLineEngine', () => {
     it('should detect and block actual crossing lines', () => {
       // This is the REAL test case that should fail without proper intersection detection
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Create the exact scenario from manual testing:
       engine.makeMove({ row: 0, col: 0 }); // Move 1
@@ -517,6 +605,8 @@ describe('HoldTheLineEngine', () => {
       // Reproduce the bug from the screenshot
       // Creating an X pattern: (0,0)-(1,0) crossing with (0,1)-(1,1)
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Build path: (0,1) -> (1,1) -> (0,0)
       engine.makeMove({ row: 0, col: 1 }); // Move 1
@@ -544,6 +634,8 @@ describe('HoldTheLineEngine', () => {
     it('should block the exact scenario from latest screenshot', () => {
       // Test the exact X-crossing scenario
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Create the problematic path: (0,0) -> (1,1) -> (0,1) -> (1,0)
       expect(engine.makeMove({ row: 0, col: 0 })).toBe(true); // Move 1
@@ -566,6 +658,8 @@ describe('HoldTheLineEngine', () => {
       // Then try to cross it with horizontal line
 
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Vertical line: (0,1) -> (1,1) -> (2,1)
       engine.makeMove({ row: 0, col: 1 });
@@ -609,6 +703,8 @@ describe('HoldTheLineEngine', () => {
       // For example: segment from (0,0) to (1,1) crosses segment from (0,1) to (1,0)
 
       engine.reset();
+      engine.setPlayerReady(1);
+      engine.setPlayerReady(2);
 
       // Create: (0,0) -> (1,1)
       engine.makeMove({ row: 0, col: 0 });
