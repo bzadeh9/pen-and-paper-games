@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
 import { GameStats } from '@/components/game/hold-the-line/game-stats';
@@ -16,6 +16,7 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from '@/components/ui/collapsible';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 export default function HoldTheLinePage() {
   const [player1Color, setPlayer1Color] =
@@ -25,22 +26,8 @@ export default function HoldTheLinePage() {
   const [player2Name, setPlayer2Name] = useState('Player 2');
   const [stats, setStats] = useState(() => getGameStatistics());
   
-  // Use media query to detect mobile - this avoids hydration mismatch
-  const [isMobile, setIsMobile] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    const mediaQuery = window.matchMedia('(max-width: 767px)');
-    setIsMobile(mediaQuery.matches);
-    
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches);
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  // Use media query to detect mobile
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   const handleGameEnd = useCallback((winningPlayer: Player) => {
     // Record the game and update stats
@@ -71,7 +58,6 @@ export default function HoldTheLinePage() {
         {/* Game rules */}
         <Collapsible
           defaultOpen={!isMobile}
-          key={`rules-${isClient}`}
           className="mb-8 rounded-lg border border-foreground/20 bg-background"
         >
           <div className="px-6 pt-6 pb-3">
@@ -109,7 +95,6 @@ export default function HoldTheLinePage() {
           <div className="flex flex-col gap-4">
             <Collapsible
               defaultOpen={!isMobile}
-              key={`player1-${isClient}`}
               className="rounded-lg border border-foreground/20 bg-background"
             >
               <div className="px-4 pt-4 pb-2">
@@ -139,6 +124,8 @@ export default function HoldTheLinePage() {
             <GameBoard
               player1Color={player1Color}
               player2Color={player2Color}
+              player1Name={player1Name}
+              player2Name={player2Name}
               onGameEnd={handleGameEnd}
             />
           </div>
@@ -147,7 +134,6 @@ export default function HoldTheLinePage() {
           <div className="flex flex-col gap-4">
             <Collapsible
               defaultOpen={!isMobile}
-              key={`player2-${isClient}`}
               className="rounded-lg border border-foreground/20 bg-background"
             >
               <div className="px-4 pt-4 pb-2">
