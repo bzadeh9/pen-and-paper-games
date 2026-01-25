@@ -527,14 +527,33 @@ describe('HoldTheLineEngine', () => {
       // Segments: (0,1)-(1,1) and (1,1)-(0,0)
       
       // Now try to add (1,0)
-      // This would create segment (0,0)-(1,0)
-      // which should intersect with (0,1)-(1,1) forming an X
+      // This would create segment (0,0)-(1,0) or (0,1)-(1,0)
+      // Either way should intersect with existing (0,0)-(1,1) segment
       const isValid = engine.isValidMove({ row: 1, col: 0 });
       expect(isValid).toBe(false);
       
       // Verify the move is actually rejected
       const result = engine.makeMove({ row: 1, col: 0 });
       expect(result).toBe(false);
+      
+      // Verify only 3 moves were made
+      const state = engine.getState();
+      expect(state.moveHistory.length).toBe(3);
+    });
+
+    it('should block the exact scenario from latest screenshot', () => {
+      // Test the exact X-crossing scenario
+      engine.reset();
+      
+      // Create the problematic path: (0,0) -> (1,1) -> (0,1) -> (1,0)
+      expect(engine.makeMove({ row: 0, col: 0 })).toBe(true); // Move 1
+      expect(engine.makeMove({ row: 1, col: 1 })).toBe(true); // Move 2 - diagonal
+      expect(engine.makeMove({ row: 0, col: 1 })).toBe(true); // Move 3 - back up
+      
+      // Move 4 should be BLOCKED - would create X pattern
+      // Segment (0,1)-(1,0) would intersect with segment (0,0)-(1,1)
+      expect(engine.isValidMove({ row: 1, col: 0 })).toBe(false);
+      expect(engine.makeMove({ row: 1, col: 0 })).toBe(false);
       
       // Verify only 3 moves were made
       const state = engine.getState();
