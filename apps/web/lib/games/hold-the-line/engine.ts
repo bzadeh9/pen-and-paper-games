@@ -263,12 +263,22 @@ export class HoldTheLineEngine {
     const nextPlayerValidMoves = this.getValidMoves();
 
     if (nextPlayerValidMoves.length === 0) {
-      // No valid moves left - current player wins (normal play)
-      this.state.status = 'ended';
-      this.state.winner = this.state.currentPlayer;
+      if (this.state.lines.length === 0) {
+        // Edge case: No valid moves after first dot placement (should be impossible with grid >= 3x3)
+        // But if impossible, the game is ended
+        this.state.status = 'ended';
+        this.state.winner = this.state.currentPlayer === 1 ? 2 : 1; // Current player loses if they can't even start
+      } else {
+        // No valid moves left - current player wins (normal play)
+        this.state.status = 'ended';
+        this.state.winner = this.state.currentPlayer;
+      }
     } else {
-      // Switch to next player
-      this.state.currentPlayer = this.state.currentPlayer === 1 ? 2 : 1;
+      // Switch to next player ONLY if a line was created or we just finished a turn that involved lines
+      // If we just placed the FIRST dot (no lines yet), we stay on the current player
+      if (this.state.lines.length > 0) {
+        this.state.currentPlayer = this.state.currentPlayer === 1 ? 2 : 1;
+      }
     }
 
     return true;

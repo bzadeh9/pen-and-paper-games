@@ -62,7 +62,7 @@ describe('HoldTheLineEngine', () => {
       expect(engine.isValidMove({ row: 0, col: 4 })).toBe(false);
     });
 
-    it('should set path ends correctly after first move', () => {
+    it('should set path ends correctly after first move (first dot)', () => {
       const pos = { row: 1, col: 1 };
       engine.makeMove(pos);
       const state = engine.getState();
@@ -71,46 +71,74 @@ describe('HoldTheLineEngine', () => {
       expect(state.pathEnds![1]).toEqual(pos);
     });
 
-    it('should switch player after first move', () => {
+    it('should NOT switch player after first dot (start of line)', () => {
       engine.makeMove({ row: 1, col: 1 });
       const state = engine.getState();
+      expect(state.currentPlayer).toBe(1); // Still player 1
+    });
+
+    it('should switch player after completing first line (second dot)', () => {
+      engine.makeMove({ row: 1, col: 1 }); // Player 1 (first dot)
+      engine.makeMove({ row: 1, col: 2 }); // Player 1 (second dot -> line)
+      const state = engine.getState();
       expect(state.currentPlayer).toBe(2);
+      expect(state.lines.length).toBe(1);
     });
   });
 
   describe('subsequent moves', () => {
     beforeEach(() => {
-      // Start the game and make first move at (1, 1)
+      // Start the game and make first full move (start line)
       engine.startGame();
       engine.makeMove({ row: 1, col: 1 });
+      engine.makeMove({ row: 1, col: 2 });
     });
 
     it('should allow adjacent horizontal moves', () => {
-      expect(engine.isValidMove({ row: 1, col: 0 })).toBe(true); // left
-      expect(engine.isValidMove({ row: 1, col: 2 })).toBe(true); // right
+      // Current ends: (1,1) and (1,2)
+      // (1,0) is left of (1,1) -> valid
+      expect(engine.isValidMove({ row: 1, col: 0 })).toBe(true);
+
+      // (1,3) is right of (1,2) -> valid
+      expect(engine.isValidMove({ row: 1, col: 3 })).toBe(true);
     });
 
     it('should allow adjacent vertical moves', () => {
-      expect(engine.isValidMove({ row: 0, col: 1 })).toBe(true); // up
-      expect(engine.isValidMove({ row: 2, col: 1 })).toBe(true); // down
+      // From (1,1): (0,1) up, (2,1) down
+      expect(engine.isValidMove({ row: 0, col: 1 })).toBe(true);
+      expect(engine.isValidMove({ row: 2, col: 1 })).toBe(true);
+
+      // From (1,2): (0,2) up, (2,2) down
+      expect(engine.isValidMove({ row: 0, col: 2 })).toBe(true);
+      expect(engine.isValidMove({ row: 2, col: 2 })).toBe(true);
     });
 
     it('should allow adjacent diagonal moves', () => {
-      expect(engine.isValidMove({ row: 0, col: 0 })).toBe(true); // top-left
-      expect(engine.isValidMove({ row: 0, col: 2 })).toBe(true); // top-right
-      expect(engine.isValidMove({ row: 2, col: 0 })).toBe(true); // bottom-left
-      expect(engine.isValidMove({ row: 2, col: 2 })).toBe(true); // bottom-right
+      // From (1,1): (0,0) top-left, (2,0) bottom-left, (0,2) top-right, (2,2) bottom-right
+      // Note: (0,2) and (2,2) are also adjacent to (1,2) which is the other end
+
+      expect(engine.isValidMove({ row: 0, col: 0 })).toBe(true); // top-left of 1,1
+      expect(engine.isValidMove({ row: 2, col: 0 })).toBe(true); // bottom-left of 1,1
+
+      // From (1,2): (0,3) top-right, (2,3) bottom-right
+      expect(engine.isValidMove({ row: 0, col: 3 })).toBe(true);
+      expect(engine.isValidMove({ row: 2, col: 3 })).toBe(true);
     });
 
     it('should reject non-adjacent moves', () => {
+      // (3,3) is not adjacent to (1,1) or (1,2)
       expect(engine.isValidMove({ row: 3, col: 3 })).toBe(false);
-      expect(engine.isValidMove({ row: 0, col: 3 })).toBe(false);
+
+      // (0, 0) is adjacent to (1,1) - valid
+      // (0, 3) is adjacent to (1,2) - valid
+      // (0, 4) is NOT adjacent to (1,1) or (1,2)
+      expect(engine.isValidMove({ row: 0, col: 4 })).toBe(false);
     });
 
     it('should reject already visited dots', () => {
-      engine.makeMove({ row: 1, col: 2 });
-      expect(engine.isValidMove({ row: 1, col: 1 })).toBe(false); // first move
-      expect(engine.isValidMove({ row: 1, col: 2 })).toBe(false); // second move
+      // (1,1) and (1,2) are already visited in beforeEach
+      expect(engine.isValidMove({ row: 1, col: 1 })).toBe(false);
+      expect(engine.isValidMove({ row: 1, col: 2 })).toBe(false);
     });
 
     it('should update path ends correctly', () => {
