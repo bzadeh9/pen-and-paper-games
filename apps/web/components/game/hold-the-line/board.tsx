@@ -6,7 +6,11 @@ import {
   Position,
   Player,
 } from '@/lib/games/hold-the-line/engine';
-import { PLAYER_COLORS, PlayerColor } from '@/lib/games/hold-the-line/types';
+import {
+  PLAYER_COLORS,
+  PlayerColor,
+  USED_ELEMENT_COLOR,
+} from '@/lib/games/hold-the-line/types';
 
 interface GameBoardProps {
   player1Color: PlayerColor;
@@ -136,8 +140,9 @@ export function GameBoard({
       ? PLAYER_COLORS[player1Color]
       : PLAYER_COLORS[player2Color];
 
-  // Use a consistent neutral color for the grid, not changing with turns
+  // Use a distinct neutral color for used elements
   const NEUTRAL_DOT_COLOR = 'currentColor';
+  const USED_DOT_COLOR = USED_ELEMENT_COLOR;
 
   const DOT_SIZE = 12;
   // Make grid spacing responsive - smaller spacing for larger grids
@@ -379,12 +384,12 @@ export function GameBoard({
 
               return (
                 <g key={`dot-${row}-${col}`}>
-                  {/* The dot itself - using neutral color consistently */}
+                  {/* The dot itself - using neutral color for unvisited, distinct color for visited */}
                   <circle
                     cx={x}
                     cy={y}
                     r={DOT_SIZE}
-                    fill={NEUTRAL_DOT_COLOR}
+                    fill={visited ? USED_DOT_COLOR : NEUTRAL_DOT_COLOR}
                     opacity={visited ? 0.8 : 0.5}
                     className={`transition-all ${
                       valid && !visited && gameState.status === 'playing'
