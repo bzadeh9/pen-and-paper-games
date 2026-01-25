@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
 import { GameStats } from '@/components/game/hold-the-line/game-stats';
@@ -18,11 +18,11 @@ export default function HoldTheLinePage() {
   const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
   const [stats, setStats] = useState(getGameStatistics);
 
-  const handleGameEnd = (winningPlayer: Player) => {
+  const handleGameEnd = useCallback((winningPlayer: Player) => {
     // Record the game and update stats
     const newStats = recordGame(winningPlayer);
     setStats(newStats);
-  };
+  }, []);
 
   const handleResetStats = () => {
     if (confirm('Are you sure you want to reset all statistics?')) {
