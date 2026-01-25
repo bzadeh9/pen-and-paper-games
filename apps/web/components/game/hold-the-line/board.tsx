@@ -12,14 +12,12 @@ interface GameBoardProps {
   player1Color: PlayerColor;
   player2Color: PlayerColor;
   onGameEnd?: (winner: Player) => void;
-  onReadyStateChange?: (player1Ready: boolean, player2Ready: boolean) => void;
 }
 
 export function GameBoard({
   player1Color,
   player2Color,
   onGameEnd,
-  onReadyStateChange,
 }: GameBoardProps) {
   const [engine] = useState(() => new HoldTheLineEngine(4));
   const [gameState, setGameState] = useState(engine.getState());
@@ -43,12 +41,6 @@ export function GameBoard({
       onGameEnd(gameState.winner);
     }
   }, [gameState.status, gameState.winner, onGameEnd]);
-
-  useEffect(() => {
-    if (onReadyStateChange) {
-      onReadyStateChange(gameState.player1Ready, gameState.player2Ready);
-    }
-  }, [gameState.player1Ready, gameState.player2Ready, onReadyStateChange]);
 
   // Clear error message after 3 seconds
   useEffect(() => {

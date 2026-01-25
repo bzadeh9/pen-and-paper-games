@@ -16,7 +16,7 @@ export default function HoldTheLinePage() {
   const [player1Color, setPlayer1Color] =
     useState<PlayerColor>('cherryBlossom');
   const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
-  const [stats, setStats] = useState(getGameStatistics);
+  const [stats, setStats] = useState(() => getGameStatistics());
 
   const handleGameEnd = useCallback((winningPlayer: Player) => {
     // Record the game and update stats

@@ -183,6 +183,9 @@ export class HoldTheLineEngine {
 
   setPlayerReady(player: Player): void {
     if (this.state.status !== 'setup') return;
+    if (player !== 1 && player !== 2) {
+      throw new Error('Player must be 1 or 2');
+    }
 
     if (player === 1) {
       this.state.player1Ready = true;
