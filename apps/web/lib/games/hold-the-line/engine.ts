@@ -69,7 +69,8 @@ export class HoldTheLineEngine {
     p3: Position,
     p4: Position
   ): boolean {
-    // Helper function to compute the cross product of vectors (b-a) and (c-a)
+    // Helper function to compute the z-component of the cross product of 2D vectors (b-a) and (c-a)
+    // Returns positive if c is counter-clockwise from ab, negative if clockwise, zero if collinear
     const ccw = (a: Position, b: Position, c: Position): number => {
       return (b.col - a.col) * (c.row - a.row) - (b.row - a.row) * (c.col - a.col);
     };

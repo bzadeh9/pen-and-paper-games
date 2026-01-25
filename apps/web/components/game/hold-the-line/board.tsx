@@ -46,7 +46,8 @@ export function GameBoard({ player1Color, player2Color, onGameEnd }: GameBoardPr
   const handleDotClick = (pos: Position) => {
     if (!engine.isValidMove(pos)) {
       // Provide feedback for invalid move
-      setErrorMessage('Invalid move: Lines cannot intersect with existing lines.');
+      // Note: Move can be invalid for multiple reasons (not adjacent, already visited, or would intersect)
+      setErrorMessage('Invalid move: This move is not allowed.');
       return;
     }
     
