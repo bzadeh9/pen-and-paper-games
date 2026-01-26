@@ -6,7 +6,11 @@ import {
   Position,
   Player,
 } from '@/lib/games/hold-the-line/engine';
-import { PLAYER_COLORS, PlayerColor } from '@/lib/games/hold-the-line/types';
+import {
+  PLAYER_COLORS,
+  PlayerColor,
+  USED_ELEMENT_COLOR,
+} from '@/lib/games/hold-the-line/types';
 
 interface GameBoardProps {
   player1Color: PlayerColor;
@@ -16,6 +20,13 @@ interface GameBoardProps {
   gridSize?: number;
   onGameEnd?: (winner: Player) => void;
   onGameStateChange?: (status: 'setup' | 'playing' | 'ended') => void;
+  onGameStart?: () => void;
+  onNewGameRequest?: () => void;
+  tournamentMode?: boolean;
+  currentRound?: number;
+  totalRounds?: number;
+  roundWins?: { player1: number; player2: number };
+  tournamentEnded?: boolean;
 }
 
 export function GameBoard({
@@ -26,6 +37,13 @@ export function GameBoard({
   gridSize = 4,
   onGameEnd,
   onGameStateChange,
+  onGameStart,
+  onNewGameRequest,
+  tournamentMode = false,
+  currentRound = 1,
+  totalRounds = 1,
+  roundWins = { player1: 0, player2: 0 },
+  tournamentEnded = false,
 }: GameBoardProps) {
   // Memoize engine creation based on gridSize - only recreates when gridSize changes
   const engine = useMemo(() => new HoldTheLineEngine(gridSize), [gridSize]);
@@ -124,6 +142,11 @@ export function GameBoard({
   const handleReset = () => {
     engine.reset();
     setGameState(engine.getState());
+    
+    // In tournament mode, notify parent to track round progression
+    if (tournamentMode && !tournamentEnded && onNewGameRequest) {
+      onNewGameRequest();
+    }
   };
 
   const validMoves = engine.getValidMoves();
@@ -136,8 +159,9 @@ export function GameBoard({
       ? PLAYER_COLORS[player1Color]
       : PLAYER_COLORS[player2Color];
 
-  // Use a consistent neutral color for the grid, not changing with turns
+  // Use a distinct neutral color for used elements
   const NEUTRAL_DOT_COLOR = 'currentColor';
+  const USED_DOT_COLOR = USED_ELEMENT_COLOR;
 
   const DOT_SIZE = 12;
   // Make grid spacing responsive - smaller spacing for larger grids
@@ -201,6 +225,24 @@ export function GameBoard({
 
   return (
     <div className="flex flex-col items-center gap-6">
+      {/* Tournament progress display */}
+      {tournamentMode && (
+        <div className="text-center">
+          <p className="text-sm font-semibold text-foreground/80">
+            Tournament Mode: Round {currentRound} of {totalRounds}
+          </p>
+          <div className="mt-2 flex items-center justify-center gap-4 text-sm">
+            <span className="text-foreground/60">
+              {player1Name}: {roundWins.player1}
+            </span>
+            <span className="text-foreground/40">|</span>
+            <span className="text-foreground/60">
+              {player2Name}: {roundWins.player2}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Error message with accessibility support */}
       {errorMessage && (
         <div
@@ -220,6 +262,9 @@ export function GameBoard({
             onClick={() => {
               engine.startGame();
               setGameState(engine.getState());
+              if (onGameStart) {
+                onGameStart();
+              }
             }}
             className="rounded-lg bg-foreground px-8 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
             aria-label="Start Game"
@@ -253,23 +298,43 @@ export function GameBoard({
           role="status"
           aria-live="polite"
         >
-          <p className="mb-2 text-2xl font-bold text-green-800 dark:text-green-200">
-            Game Over!
-          </p>
-          <p className="text-lg text-green-700 dark:text-green-300">
-            {gameState.winner === 1 ? player1Name : player2Name} Wins! Well
-            done!
-          </p>
-          <div
-            className="mx-auto mt-2 h-4 w-4 rounded-full"
-            style={{
-              backgroundColor:
-                gameState.winner === 1
-                  ? PLAYER_COLORS[player1Color]
-                  : PLAYER_COLORS[player2Color],
-            }}
-            aria-label={`${gameState.winner === 1 ? player1Name : player2Name} won`}
-          />
+          {tournamentEnded ? (
+            <>
+              <p className="mb-2 text-2xl font-bold text-green-800 dark:text-green-200">
+                Tournament Over!
+              </p>
+              <p className="text-lg text-green-700 dark:text-green-300">
+                {roundWins.player1 > roundWins.player2
+                  ? player1Name
+                  : player2Name}{' '}
+                Wins the Tournament!
+              </p>
+              <p className="mt-2 text-sm text-green-700 dark:text-green-300">
+                Final Score: {player1Name} {roundWins.player1} - {roundWins.player2}{' '}
+                {player2Name}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="mb-2 text-2xl font-bold text-green-800 dark:text-green-200">
+                {tournamentMode ? 'Round Over!' : 'Game Over!'}
+              </p>
+              <p className="text-lg text-green-700 dark:text-green-300">
+                {gameState.winner === 1 ? player1Name : player2Name} Wins
+                {tournamentMode ? ' this round!' : '! Well done!'}
+              </p>
+              <div
+                className="mx-auto mt-2 h-4 w-4 rounded-full"
+                style={{
+                  backgroundColor:
+                    gameState.winner === 1
+                      ? PLAYER_COLORS[player1Color]
+                      : PLAYER_COLORS[player2Color],
+                }}
+                aria-label={`${gameState.winner === 1 ? player1Name : player2Name} won`}
+              />
+            </>
+          )}
         </div>
       )}
 
@@ -379,12 +444,12 @@ export function GameBoard({
 
               return (
                 <g key={`dot-${row}-${col}`}>
-                  {/* The dot itself - using neutral color consistently */}
+                  {/* The dot itself - using neutral color for unvisited, distinct color for visited */}
                   <circle
                     cx={x}
                     cy={y}
                     r={DOT_SIZE}
-                    fill={NEUTRAL_DOT_COLOR}
+                    fill={visited ? USED_DOT_COLOR : NEUTRAL_DOT_COLOR}
                     opacity={visited ? 0.8 : 0.5}
                     className={`transition-all ${
                       valid && !visited && gameState.status === 'playing'
@@ -447,9 +512,15 @@ export function GameBoard({
         <button
           onClick={handleReset}
           className="rounded-lg bg-foreground px-6 py-2 text-background transition-colors hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
-          aria-label="Start a new game"
+          aria-label={
+            tournamentMode && !tournamentEnded && gameState.status === 'ended'
+              ? 'Start next round'
+              : 'Start a new game'
+          }
         >
-          New Game
+          {tournamentMode && !tournamentEnded && gameState.status === 'ended'
+            ? 'Next Round'
+            : 'New Game'}
         </button>
       )}
     </div>

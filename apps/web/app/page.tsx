@@ -34,7 +34,7 @@ export default function Home() {
             </div>
             <h2 className="mb-2 text-2xl font-semibold">Hold The Line</h2>
             <p className="text-sm text-foreground/60">
-              Connect the dots strategically, but avoid making the last move!
+              Connect the dots strategically to make the last legal move!
             </p>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
@@ -131,7 +131,7 @@ export default function Home() {
 
         {/* Footer */}
         <div className="mt-12 text-sm text-foreground/40">
-          <p>Built with Next.js, React, and Tailwind CSS</p>
+          <p>Developed by Leon &amp; Maya</p>
         </div>
       </main>
     </div>
