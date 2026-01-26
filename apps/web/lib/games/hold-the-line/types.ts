@@ -6,6 +6,10 @@ export const PLAYER_COLORS = {
   dustyMauve: '#c9a0dc',
 } as const;
 
+// Color for used/visited dots and lines - distinct from player colors
+// Using a slate gray that contrasts with all player colors
+export const USED_ELEMENT_COLOR = '#64748b'; // Slate-500 - accessible and distinct
+
 export type PlayerColor = keyof typeof PLAYER_COLORS;
 
 export const PLAYER_COLOR_OPTIONS: { value: PlayerColor; label: string }[] = [
