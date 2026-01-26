@@ -12,39 +12,6 @@ interface GameBoardProps {
   player2Name?: string;
   onGameEnd?: (winner: Player) => void;
   onGameStateChange?: (status: 'setup' | 'playing' | 'ended') => void;
-  onTimerExpired?: () => void;
-}
-
-function TurnTimer({
-  isPlaying,
-  onExpired,
-}: {
-  isPlaying: boolean;
-  onExpired?: () => void;
-}) {
-  const [timeLeft, setTimeLeft] = useState(30);
-
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (onExpired) onExpired();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isPlaying, onExpired]);
-
-  return (
-    <span className={`text-sm font-mono ${timeLeft <= 10 ? 'text-red-500 font-bold' : ''}`}>
-      {timeLeft}s
-    </span>
-  );
 }
 
 export function GameBoard({
@@ -54,12 +21,12 @@ export function GameBoard({
   player2Name = 'Player 2',
   onGameEnd,
   onGameStateChange,
-  onTimerExpired,
 }: GameBoardProps) {
   const engine = useMemo(() => new KnightChaseEngine(), []);
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPossibleMoves, setShowPossibleMoves] = useState(false);
 
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
@@ -183,11 +150,6 @@ export function GameBoard({
                 style={{ backgroundColor: currentPlayerColor }}
                 aria-label={`${gameState.currentPlayer === 1 ? player1Name : player2Name}'s turn indicator`}
               />
-              <TurnTimer
-                key={`${gameState.currentPlayer}-${gameState.moveHistory.length}`}
-                isPlaying={gameState.status === 'playing'}
-                onExpired={onTimerExpired}
-              />
             </div>
           </div>
         </div>
@@ -238,7 +200,7 @@ export function GameBoard({
                   isExhausted
                     ? 'bg-foreground/5 dark:bg-foreground/10 cursor-not-allowed'
                     : isValid && gameState.status === 'playing'
-                      ? 'bg-green-100 dark:bg-green-900/30 cursor-pointer hover:bg-green-200 dark:hover:bg-green-900/50'
+                      ? `${showPossibleMoves ? 'bg-green-100 dark:bg-green-900/30' : 'bg-background'} cursor-pointer hover:bg-green-200 dark:hover:bg-green-900/50`
                       : 'bg-background cursor-default'
                 } ${isHovered && isValid ? 'ring-2 ring-green-500' : ''}`}
                 style={{
@@ -296,6 +258,19 @@ export function GameBoard({
 
       {/* Game info */}
       <div className="text-center text-sm text-foreground/60">
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <label className="flex cursor-pointer items-center gap-2 select-none">
+            <input
+              type="checkbox"
+              checked={showPossibleMoves}
+              onChange={(e) => setShowPossibleMoves(e.target.checked)}
+              className="h-4 w-4 rounded border-foreground/20 text-foreground accent-foreground focus:ring-foreground"
+            />
+            <span className="font-medium text-foreground">
+              Highlight Possible Moves
+            </span>
+          </label>
+        </div>
         <p>Move in an L-shape (like a chess knight)</p>
         <p className="mt-1">Squares are marked as spent once left</p>
       </div>
