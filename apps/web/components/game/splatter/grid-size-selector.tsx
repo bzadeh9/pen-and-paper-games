@@ -30,8 +30,12 @@ export function GridSizeSelector({
         className="w-full"
       />
       <div className="mt-2 flex justify-between text-xs text-foreground/60">
-        <span>{MIN_GRID_SIZE}×{MIN_GRID_SIZE}</span>
-        <span>{MAX_GRID_SIZE}×{MAX_GRID_SIZE}</span>
+        <span>
+          {MIN_GRID_SIZE}×{MIN_GRID_SIZE}
+        </span>
+        <span>
+          {MAX_GRID_SIZE}×{MAX_GRID_SIZE}
+        </span>
       </div>
     </div>
   );

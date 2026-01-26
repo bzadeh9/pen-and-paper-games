@@ -1,7 +1,11 @@
 'use client';
 
 import React from 'react';
-import { PLAYER_COLORS, PLAYER_COLOR_OPTIONS, PlayerColor } from '@/lib/games/splatter/types';
+import {
+  PLAYER_COLORS,
+  PLAYER_COLOR_OPTIONS,
+  PlayerColor,
+} from '@/lib/games/splatter/types';
 
 interface PlayerCustomizationProps {
   playerNumber: 1 | 2;
@@ -62,7 +66,9 @@ export function PlayerCustomization({
                 style={{
                   backgroundColor: color,
                 }}
-                title={isDisabled ? 'Already selected by other player' : option.label}
+                title={
+                  isDisabled ? 'Already selected by other player' : option.label
+                }
               >
                 {isSelected && (
                   <svg

@@ -86,7 +86,7 @@ export class KnightChaseEngine {
     if (!this.isValidPosition(pos)) return false;
 
     const currentPos = this.state.playerPositions[this.state.currentPlayer];
-    
+
     // Check if destination is exhausted
     if (this.state.grid[pos.row][pos.col] === 'exhausted') return false;
 

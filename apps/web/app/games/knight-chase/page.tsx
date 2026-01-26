@@ -65,9 +65,7 @@ export default function KnightChasePage() {
           <CollapsibleContent>
             <div className="px-6 pb-6">
               <ul className="space-y-2 text-foreground/80">
-                <li>
-                  • Players start at opposite corners of an 8x8 board
-                </li>
+                <li>• Players start at opposite corners of an 8x8 board</li>
                 <li>
                   • Move like a chess knight: in an L-shape (2 squares in one
                   direction, then 1 square perpendicular)
