@@ -4,8 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/knight-chase/board';
 import { PlayerCustomization } from '@/components/game/knight-chase/player-customization';
 import { GameStats } from '@/components/game/knight-chase/game-stats';
-import { PlayerColor } from '@/lib/games/knight-chase/types';
-import { Player } from '@/lib/games/knight-chase/engine';
+import { PlayerColor, Player } from '@/lib/games/knight-chase/types';
 import {
   getGameStatistics,
   recordGame,
@@ -24,9 +23,6 @@ export default function KnightChasePage() {
   const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
-  const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>(
-    'setup'
-  );
   const [stats, setStats] = useState(() => getGameStatistics());
 
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -158,7 +154,6 @@ export default function KnightChasePage() {
               player1Name={player1Name}
               player2Name={player2Name}
               onGameEnd={handleGameEnd}
-              onGameStateChange={setGameStatus}
             />
           </div>
 

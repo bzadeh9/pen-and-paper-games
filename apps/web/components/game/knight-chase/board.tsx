@@ -15,6 +15,38 @@ interface GameBoardProps {
   onTimerExpired?: () => void;
 }
 
+function TurnTimer({
+  isPlaying,
+  onExpired,
+}: {
+  isPlaying: boolean;
+  onExpired?: () => void;
+}) {
+  const [timeLeft, setTimeLeft] = useState(30);
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (onExpired) onExpired();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, onExpired]);
+
+  return (
+    <span className={`text-sm font-mono ${timeLeft <= 10 ? 'text-red-500 font-bold' : ''}`}>
+      {timeLeft}s
+    </span>
+  );
+}
+
 export function GameBoard({
   player1Color,
   player2Color,
@@ -28,31 +60,6 @@ export function GameBoard({
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [turnTimeLeft, setTurnTimeLeft] = useState<number>(30);
-
-  // Turn timer logic
-  useEffect(() => {
-    if (gameState.status !== 'playing') {
-      setTurnTimeLeft(30);
-      return;
-    }
-
-    setTurnTimeLeft(30); // Reset timer on each turn
-    const interval = setInterval(() => {
-      setTurnTimeLeft((prev) => {
-        if (prev <= 1) {
-          // Time expired - current player loses
-          if (onTimerExpired) {
-            onTimerExpired();
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [gameState.currentPlayer, gameState.status, onTimerExpired]);
 
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
@@ -121,7 +128,6 @@ export function GameBoard({
   const handleReset = () => {
     engine.reset();
     setGameState(engine.getState());
-    setTurnTimeLeft(30);
   };
 
   const validMoves = engine.getValidMoves();
@@ -134,7 +140,6 @@ export function GameBoard({
       : PLAYER_COLORS[player2Color];
 
   const CELL_SIZE = 60;
-  const BORDER_WIDTH = 2;
   const KNIGHT_SIZE = 40;
 
   return (
@@ -178,11 +183,11 @@ export function GameBoard({
                 style={{ backgroundColor: currentPlayerColor }}
                 aria-label={`${gameState.currentPlayer === 1 ? player1Name : player2Name}'s turn indicator`}
               />
-              <span
-                className={`text-sm font-mono ${turnTimeLeft <= 10 ? 'text-red-500 font-bold' : ''}`}
-              >
-                {turnTimeLeft}s
-              </span>
+              <TurnTimer
+                key={`${gameState.currentPlayer}-${gameState.moveHistory.length}`}
+                isPlaying={gameState.status === 'playing'}
+                onExpired={onTimerExpired}
+              />
             </div>
           </div>
         </div>
