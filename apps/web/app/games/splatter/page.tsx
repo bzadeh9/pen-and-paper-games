@@ -73,7 +73,7 @@ export default function SplatterPage() {
                   <strong>Manual</strong> (take turns placing dots) mode
                 </li>
                 <li>
-                  • Once setup is complete, click "Start Game" to begin
+                  • Once setup is complete, click &quot;Start Game&quot; to begin
                 </li>
                 <li>
                   • On your turn, click one of your colored dots to perform a{' '}

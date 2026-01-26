@@ -14,11 +14,6 @@ export function GridSizeSelector({
   onGridSizeChange,
   disabled = false,
 }: GridSizeSelectorProps) {
-  const gridSizes = Array.from(
-    { length: MAX_GRID_SIZE - MIN_GRID_SIZE + 1 },
-    (_, i) => MIN_GRID_SIZE + i
-  );
-
   return (
     <div>
       <label htmlFor="grid-size" className="mb-2 block text-sm font-medium">
