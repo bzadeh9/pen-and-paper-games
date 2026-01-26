@@ -236,7 +236,7 @@ export function GameBoard({
                 key={`${row}-${col}`}
                 className={`relative flex items-center justify-center border border-foreground/20 transition-all ${
                   isExhausted
-                    ? 'bg-ink-black/80 cursor-not-allowed'
+                    ? 'bg-foreground/5 dark:bg-foreground/10 cursor-not-allowed'
                     : isValid && gameState.status === 'playing'
                       ? 'bg-green-100 dark:bg-green-900/30 cursor-pointer hover:bg-green-200 dark:hover:bg-green-900/50'
                       : 'bg-background cursor-default'
@@ -249,6 +249,21 @@ export function GameBoard({
                 onMouseEnter={() => setHoveredCell(pos)}
                 onMouseLeave={() => setHoveredCell(null)}
               >
+                {isExhausted && (
+                  <svg
+                    className="absolute inset-0 h-full w-full p-4 text-foreground/20"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )}
                 {isPlayer1 && (
                   <div
                     className="rounded-full flex items-center justify-center text-white font-bold"
@@ -282,7 +297,7 @@ export function GameBoard({
       {/* Game info */}
       <div className="text-center text-sm text-foreground/60">
         <p>Move in an L-shape (like a chess knight)</p>
-        <p className="mt-1">Squares turn dark once left</p>
+        <p className="mt-1">Squares are marked as spent once left</p>
       </div>
     </div>
   );
