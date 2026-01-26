@@ -142,7 +142,7 @@ export function GameBoard({
   const handleReset = () => {
     engine.reset();
     setGameState(engine.getState());
-    
+
     // In tournament mode, notify parent to track round progression
     if (tournamentMode && !tournamentEnded && onNewGameRequest) {
       onNewGameRequest();
@@ -310,8 +310,8 @@ export function GameBoard({
                 Wins the Tournament!
               </p>
               <p className="mt-2 text-sm text-green-700 dark:text-green-300">
-                Final Score: {player1Name} {roundWins.player1} - {roundWins.player2}{' '}
-                {player2Name}
+                Final Score: {player1Name} {roundWins.player1} -{' '}
+                {roundWins.player2} {player2Name}
               </p>
             </>
           ) : (

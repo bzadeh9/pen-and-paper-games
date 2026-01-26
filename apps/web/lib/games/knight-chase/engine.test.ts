@@ -59,11 +59,11 @@ describe('KnightChaseEngine', () => {
     it('should reject moves to exhausted squares', () => {
       // Make a move to (1,2), which exhausts (0,0)
       engine.makeMove({ row: 1, col: 2 });
-      
+
       // Now try to move back - should fail if (0,0) was exhausted
       // But we need to make another move first to come back to player 1
       engine.makeMove({ row: 6, col: 5 }); // Player 2 moves
-      
+
       // Player 1 should not be able to move to an exhausted square
       const state = engine.getState();
       expect(state.grid[0][0]).toBe('exhausted');
@@ -116,24 +116,24 @@ describe('KnightChaseEngine', () => {
     it('should detect elimination when a player lands on opponent', () => {
       // This is a contrived example - in practice it's hard to eliminate directly
       // But we can test the logic by creating a scenario
-      
+
       // We'll need to carefully move players toward each other
       // For testing, let's manually verify the elimination logic works
-      
+
       // Move player 1 from (0,0) to (1,2)
       engine.makeMove({ row: 1, col: 2 });
-      
+
       // Move player 2 from (7,7) to (6,5)
       engine.makeMove({ row: 6, col: 5 });
-      
+
       // Continue moving toward each other
       engine.makeMove({ row: 2, col: 4 }); // Player 1
       engine.makeMove({ row: 5, col: 3 }); // Player 2
-      
+
       // Move to same square
       engine.makeMove({ row: 3, col: 2 }); // Player 1
       engine.makeMove({ row: 3, col: 2 }); // Player 2 lands on Player 1
-      
+
       const state = engine.getState();
       expect(state.status).toBe('ended');
       expect(state.winner).toBe(2);
@@ -153,9 +153,9 @@ describe('KnightChaseEngine', () => {
       engine.startGame();
       engine.makeMove({ row: 1, col: 2 });
       engine.makeMove({ row: 6, col: 5 });
-      
+
       engine.reset();
-      
+
       const state = engine.getState();
       expect(state.status).toBe('setup');
       expect(state.currentPlayer).toBe(1);

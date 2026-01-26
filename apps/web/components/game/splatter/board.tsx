@@ -96,7 +96,8 @@ export function GameBoard({
     gameState.currentPlayer === 1 ? player1Name : player2Name;
 
   const DOT_SIZE = 16;
-  const GRID_SPACING = gameState.gridSize <= 5 ? 70 : gameState.gridSize <= 7 ? 55 : 45;
+  const GRID_SPACING =
+    gameState.gridSize <= 5 ? 70 : gameState.gridSize <= 7 ? 55 : 45;
   const PADDING = 40;
   const SVG_WIDTH = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
   const SVG_HEIGHT = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
@@ -137,25 +138,30 @@ export function GameBoard({
             <p className="text-lg font-semibold">{currentPlayerName}</p>
           </div>
           <div className="mt-2 text-xs text-foreground/60">
-            {player1Name}: {dotCounts.player1} dots | {player2Name}: {dotCounts.player2} dots
+            {player1Name}: {dotCounts.player1} dots | {player2Name}:{' '}
+            {dotCounts.player2} dots
           </div>
         </div>
       )}
 
       {/* Setup instruction */}
-      {gameState.status === 'setup' && !gameState.setupComplete && setupMode === 'manual' && (
-        <div className="rounded-lg border border-foreground/20 bg-background p-4 text-center">
-          <p className="text-sm text-foreground/60">Setup Phase</p>
-          <div className="flex items-center gap-2 mt-1 justify-center">
-            <div
-              className="h-4 w-4 rounded-full"
-              style={{ backgroundColor: currentPlayerColor }}
-            />
-            <p className="text-lg font-semibold">{currentPlayerName}</p>
+      {gameState.status === 'setup' &&
+        !gameState.setupComplete &&
+        setupMode === 'manual' && (
+          <div className="rounded-lg border border-foreground/20 bg-background p-4 text-center">
+            <p className="text-sm text-foreground/60">Setup Phase</p>
+            <div className="flex items-center gap-2 mt-1 justify-center">
+              <div
+                className="h-4 w-4 rounded-full"
+                style={{ backgroundColor: currentPlayerColor }}
+              />
+              <p className="text-lg font-semibold">{currentPlayerName}</p>
+            </div>
+            <p className="text-sm text-foreground/60 mt-1">
+              Click to place your dot
+            </p>
           </div>
-          <p className="text-sm text-foreground/60 mt-1">Click to place your dot</p>
-        </div>
-      )}
+        )}
 
       {/* Ready button for setup */}
       {gameState.status === 'setup' && gameState.setupComplete && (
@@ -176,11 +182,14 @@ export function GameBoard({
             Array.from({ length: gameState.gridSize }).map((_, col) => {
               const pos = getDotPosition(row, col);
               const cell = gameState.grid[row][col];
-              const isHovered = hoveredCell?.row === row && hoveredCell?.col === col;
+              const isHovered =
+                hoveredCell?.row === row && hoveredCell?.col === col;
               const isInAreaPreview = areaPreviewCells.some(
                 (p) => p.row === row && p.col === col
               );
-              const canSelect = gameState.status === 'playing' && engine.canSelectCell({ row, col });
+              const canSelect =
+                gameState.status === 'playing' &&
+                engine.canSelectCell({ row, col });
 
               return (
                 <g key={`${row}-${col}`}>
@@ -220,12 +229,19 @@ export function GameBoard({
                       cy={pos.y}
                       r={DOT_SIZE}
                       fill={getCellColor(cell)}
-                      stroke={isHovered && canSelect ? currentPlayerColor : 'currentColor'}
+                      stroke={
+                        isHovered && canSelect
+                          ? currentPlayerColor
+                          : 'currentColor'
+                      }
                       strokeWidth={isHovered && canSelect ? 3 : 1}
                       opacity={cell !== null ? 1 : 0}
-                      className={canSelect ? 'cursor-pointer transition-all' : ''}
+                      className={
+                        canSelect ? 'cursor-pointer transition-all' : ''
+                      }
                       style={{
-                        filter: isHovered && canSelect ? 'brightness(1.2)' : 'none',
+                        filter:
+                          isHovered && canSelect ? 'brightness(1.2)' : 'none',
                       }}
                     />
                   )}
@@ -238,7 +254,9 @@ export function GameBoard({
                     height={GRID_SPACING}
                     fill="transparent"
                     className={
-                      (gameState.status === 'setup' && setupMode === 'manual' && cell === null) ||
+                      (gameState.status === 'setup' &&
+                        setupMode === 'manual' &&
+                        cell === null) ||
                       canSelect
                         ? 'cursor-pointer'
                         : ''
@@ -250,7 +268,8 @@ export function GameBoard({
                         handleCellClick({ row, col }, true);
                       } else if (canSelect) {
                         // Right-click or Ctrl+click for area splatter
-                        const isAreaSplatter = e.ctrlKey || e.metaKey || e.shiftKey;
+                        const isAreaSplatter =
+                          e.ctrlKey || e.metaKey || e.shiftKey;
                         handleCellClick({ row, col }, !isAreaSplatter);
                       }
                     }}
@@ -262,7 +281,12 @@ export function GameBoard({
                     }}
                     onMouseDown={(e) => {
                       // Show area preview on right-click or modifier key press
-                      if (e.button === 2 || e.ctrlKey || e.metaKey || e.shiftKey) {
+                      if (
+                        e.button === 2 ||
+                        e.ctrlKey ||
+                        e.metaKey ||
+                        e.shiftKey
+                      ) {
                         setShowAreaPreview(true);
                       }
                     }}

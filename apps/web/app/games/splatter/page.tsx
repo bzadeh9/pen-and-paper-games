@@ -21,13 +21,16 @@ import {
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 export default function SplatterPage() {
-  const [player1Color, setPlayer1Color] = useState<PlayerColor>('cherryBlossom');
+  const [player1Color, setPlayer1Color] =
+    useState<PlayerColor>('cherryBlossom');
   const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState(5);
   const [setupMode, setSetupMode] = useState<SetupMode>('auto');
-  const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>('setup');
+  const [gameStatus, setGameStatus] = useState<'setup' | 'playing' | 'ended'>(
+    'setup'
+  );
   const [stats, setStats] = useState(() => getGameStatistics());
 
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -73,7 +76,8 @@ export default function SplatterPage() {
                   <strong>Manual</strong> (take turns placing dots) mode
                 </li>
                 <li>
-                  • Once setup is complete, click &quot;Start Game&quot; to begin
+                  • Once setup is complete, click &quot;Start Game&quot; to
+                  begin
                 </li>
                 <li>
                   • On your turn, click one of your colored dots to perform a{' '}
@@ -154,7 +158,9 @@ export default function SplatterPage() {
             >
               <div className="px-4 pt-4 pb-2">
                 <CollapsibleTrigger>
-                  <h3 className="text-lg font-semibold">{player1Name} Options</h3>
+                  <h3 className="text-lg font-semibold">
+                    {player1Name} Options
+                  </h3>
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent>
@@ -178,7 +184,9 @@ export default function SplatterPage() {
             >
               <div className="px-4 pt-4 pb-2">
                 <CollapsibleTrigger>
-                  <h3 className="text-lg font-semibold">{player2Name} Options</h3>
+                  <h3 className="text-lg font-semibold">
+                    {player2Name} Options
+                  </h3>
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent>
