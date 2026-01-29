@@ -25,8 +25,8 @@ export function GameBoard({
   const engine = useMemo(() => new KnightChaseEngine(), []);
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPossibleMoves, setShowPossibleMoves] = useState(false);
+  const [shakePlayer, setShakePlayer] = useState<Player | null>(null);
 
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
@@ -38,25 +38,25 @@ export function GameBoard({
   }, [gameState.status, gameState.winner, onGameEnd, onGameStateChange]);
 
   useEffect(() => {
-    if (errorMessage) {
+    if (shakePlayer) {
       const timer = setTimeout(() => {
-        setErrorMessage(null);
-      }, 3000);
+        setShakePlayer(null);
+      }, 400);
       return () => clearTimeout(timer);
     }
-  }, [errorMessage]);
+  }, [shakePlayer]);
 
   const handleCellClick = (pos: Position) => {
     if (gameState.status !== 'playing') return;
 
     if (!engine.isValidMove(pos)) {
-      setErrorMessage('Invalid move: Must be a valid L-shaped knight move.');
+      setShakePlayer(gameState.currentPlayer);
       return;
     }
 
     if (engine.makeMove(pos)) {
       setGameState(engine.getState());
-      setErrorMessage(null);
+      setShakePlayer(null);
       playSound();
     }
   };
@@ -111,16 +111,6 @@ export function GameBoard({
 
   return (
     <div className="flex flex-col items-center gap-6">
-      {errorMessage && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="rounded-lg border-2 border-red-500 bg-red-100 px-4 py-2 text-red-800 dark:bg-red-900 dark:text-red-200"
-        >
-          {errorMessage}
-        </div>
-      )}
-
       {gameState.status === 'setup' && (
         <div className="text-center">
           <p className="mb-4 text-lg font-semibold">Ready to Chase?</p>
@@ -228,7 +218,9 @@ export function GameBoard({
                 )}
                 {isPlayer1 && (
                   <div
-                    className="rounded-full flex items-center justify-center text-white font-bold"
+                    className={`rounded-full flex items-center justify-center text-white font-bold ${
+                      shakePlayer === 1 ? 'shake' : ''
+                    }`}
                     style={{
                       width: KNIGHT_SIZE,
                       height: KNIGHT_SIZE,
@@ -240,7 +232,9 @@ export function GameBoard({
                 )}
                 {isPlayer2 && (
                   <div
-                    className="rounded-full flex items-center justify-center text-white font-bold"
+                    className={`rounded-full flex items-center justify-center text-white font-bold ${
+                      shakePlayer === 2 ? 'shake' : ''
+                    }`}
                     style={{
                       width: KNIGHT_SIZE,
                       height: KNIGHT_SIZE,

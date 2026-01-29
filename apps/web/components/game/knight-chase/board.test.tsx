@@ -25,9 +25,9 @@ const audioContextMock = {
   currentTime: 0,
 };
 
-// @ts-ignore
+// @ts-expect-error AudioContext mock for tests
 window.AudioContext = vi.fn().mockImplementation(() => audioContextMock);
-// @ts-ignore
+// @ts-expect-error webkitAudioContext mock for tests
 window.webkitAudioContext = vi.fn().mockImplementation(() => audioContextMock);
 
 describe('KnightChase GameBoard', () => {
@@ -82,5 +82,20 @@ describe('KnightChase GameBoard', () => {
     highlightedCells = container.querySelectorAll('.bg-green-100');
     // Expect 2 valid moves for Knight at corner (2,1) and (1,2)
     expect(highlightedCells.length).toBe(2);
+  });
+
+  it('shakes the current player piece on invalid move', () => {
+    const { container } = render(<GameBoard {...defaultProps} />);
+    fireEvent.click(screen.getByText('Start Game'));
+
+    const playerOnePiece = container.querySelector('.shake');
+    expect(playerOnePiece).toBeNull();
+
+    const cell = container.querySelector('div.grid > div');
+    expect(cell).not.toBeNull();
+    fireEvent.click(cell as HTMLElement);
+
+    const shakenPiece = container.querySelector('.shake');
+    expect(shakenPiece).not.toBeNull();
   });
 });

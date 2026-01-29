@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   HoldTheLineEngine,
   Position,
@@ -50,6 +50,10 @@ export function GameBoard({
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredDot, setHoveredDot] = useState<Position | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [pendingMove, setPendingMove] = useState<{
+    pos: Position;
+    ends: Position[];
+  } | null>(null);
 
   // Generate offsets dynamically based on max possible grid size
   const [pathOffsets] = useState(() => {
@@ -100,9 +104,34 @@ export function GameBoard({
       return;
     }
 
-    if (engine.makeMove(pos)) {
+    if (
+      pendingMove &&
+      (pendingMove.pos.row !== pos.row || pendingMove.pos.col !== pos.col)
+    ) {
+      setPendingMove(null);
+    }
+
+    const validEnds = engine.getValidConnectionEnds(pos);
+    if (gameState.pathEnds && validEnds.length > 1) {
+      setPendingMove({ pos, ends: validEnds });
+      setErrorMessage(null);
+      return;
+    }
+
+    if (engine.makeMove(pos, validEnds[0])) {
       setGameState(engine.getState());
       setErrorMessage(null); // Clear any previous error
+      setPendingMove(null);
+      playSound();
+    }
+  };
+
+  const handleEndSelection = (end: Position) => {
+    if (!pendingMove) return;
+    if (engine.makeMove(pendingMove.pos, end)) {
+      setGameState(engine.getState());
+      setPendingMove(null);
+      setErrorMessage(null);
       playSound();
     }
   };
@@ -142,6 +171,8 @@ export function GameBoard({
   const handleReset = () => {
     engine.reset();
     setGameState(engine.getState());
+    setPendingMove(null);
+    setHoveredDot(null);
 
     // In tournament mode, notify parent to track round progression
     if (tournamentMode && !tournamentEnded && onNewGameRequest) {
@@ -150,8 +181,11 @@ export function GameBoard({
   };
 
   const validMoves = engine.getValidMoves();
-  const isValidMove = (pos: Position) =>
-    validMoves.some((move) => move.row === pos.row && move.col === pos.col);
+  const isValidMove = useCallback(
+    (pos: Position) =>
+      validMoves.some((move) => move.row === pos.row && move.col === pos.col),
+    [validMoves]
+  );
 
   // Current player's color for turn indicator
   const currentPlayerColor =
@@ -171,57 +205,53 @@ export function GameBoard({
   const SVG_WIDTH = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
   const SVG_HEIGHT = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
 
-  const getDotPosition = (row: number, col: number) => ({
-    x: PADDING + col * GRID_SPACING,
-    y: PADDING + row * GRID_SPACING,
-  });
+  const getDotPosition = useCallback(
+    (row: number, col: number) => ({
+      x: PADDING + col * GRID_SPACING,
+      y: PADDING + row * GRID_SPACING,
+    }),
+    [PADDING, GRID_SPACING]
+  );
 
-  const positionKey = (pos: Position) => `${pos.row},${pos.col}`;
-  const isVisited = (pos: Position) =>
-    gameState.visitedDots.has(positionKey(pos));
-
-  // Helper function to find which path end a move would connect to
-  const getConnectedPathEnd = (pos: Position): Position | null => {
-    if (!gameState.pathEnds || !isValidMove(pos)) return null;
-
-    const [end1, end2] = gameState.pathEnds;
-    const rowDiff1 = Math.abs(pos.row - end1.row);
-    const colDiff1 = Math.abs(pos.col - end1.col);
-    const rowDiff2 = Math.abs(pos.row - end2.row);
-    const colDiff2 = Math.abs(pos.col - end2.col);
-
-    // Check adjacency to end1
-    if (rowDiff1 <= 1 && colDiff1 <= 1 && (rowDiff1 > 0 || colDiff1 > 0)) {
-      return end1;
-    }
-
-    // Check adjacency to end2
-    if (rowDiff2 <= 1 && colDiff2 <= 1 && (rowDiff2 > 0 || colDiff2 > 0)) {
-      return end2;
-    }
-
-    return null;
-  };
+  const positionKey = useCallback(
+    (pos: Position) => `${pos.row},${pos.col}`,
+    []
+  );
+  const isVisited = useCallback(
+    (pos: Position) => gameState.visitedDots.has(positionKey(pos)),
+    [gameState.visitedDots, positionKey]
+  );
 
   // Memoize hover preview line data
-  const hoverPreviewLine = useMemo(() => {
+  const hoverPreviewLines = useMemo(() => {
+    const previewDot = pendingMove?.pos ?? hoveredDot;
     if (
-      !hoveredDot ||
+      !previewDot ||
       gameState.status !== 'playing' ||
-      !isValidMove(hoveredDot) ||
-      isVisited(hoveredDot)
+      !isValidMove(previewDot) ||
+      isVisited(previewDot)
     ) {
-      return null;
+      return [];
     }
 
-    const connectedEnd = getConnectedPathEnd(hoveredDot);
-    if (!connectedEnd) return null;
+    const validEnds =
+      pendingMove?.ends ?? engine.getValidConnectionEnds(previewDot);
+    if (validEnds.length === 0) return [];
 
-    return {
-      start: getDotPosition(connectedEnd.row, connectedEnd.col),
-      end: getDotPosition(hoveredDot.row, hoveredDot.col),
-    };
-  }, [hoveredDot, gameState.status, gameState.pathEnds, validMoves]);
+    return validEnds.map((end) => ({
+      start: getDotPosition(end.row, end.col),
+      end: getDotPosition(previewDot.row, previewDot.col),
+      key: `${end.row}-${end.col}-${previewDot.row}-${previewDot.col}`,
+    }));
+  }, [
+    hoveredDot,
+    pendingMove,
+    gameState.status,
+    engine,
+    getDotPosition,
+    isValidMove,
+    isVisited,
+  ]);
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -416,21 +446,43 @@ export function GameBoard({
             );
           })}
 
-          {/* Draw hover preview line (dashed) */}
-          {hoverPreviewLine && (
+          {/* Draw hover preview lines (dashed) */}
+          {hoverPreviewLines.map((line) => (
             <line
-              key="hover-preview"
-              x1={hoverPreviewLine.start.x}
-              y1={hoverPreviewLine.start.y}
-              x2={hoverPreviewLine.end.x}
-              y2={hoverPreviewLine.end.y}
+              key={`hover-preview-${line.key}`}
+              x1={line.start.x}
+              y1={line.start.y}
+              x2={line.end.x}
+              y2={line.end.y}
               stroke={currentPlayerColor}
               strokeWidth="2"
               strokeDasharray="5,5"
               opacity="0.5"
               strokeLinecap="round"
             />
-          )}
+          ))}
+
+          {/* Highlight selectable path ends for ambiguous moves */}
+          {pendingMove?.ends.map((end, index) => {
+            const { x, y } = getDotPosition(end.row, end.col);
+            return (
+              <circle
+                key={`pending-end-${index}`}
+                cx={x}
+                cy={y}
+                r={DOT_SIZE + 10}
+                fill="none"
+                stroke={currentPlayerColor}
+                strokeWidth="3"
+                strokeDasharray="4,4"
+                opacity="0.8"
+                onClick={() => handleEndSelection(end)}
+                style={{ cursor: 'pointer' }}
+                role="button"
+                aria-label="Select path end"
+              />
+            );
+          })}
 
           {/* Draw dots */}
           {Array.from({ length: gameState.gridSize }).map((_, row) =>
@@ -441,6 +493,8 @@ export function GameBoard({
               const valid = isValidMove(pos);
               const hovered =
                 hoveredDot?.row === row && hoveredDot?.col === col;
+              const isPending =
+                pendingMove?.pos.row === row && pendingMove?.pos.col === col;
 
               return (
                 <g key={`dot-${row}-${col}`}>
@@ -472,17 +526,17 @@ export function GameBoard({
                   />
 
                   {/* Highlight valid moves - drawn after dot so it doesn't block clicks */}
-                  {valid && !visited && gameState.status === 'playing' && (
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r={DOT_SIZE + 6}
-                      fill={currentPlayerColor}
-                      opacity={hovered ? 0.4 : 0.2}
-                      className="transition-opacity"
-                      style={{ pointerEvents: 'none' }}
-                    />
-                  )}
+                    {valid && !visited && gameState.status === 'playing' && (
+                      <circle
+                        cx={x}
+                        cy={y}
+                        r={DOT_SIZE + 6}
+                        fill={currentPlayerColor}
+                        opacity={hovered || isPending ? 0.4 : 0.2}
+                        className="transition-opacity"
+                        style={{ pointerEvents: 'none' }}
+                      />
+                    )}
 
                   {/* Show move order number on visited dots */}
                   {visited && (
