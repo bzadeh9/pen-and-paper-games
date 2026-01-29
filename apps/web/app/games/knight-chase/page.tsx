@@ -81,7 +81,6 @@ export default function KnightChasePage() {
                   • Or win when your opponent has no valid moves left
                   (entrapment)
                 </li>
-                <li>• You have 30 seconds per turn</li>
               </ul>
             </div>
           </CollapsibleContent>
