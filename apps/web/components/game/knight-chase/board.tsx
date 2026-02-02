@@ -14,6 +14,18 @@ interface GameBoardProps {
   onGameStateChange?: (status: 'setup' | 'playing' | 'ended') => void;
 }
 
+// Tooltip component for invalid move feedback
+const InvalidMoveTooltip = () => (
+  <div
+    role="tooltip"
+    aria-live="polite"
+    className="absolute -top-12 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
+  >
+    Invalid move
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600"></div>
+  </div>
+);
+
 export function GameBoard({
   player1Color,
   player2Color,
@@ -239,16 +251,7 @@ export function GameBoard({
                 )}
                 {isPlayer1 && (
                   <div className="relative flex items-center justify-center w-full h-full">
-                    {showTooltip && (
-                      <div
-                        role="tooltip"
-                        aria-live="polite"
-                        className="absolute -top-12 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
-                      >
-                        Invalid move
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600"></div>
-                      </div>
-                    )}
+                    {showTooltip && <InvalidMoveTooltip />}
                     <div
                       className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
                         shakeKnight && isCurrentPlayerKnight ? 'animate-shake' : ''
@@ -267,16 +270,7 @@ export function GameBoard({
                 )}
                 {isPlayer2 && (
                   <div className="relative flex items-center justify-center w-full h-full">
-                    {showTooltip && (
-                      <div
-                        role="tooltip"
-                        aria-live="polite"
-                        className="absolute -top-12 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
-                      >
-                        Invalid move
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600"></div>
-                      </div>
-                    )}
+                    {showTooltip && <InvalidMoveTooltip />}
                     <div
                       className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
                         shakeKnight && isCurrentPlayerKnight ? 'animate-shake' : ''

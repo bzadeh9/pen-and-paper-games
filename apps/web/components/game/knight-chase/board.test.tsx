@@ -100,7 +100,7 @@ describe('KnightChase GameBoard', () => {
     
     // Tooltip should now be visible
     tooltip = screen.queryByRole('tooltip');
-    expect(tooltip).toBeDefined();
+    expect(tooltip).not.toBeNull();
     expect(tooltip?.textContent).toContain('Invalid move');
   });
 
