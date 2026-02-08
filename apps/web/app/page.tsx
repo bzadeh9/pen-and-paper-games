@@ -131,7 +131,7 @@ export default function Home() {
 
         {/* Footer */}
         <div className="mt-12 text-sm text-foreground/40">
-          <p>Developed by Leon &amp; Maya</p>
+          <p>Developed by Leon &amp; Maya 😜</p>
         </div>
       </main>
     </div>
