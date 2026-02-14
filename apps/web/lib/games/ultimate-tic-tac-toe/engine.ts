@@ -12,7 +12,18 @@ export class UltimateTicTacToeEngine {
   private state: GameState;
 
   constructor(mode: GameMode = 'standard') {
-    // Initialize 3x3 grid of local boards, each with 3x3 cells
+    this.state = {
+      localBoards: this.createEmptyBoards(),
+      currentPlayer: 'X',
+      mode,
+      status: 'setup',
+      winner: null,
+      activeBoard: null,
+      moveHistory: [],
+    };
+  }
+
+  private createEmptyBoards(): LocalBoard[][] {
     const localBoards: LocalBoard[][] = [];
     for (let i = 0; i < 3; i++) {
       localBoards[i] = [];
@@ -27,16 +38,7 @@ export class UltimateTicTacToeEngine {
         };
       }
     }
-
-    this.state = {
-      localBoards,
-      currentPlayer: 'X',
-      mode,
-      status: 'setup',
-      winner: null,
-      activeBoard: null,
-      moveHistory: [],
-    };
+    return localBoards;
   }
 
   getState(): GameState {
@@ -268,23 +270,8 @@ export class UltimateTicTacToeEngine {
 
   reset(): void {
     const mode = this.state.mode;
-    const localBoards: LocalBoard[][] = [];
-    for (let i = 0; i < 3; i++) {
-      localBoards[i] = [];
-      for (let j = 0; j < 3; j++) {
-        const cells: CellState[][] = [];
-        for (let r = 0; r < 3; r++) {
-          cells[r] = [null, null, null];
-        }
-        localBoards[i][j] = {
-          cells,
-          winner: null,
-        };
-      }
-    }
-
     this.state = {
-      localBoards,
+      localBoards: this.createEmptyBoards(),
       currentPlayer: 'X',
       mode,
       status: 'playing',
