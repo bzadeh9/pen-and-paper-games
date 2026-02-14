@@ -90,13 +90,14 @@ describe('BlackHoleEngine', () => {
       expect(state.player2Score).toBeGreaterThanOrEqual(0);
     });
 
-    it('should declare winner with lower score', () => {
-      // Simulate a game
+    it('should declare winner with lower score in lowest mode', () => {
+      // Simulate a game in lowest mode (default)
       for (let i = 0; i < 20; i++) {
         engine.makeMove(i);
       }
 
       const state = engine.getState();
+      expect(state.mode).toBe('lowest');
       if (state.winner !== 'draw') {
         if (state.winner === 1) {
           expect(state.player1Score).toBeLessThan(state.player2Score);
@@ -106,6 +107,56 @@ describe('BlackHoleEngine', () => {
       } else {
         expect(state.player1Score).toBe(state.player2Score);
       }
+    });
+
+    it('should declare winner with higher score in highest mode', () => {
+      // Create engine with highest mode
+      const highestEngine = new BlackHoleEngine('highest');
+      
+      // Simulate a game
+      for (let i = 0; i < 20; i++) {
+        highestEngine.makeMove(i);
+      }
+
+      const state = highestEngine.getState();
+      expect(state.mode).toBe('highest');
+      if (state.winner !== 'draw') {
+        if (state.winner === 1) {
+          expect(state.player1Score).toBeGreaterThan(state.player2Score);
+        } else {
+          expect(state.player2Score).toBeGreaterThan(state.player1Score);
+        }
+      } else {
+        expect(state.player1Score).toBe(state.player2Score);
+      }
+    });
+  });
+
+  describe('game modes', () => {
+    it('should default to lowest mode', () => {
+      const state = engine.getState();
+      expect(state.mode).toBe('lowest');
+    });
+
+    it('should support highest mode', () => {
+      const highestEngine = new BlackHoleEngine('highest');
+      const state = highestEngine.getState();
+      expect(state.mode).toBe('highest');
+    });
+
+    it('should allow mode changes', () => {
+      engine.setMode('highest');
+      const state = engine.getState();
+      expect(state.mode).toBe('highest');
+    });
+
+    it('should preserve mode on reset', () => {
+      engine.setMode('highest');
+      engine.makeMove(0);
+      engine.reset();
+      
+      const state = engine.getState();
+      expect(state.mode).toBe('highest');
     });
   });
 

@@ -1,5 +1,6 @@
 export type Player = 1 | 2;
 export type GameStatus = 'playing' | 'ended';
+export type GameMode = 'lowest' | 'highest';
 
 export interface Circle {
   id: number;
@@ -16,6 +17,7 @@ export interface GameState {
   player1Counter: number;
   player2Counter: number;
   status: GameStatus;
+  mode: GameMode;
   blackHoleId: number | null;
   winner: Player | 'draw' | null;
   player1Score: number;

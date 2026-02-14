@@ -1,13 +1,13 @@
-import type { GameState, Circle } from './types';
+import type { GameState, Circle, GameMode } from './types';
 
 export class BlackHoleEngine {
   private state: GameState;
 
-  constructor() {
-    this.state = this.createInitialState();
+  constructor(mode: GameMode = 'lowest') {
+    this.state = this.createInitialState(mode);
   }
 
-  private createInitialState(): GameState {
+  private createInitialState(mode: GameMode): GameState {
     const circles: Circle[] = [];
     let id = 0;
 
@@ -31,6 +31,7 @@ export class BlackHoleEngine {
       player1Counter: 1,
       player2Counter: 1,
       status: 'playing',
+      mode,
       blackHoleId: null,
       winner: null,
       player1Score: 0,
@@ -158,17 +159,34 @@ export class BlackHoleEngine {
     this.state.player1Score = player1Score;
     this.state.player2Score = player2Score;
 
-    // Determine winner (lowest score wins)
-    if (player1Score < player2Score) {
-      this.state.winner = 1;
-    } else if (player2Score < player1Score) {
-      this.state.winner = 2;
+    // Determine winner based on game mode
+    if (this.state.mode === 'lowest') {
+      // Lowest score wins
+      if (player1Score < player2Score) {
+        this.state.winner = 1;
+      } else if (player2Score < player1Score) {
+        this.state.winner = 2;
+      } else {
+        this.state.winner = 'draw';
+      }
     } else {
-      this.state.winner = 'draw';
+      // Highest score wins
+      if (player1Score > player2Score) {
+        this.state.winner = 1;
+      } else if (player2Score > player1Score) {
+        this.state.winner = 2;
+      } else {
+        this.state.winner = 'draw';
+      }
     }
   }
 
+  setMode(mode: GameMode): void {
+    this.state.mode = mode;
+  }
+
   reset(): void {
-    this.state = this.createInitialState();
+    const mode = this.state.mode;
+    this.state = this.createInitialState(mode);
   }
 }

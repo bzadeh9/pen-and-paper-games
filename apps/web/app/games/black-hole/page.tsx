@@ -4,13 +4,14 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Board } from '@/components/game/black-hole/board';
 import { TurnIndicator } from '@/components/game/black-hole/turn-indicator';
 import { GameStats } from '@/components/game/black-hole/game-stats';
+import { GameControls } from '@/components/game/black-hole/game-controls';
 import { BlackHoleEngine } from '@/lib/games/black-hole/engine';
 import {
   getGameStatistics,
   recordGame,
   resetStatistics,
 } from '@/lib/games/black-hole/stats';
-import { Button } from '@/components/ui/button';
+import type { GameMode } from '@/lib/games/black-hole/types';
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -19,11 +20,24 @@ import {
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 export default function BlackHolePage() {
-  const engine = useMemo(() => new BlackHoleEngine(), []);
+  const [mode, setMode] = useState<GameMode>('lowest');
+  const engine = useMemo(() => new BlackHoleEngine(mode), [mode]);
   const [gameState, setGameState] = useState(engine.getState());
   const [stats, setStats] = useState(() => getGameStatistics());
 
   const isMobile = useMediaQuery('(max-width: 767px)');
+
+  // Update mode when changed
+  const handleModeChange = useCallback(
+    (newMode: GameMode) => {
+      if (gameState.status === 'ended') {
+        setMode(newMode);
+        engine.setMode(newMode);
+        setGameState(engine.getState());
+      }
+    },
+    [engine, gameState.status]
+  );
 
   const handleCircleClick = useCallback(
     (circleId: number) => {
@@ -115,10 +129,10 @@ export default function BlackHolePage() {
                       • Each player&apos;s score is the sum of their numbers touching the Black Hole
                     </li>
                     <li>
-                      • The player with the <strong>lowest</strong> score wins!
+                      • <strong>Lowest Score Mode:</strong> The player with the lowest score wins (reverse-area control)
                     </li>
                     <li>
-                      • This is reverse-area control: you want to isolate your high numbers
+                      • <strong>Highest Score Mode:</strong> The player with the highest score wins
                     </li>
                   </ul>
                 </div>
@@ -129,10 +143,10 @@ export default function BlackHolePage() {
                   </h3>
                   <ul className="space-y-2 text-foreground/80">
                     <li>
-                      • Try to place your low numbers near potential Black Hole locations
+                      • In Lowest Score mode: Isolate your high numbers and place low numbers near potential Black Hole locations
                     </li>
                     <li>
-                      • Force your opponent to place high numbers in dangerous positions
+                      • In Highest Score mode: Aim to place your high numbers near the eventual Black Hole
                     </li>
                     <li>
                       • Remember: the last empty circle becomes the Black Hole!
@@ -152,6 +166,7 @@ export default function BlackHolePage() {
             player1Counter={gameState.player1Counter}
             player2Counter={gameState.player2Counter}
             gameStatus={gameState.status}
+            mode={gameState.mode}
             winner={gameState.winner}
             player1Score={gameState.player1Score}
             player2Score={gameState.player2Score}
@@ -160,14 +175,14 @@ export default function BlackHolePage() {
 
         {/* Main game area */}
         <div className="grid gap-6 md:grid-cols-[1fr_2fr_1fr]">
-          {/* Left panel: New Game button */}
+          {/* Left panel: Game Controls */}
           <div>
-            <div className="rounded-lg border-2 border-foreground/20 bg-background p-4">
-              <h2 className="mb-4 text-xl font-bold">Controls</h2>
-              <Button onClick={handleReset} className="w-full">
-                New Game
-              </Button>
-            </div>
+            <GameControls
+              mode={mode}
+              onModeChange={handleModeChange}
+              onReset={handleReset}
+              gameStatus={gameState.status}
+            />
           </div>
 
           {/* Center: Game Board */}

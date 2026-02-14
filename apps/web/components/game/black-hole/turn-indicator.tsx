@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { Player, GameStatus } from '@/lib/games/black-hole/types';
+import type { Player, GameStatus, GameMode } from '@/lib/games/black-hole/types';
 
 interface TurnIndicatorProps {
   currentPlayer: Player;
@@ -9,6 +9,7 @@ interface TurnIndicatorProps {
   player1Counter: number;
   player2Counter: number;
   gameStatus: GameStatus;
+  mode: GameMode;
   winner: Player | 'draw' | null;
   player1Score: number;
   player2Score: number;
@@ -20,10 +21,13 @@ export function TurnIndicator({
   player1Counter,
   player2Counter,
   gameStatus,
+  mode,
   winner,
   player1Score,
   player2Score,
 }: TurnIndicatorProps) {
+  const modeText = mode === 'lowest' ? 'Lowest score wins' : 'Highest score wins';
+  
   if (gameStatus === 'ended') {
     return (
       <div className="rounded-lg border-2 border-foreground/20 bg-background p-6 text-center">
@@ -54,7 +58,7 @@ export function TurnIndicator({
           )}
         </div>
         <p className="mt-2 text-sm text-foreground/60">
-          (Lowest score wins in Black Hole)
+          ({modeText})
         </p>
       </div>
     );
