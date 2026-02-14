@@ -1,4 +1,4 @@
-import type { GameState, Circle, Player } from './types';
+import type { GameState, Circle } from './types';
 
 export class BlackHoleEngine {
   private state: GameState;
