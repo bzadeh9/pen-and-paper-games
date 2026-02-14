@@ -25,8 +25,8 @@ export function CellComponent({
   const getPreviewClass = () => {
     if (!showPreview) return '';
     return selectedColor === 'cherry-blossom'
-      ? 'ring-2 ring-offset-2 ring-cherry-blossom'
-      : 'ring-2 ring-offset-2 ring-dusty-mauve';
+      ? 'ring-2 ring-cherry-blossom/40'
+      : 'ring-2 ring-dusty-mauve/40';
   };
 
   return (
@@ -34,14 +34,16 @@ export function CellComponent({
       onClick={onClick}
       disabled={isDisabled}
       className={`
-        h-12 w-12 rounded-lg border-2 border-foreground/20 transition-all
+        h-14 w-14 md:h-16 md:w-16 rounded-full flex items-center justify-center transition-all duration-200
+        ${!cell.color ? 'border-2 border-foreground/20' : ''}
         ${getColorClass(cell.color)}
         ${
           !isDisabled && !cell.color
-            ? 'hover:border-foreground/60 hover:scale-105 cursor-pointer'
+            ? 'hover:scale-110 hover:shadow-lg cursor-pointer'
             : ''
         }
-        ${isDisabled ? 'cursor-not-allowed opacity-75' : ''}
+        ${isDisabled ? 'cursor-not-allowed' : ''}
+        ${cell.color ? 'scale-100 hover:scale-105' : ''}
         ${getPreviewClass()}
       `}
       aria-label={`Cell at row ${cell.row + 1}, column ${cell.col + 1}${
@@ -49,11 +51,7 @@ export function CellComponent({
       }`}
     >
       {cell.color && (
-        <div className="h-full w-full rounded-md flex items-center justify-center">
-          <div
-            className={`h-8 w-8 rounded-full ${getColorClass(cell.color)}`}
-          />
-        </div>
+        <div className={`h-10 w-10 md:h-12 md:w-12 rounded-full ${getColorClass(cell.color)}`} />
       )}
     </button>
   );

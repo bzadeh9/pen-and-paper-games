@@ -15,8 +15,8 @@ export function Board({
   selectedColor,
 }: BoardProps) {
   return (
-    <div className="inline-block rounded-lg border-4 border-foreground/20 bg-alabaster-grey p-2">
-      <div className="grid grid-cols-6 gap-1">
+    <div className="inline-block rounded-lg border-2 border-foreground/20 bg-background p-4 shadow-lg">
+      <div className="grid grid-cols-6 gap-2">
         {board.map((row, rowIndex) =>
           row.map((cell, colIndex) => (
             <CellComponent
