@@ -274,7 +274,7 @@ export class UltimateTicTacToeEngine {
       localBoards: this.createEmptyBoards(),
       currentPlayer: 'X',
       mode,
-      status: 'playing',
+      status: 'setup',
       winner: null,
       activeBoard: null,
       moveHistory: [],
