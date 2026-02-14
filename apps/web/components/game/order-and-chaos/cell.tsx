@@ -21,6 +21,13 @@ export function CellComponent({
   };
 
   const showPreview = !cell.color && selectedColor && !isDisabled;
+  
+  const getPreviewClass = () => {
+    if (!showPreview) return '';
+    return selectedColor === 'cherry-blossom'
+      ? 'ring-2 ring-offset-2 ring-cherry-blossom'
+      : 'ring-2 ring-offset-2 ring-dusty-mauve';
+  };
 
   return (
     <button
@@ -35,7 +42,7 @@ export function CellComponent({
             : ''
         }
         ${isDisabled ? 'cursor-not-allowed opacity-75' : ''}
-        ${showPreview ? 'ring-2 ring-offset-2 ring-' + selectedColor : ''}
+        ${getPreviewClass()}
       `}
       aria-label={`Cell at row ${cell.row + 1}, column ${cell.col + 1}${
         cell.color ? `, occupied by ${cell.color}` : ''

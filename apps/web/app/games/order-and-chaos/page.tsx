@@ -188,10 +188,7 @@ export default function OrderAndChaosPage() {
         {/* Game area */}
         <div className="grid gap-8 lg:grid-cols-[1fr_auto_1fr]">
           {/* Left panel - Stats and Turn Indicator (or Turn Indicator on mobile) */}
-          <div
-            className={`space-y-6 ${isMobile ? 'order-1' : ''}`}
-            style={isMobile ? { order: 1 } : undefined}
-          >
+          <div className={`space-y-6 ${isMobile ? 'order-1' : ''}`}>
             <TurnIndicator
               currentPlayer={gameState.currentPlayer}
               selectedColor={selectedColor}
@@ -209,10 +206,7 @@ export default function OrderAndChaosPage() {
           </div>
 
           {/* Center - Board */}
-          <div
-            className={`flex items-start justify-center ${isMobile ? 'order-2' : ''}`}
-            style={isMobile ? { order: 2 } : undefined}
-          >
+          <div className={`flex items-start justify-center ${isMobile ? 'order-2' : ''}`}>
             <Board
               board={gameState.board}
               onCellClick={handleCellClick}
@@ -222,10 +216,7 @@ export default function OrderAndChaosPage() {
           </div>
 
           {/* Right panel - Controls (or Stats and Controls on mobile) */}
-          <div
-            className={`space-y-6 ${isMobile ? 'order-3' : ''}`}
-            style={isMobile ? { order: 3 } : undefined}
-          >
+          <div className={`space-y-6 ${isMobile ? 'order-3' : ''}`}>
             <GameControls
               onReset={handleReset}
               winner={gameState.winner}
