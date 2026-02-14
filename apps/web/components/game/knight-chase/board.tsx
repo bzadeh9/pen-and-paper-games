@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { KnightChaseEngine } from '@/lib/games/knight-chase/engine';
 import { PLAYER_COLORS, PlayerColor } from '@/lib/games/knight-chase/types';
 import type { Position, Player } from '@/lib/games/knight-chase/types';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 interface GameBoardProps {
   player1Color: PlayerColor;
@@ -106,8 +107,9 @@ export function GameBoard({
       ? PLAYER_COLORS[player1Color]
       : PLAYER_COLORS[player2Color];
 
-  const CELL_SIZE = 60;
-  const KNIGHT_SIZE = 40;
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const CELL_SIZE = isMobile ? 40 : 60;
+  const KNIGHT_SIZE = isMobile ? 28 : 40;
 
   return (
     <div className="flex flex-col items-center gap-6">
