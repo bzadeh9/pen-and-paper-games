@@ -11,7 +11,7 @@ export class BlackHoleEngine {
     const circles: Circle[] = [];
     let id = 0;
 
-    // Create the pyramid: rows 0-5 with 1,2,3,4,5,6 circles
+    // Create the pyramid: row 0 has 1 circle, row 1 has 2 circles, ..., row 5 has 6 circles
     for (let row = 0; row <= 5; row++) {
       for (let col = 0; col <= row; col++) {
         circles.push({
