@@ -29,8 +29,19 @@ export function Board({ gameState, onCircleClick }: BoardProps) {
     return gameState.status === 'playing' && gameState.circles[circleId].value === null;
   };
 
+  const showSetupOverlay = gameState.status === 'setup';
+
   return (
-    <div className="flex flex-col items-center gap-3 p-6">
+    <div className="flex flex-col items-center gap-3 p-6 relative">
+      {showSetupOverlay && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10 rounded-xl">
+          <div className="text-center p-6">
+            <p className="text-lg font-semibold text-foreground/80">
+              Select a game mode and click Start Game
+            </p>
+          </div>
+        </div>
+      )}
       {[0, 1, 2, 3, 4, 5].map((row) => {
         const circles = getCirclesByRow(row);
         return (

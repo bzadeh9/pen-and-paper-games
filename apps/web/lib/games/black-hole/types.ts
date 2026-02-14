@@ -1,5 +1,5 @@
 export type Player = 1 | 2;
-export type GameStatus = 'playing' | 'ended';
+export type GameStatus = 'setup' | 'playing' | 'ended';
 export type GameMode = 'lowest' | 'highest';
 
 export interface Circle {

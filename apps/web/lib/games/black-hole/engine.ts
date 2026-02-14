@@ -30,7 +30,7 @@ export class BlackHoleEngine {
       currentTurnNumber: 1,
       player1Counter: 1,
       player2Counter: 1,
-      status: 'playing',
+      status: 'setup',
       mode,
       blackHoleId: null,
       winner: null,
@@ -44,6 +44,10 @@ export class BlackHoleEngine {
       ...this.state,
       circles: this.state.circles.map((c) => ({ ...c })),
     };
+  }
+
+  startGame(): void {
+    this.state.status = 'playing';
   }
 
   private getAdjacentCircleIds(circleId: number): number[] {
@@ -101,6 +105,11 @@ export class BlackHoleEngine {
   }
 
   makeMove(circleId: number): boolean {
+    // Auto-start the game if in setup
+    if (this.state.status === 'setup') {
+      this.startGame();
+    }
+
     if (!this.isValidMove(circleId)) {
       return false;
     }

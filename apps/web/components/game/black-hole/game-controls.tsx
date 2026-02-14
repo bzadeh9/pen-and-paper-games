@@ -17,7 +17,8 @@ export function GameControls({
   onReset,
   gameStatus,
 }: GameControlsProps) {
-  const isModeChangeable = gameStatus === 'ended';
+  const isModeChangeable = gameStatus === 'setup' || gameStatus === 'ended';
+  const isSetup = gameStatus === 'setup';
 
   return (
     <div className="space-y-4">
@@ -63,13 +64,13 @@ export function GameControls({
         )}
       </div>
 
-      {/* Reset Button */}
+      {/* Reset/Start Button */}
       <Button
         onClick={onReset}
         className="w-full"
         variant="default"
       >
-        {gameStatus === 'ended' ? 'Play Again' : 'New Game'}
+        {isSetup ? 'Start Game' : gameStatus === 'ended' ? 'Play Again' : 'New Game'}
       </Button>
     </div>
   );

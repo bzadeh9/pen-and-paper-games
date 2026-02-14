@@ -30,7 +30,7 @@ export default function BlackHolePage() {
   // Update mode when changed
   const handleModeChange = useCallback(
     (newMode: GameMode) => {
-      if (gameState.status === 'ended') {
+      if (gameState.status === 'setup' || gameState.status === 'ended') {
         setMode(newMode);
         engine.setMode(newMode);
         setGameState(engine.getState());
@@ -41,18 +41,30 @@ export default function BlackHolePage() {
 
   const handleCircleClick = useCallback(
     (circleId: number) => {
+      // Auto-start the game on first move if in setup
+      if (gameState.status === 'setup') {
+        engine.startGame();
+      }
+
       const success = engine.makeMove(circleId);
       if (success) {
         setGameState(engine.getState());
       }
     },
-    [engine]
+    [engine, gameState.status]
   );
 
   const handleReset = useCallback(() => {
-    engine.reset();
-    setGameState(engine.getState());
-  }, [engine]);
+    // If in setup mode, just start the game
+    if (gameState.status === 'setup') {
+      engine.startGame();
+      setGameState(engine.getState());
+    } else {
+      // Otherwise reset to setup
+      engine.reset();
+      setGameState(engine.getState());
+    }
+  }, [engine, gameState.status]);
 
   const handleResetStats = useCallback(() => {
     if (confirm('Are you sure you want to reset all statistics?')) {

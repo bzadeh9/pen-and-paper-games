@@ -170,7 +170,7 @@ describe('BlackHoleEngine', () => {
       expect(state.currentPlayer).toBe(1);
       expect(state.currentTurnNumber).toBe(1);
       expect(state.circles.every((c) => c.value === null)).toBe(true);
-      expect(state.status).toBe('playing');
+      expect(state.status).toBe('setup');
     });
   });
 });
