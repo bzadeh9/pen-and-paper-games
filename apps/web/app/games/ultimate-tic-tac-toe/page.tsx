@@ -160,24 +160,14 @@ export default function UltimateTicTacToePage() {
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Turn indicator */}
-        <div className="mb-6">
-          <TurnIndicator
-            currentPlayer={gameState.currentPlayer}
-            gameStatus={gameState.status}
-            winner={gameState.winner}
-          />
-        </div>
-
         {/* Main game area */}
         <div className="grid gap-6 md:grid-cols-[1fr_2fr_1fr]">
-          {/* Left panel: Game Controls (on mobile: second position) */}
+          {/* Left panel: Turn Indicator (on mobile: second position after board) */}
           <div className={isMobile ? 'order-2 md:order-1' : ''}>
-            <GameControls
-              mode={mode}
-              onModeChange={handleModeChange}
-              onReset={handleReset}
+            <TurnIndicator
+              currentPlayer={gameState.currentPlayer}
               gameStatus={gameState.status}
+              winner={gameState.winner}
             />
           </div>
 
@@ -191,8 +181,14 @@ export default function UltimateTicTacToePage() {
             </div>
           </div>
 
-          {/* Right panel: Stats (on mobile: third position) */}
-          <div className={isMobile ? 'order-3' : ''}>
+          {/* Right panel: Game Controls and Stats */}
+          <div className={`space-y-6 ${isMobile ? 'order-3' : ''}`}>
+            <GameControls
+              mode={mode}
+              onModeChange={handleModeChange}
+              onReset={handleReset}
+              gameStatus={gameState.status}
+            />
             <GameStats stats={stats} onReset={handleResetStats} />
           </div>
         </div>

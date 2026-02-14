@@ -326,7 +326,7 @@ describe('UltimateTicTacToeEngine', () => {
       engine.reset();
 
       const state = engine.getState();
-      expect(state.status).toBe('playing');
+      expect(state.status).toBe('setup');
       expect(state.currentPlayer).toBe('X');
       expect(state.winner).toBeNull();
       expect(state.moveHistory).toHaveLength(0);
