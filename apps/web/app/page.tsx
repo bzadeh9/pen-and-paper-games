@@ -176,6 +176,37 @@ export default function Home() {
             </div>
           </Link>
 
+          <Link
+            href="/games/order-and-chaos"
+            className="group rounded-lg border border-foreground/20 bg-background p-6 transition-all hover:border-foreground/40 hover:shadow-lg"
+          >
+            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-pastel-pink/20">
+              <svg
+                className="h-8 w-8 text-pastel-pink"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-2xl font-semibold">Order and Chaos</h2>
+            <p className="text-sm text-foreground/60">
+              Asymmetric strategy - build or block five in a row!
+            </p>
+            <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
+              <span>Play Now</span>
+              <span className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </div>
+          </Link>
+
           <div className="rounded-lg border border-dashed border-foreground/20 bg-background/50 p-6 opacity-50">
             <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-foreground/10">
               <svg
