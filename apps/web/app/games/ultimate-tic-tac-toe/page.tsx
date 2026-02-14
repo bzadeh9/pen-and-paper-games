@@ -21,7 +21,7 @@ import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 export default function UltimateTicTacToePage() {
   const [mode, setMode] = useState<GameMode>('standard');
-  const engine = useMemo(() => new UltimateTicTacToeEngine(mode), []);
+  const engine = useMemo(() => new UltimateTicTacToeEngine(mode), [mode]);
   const [gameState, setGameState] = useState(engine.getState());
   const [stats, setStats] = useState(() => getGameStatistics());
 
@@ -74,8 +74,11 @@ export default function UltimateTicTacToePage() {
   // Record game when it ends
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner) {
-      const newStats = recordGame(gameState.winner);
-      setStats(newStats);
+      // Use a microtask to avoid synchronous setState in effect
+      Promise.resolve().then(() => {
+        const newStats = recordGame(gameState.winner!);
+        setStats(newStats);
+      });
     }
   }, [gameState.status, gameState.winner]);
 

@@ -6,16 +6,12 @@ import type { LocalBoard as LocalBoardType } from '@/lib/games/ultimate-tic-tac-
 
 interface LocalBoardProps {
   board: LocalBoardType;
-  localRow: number;
-  localCol: number;
   isActive: boolean;
   onCellClick: (cellRow: number, cellCol: number) => void;
 }
 
 export function LocalBoard({
   board,
-  localRow,
-  localCol,
   isActive,
   onCellClick,
 }: LocalBoardProps) {

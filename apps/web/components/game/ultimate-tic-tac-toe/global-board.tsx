@@ -4,7 +4,6 @@ import React from 'react';
 import { LocalBoard } from './local-board';
 import type {
   GameState,
-  GameMode,
 } from '@/lib/games/ultimate-tic-tac-toe/types';
 
 interface GlobalBoardProps {
@@ -42,8 +41,6 @@ export function GlobalBoard({ gameState, onCellClick }: GlobalBoardProps) {
           <LocalBoard
             key={`${rowIndex}-${colIndex}`}
             board={board}
-            localRow={rowIndex}
-            localCol={colIndex}
             isActive={isLocalBoardActive(rowIndex, colIndex)}
             onCellClick={(cellRow, cellCol) =>
               onCellClick(rowIndex, colIndex, cellRow, cellCol)
