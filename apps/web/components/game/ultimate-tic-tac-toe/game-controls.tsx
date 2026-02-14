@@ -17,6 +17,8 @@ export function GameControls({
   onReset,
   gameStatus,
 }: GameControlsProps) {
+  const isModeChangeable = gameStatus === 'setup' || gameStatus === 'ended';
+
   return (
     <div className="space-y-4">
       {/* Mode Toggle */}
@@ -31,10 +33,10 @@ export function GameControls({
               value="standard"
               checked={mode === 'standard'}
               onChange={() => onModeChange('standard')}
-              disabled={gameStatus === 'playing'}
+              disabled={!isModeChangeable}
               className="h-4 w-4"
             />
-            <span className="text-sm">
+            <span className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}>
               <strong>Standard (Casual):</strong> Play anywhere on the board
             </span>
           </label>
@@ -46,17 +48,17 @@ export function GameControls({
               value="strict"
               checked={mode === 'strict'}
               onChange={() => onModeChange('strict')}
-              disabled={gameStatus === 'playing'}
+              disabled={!isModeChangeable}
               className="h-4 w-4"
             />
-            <span className="text-sm">
+            <span className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}>
               <strong>Strict (Classic):</strong> Follow the board rules
             </span>
           </label>
         </div>
         {gameStatus === 'playing' && (
           <p className="mt-2 text-xs text-foreground/60">
-            Mode cannot be changed during a game
+            Mode locked during game
           </p>
         )}
       </div>

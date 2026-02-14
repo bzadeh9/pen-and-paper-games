@@ -11,6 +11,12 @@ interface CellProps {
 }
 
 export function Cell({ value, onClick, isActive, isDisabled }: CellProps) {
+  const getPlayerColor = () => {
+    if (value === 'X') return 'text-dusty-mauve';
+    if (value === 'O') return 'text-pastel-pink';
+    return '';
+  };
+
   return (
     <button
       type="button"
@@ -25,7 +31,7 @@ export function Cell({ value, onClick, isActive, isDisabled }: CellProps) {
       `}
     >
       {value && (
-        <span className="text-2xl font-bold">
+        <span className={`text-2xl font-bold ${getPlayerColor()}`}>
           {value}
         </span>
       )}

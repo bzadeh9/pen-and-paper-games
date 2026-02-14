@@ -34,8 +34,15 @@ export function GlobalBoard({ gameState, onCellClick }: GlobalBoardProps) {
     );
   };
 
+  const getBorderColor = () => {
+    if (gameState.status !== 'playing') return 'border-foreground/30';
+    if (gameState.currentPlayer === 'X') return 'border-dusty-mauve';
+    if (gameState.currentPlayer === 'O') return 'border-pastel-pink';
+    return 'border-foreground/30';
+  };
+
   return (
-    <div className="grid grid-cols-3 gap-3 rounded-xl border-4 border-foreground/30 bg-background p-3">
+    <div className={`grid grid-cols-3 gap-3 rounded-xl border-4 bg-background p-3 transition-colors duration-300 ${getBorderColor()}`}>
       {gameState.localBoards.map((row, rowIndex) =>
         row.map((board, colIndex) => (
           <LocalBoard

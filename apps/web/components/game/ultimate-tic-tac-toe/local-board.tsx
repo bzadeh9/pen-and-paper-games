@@ -17,6 +17,12 @@ export function LocalBoard({
 }: LocalBoardProps) {
   const hasWinner = board.winner !== null;
 
+  const getWinnerColor = () => {
+    if (board.winner === 'X') return 'text-dusty-mauve';
+    if (board.winner === 'O') return 'text-pastel-pink';
+    return 'text-foreground/60';
+  };
+
   return (
     <div
       className={`
@@ -28,7 +34,7 @@ export function LocalBoard({
       {/* Winner overlay */}
       {hasWinner && (
         <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-background/80">
-          <span className="text-6xl font-bold text-foreground/60">
+          <span className={`text-6xl font-bold ${getWinnerColor()}`}>
             {board.winner === 'draw' ? '=' : board.winner}
           </span>
         </div>

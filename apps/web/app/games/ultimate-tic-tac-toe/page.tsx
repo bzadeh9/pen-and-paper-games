@@ -30,7 +30,7 @@ export default function UltimateTicTacToePage() {
   // Update mode when changed
   const handleModeChange = useCallback(
     (newMode: GameMode) => {
-      if (gameState.status === 'setup') {
+      if (gameState.status === 'setup' || gameState.status === 'ended') {
         setMode(newMode);
         engine.setMode(newMode);
         setGameState(engine.getState());
@@ -171,8 +171,8 @@ export default function UltimateTicTacToePage() {
 
         {/* Main game area */}
         <div className="grid gap-6 md:grid-cols-[1fr_2fr_1fr]">
-          {/* Left panel: Game Controls */}
-          <div>
+          {/* Left panel: Game Controls (on mobile: second position) */}
+          <div className={isMobile ? 'order-2 md:order-1' : ''}>
             <GameControls
               mode={mode}
               onModeChange={handleModeChange}
@@ -181,8 +181,8 @@ export default function UltimateTicTacToePage() {
             />
           </div>
 
-          {/* Center: Game Board */}
-          <div className="flex items-center justify-center">
+          {/* Center: Game Board (on mobile: first position) */}
+          <div className={`flex items-center justify-center ${isMobile ? 'order-1 md:order-2' : ''}`}>
             <div className="w-full max-w-2xl">
               <GlobalBoard
                 gameState={gameState}
@@ -191,8 +191,8 @@ export default function UltimateTicTacToePage() {
             </div>
           </div>
 
-          {/* Right panel: Stats */}
-          <div>
+          {/* Right panel: Stats (on mobile: third position) */}
+          <div className={isMobile ? 'order-3' : ''}>
             <GameStats stats={stats} onReset={handleResetStats} />
           </div>
         </div>
