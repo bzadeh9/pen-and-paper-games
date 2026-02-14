@@ -139,6 +139,43 @@ export default function Home() {
             </div>
           </Link>
 
+          <Link
+            href="/games/black-hole"
+            className="group rounded-lg border border-foreground/20 bg-background p-6 transition-all hover:border-foreground/40 hover:shadow-lg"
+          >
+            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-dusty-mauve/20">
+              <svg
+                className="h-8 w-8 text-dusty-mauve"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-2xl font-semibold">Black Hole</h2>
+            <p className="text-sm text-foreground/60">
+              A game of reverse-area control - isolate your high numbers!
+            </p>
+            <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
+              <span>Play Now</span>
+              <span className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </div>
+          </Link>
+
           <div className="rounded-lg border border-dashed border-foreground/20 bg-background/50 p-6 opacity-50">
             <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-foreground/10">
               <svg

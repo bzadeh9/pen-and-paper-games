@@ -16,8 +16,8 @@ export function Board({ gameState, onCircleClick }: BoardProps) {
 
   const getCircleColor = (circleId: number) => {
     const circle = gameState.circles[circleId];
-    if (circle.owner === 1) return 'bg-blue-500 text-white';
-    if (circle.owner === 2) return 'bg-red-500 text-white';
+    if (circle.owner === 1) return 'bg-dusty-mauve text-white';
+    if (circle.owner === 2) return 'bg-cherry-blossom text-white';
     return 'bg-gray-200 dark:bg-gray-700 text-foreground/60';
   };
 

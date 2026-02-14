@@ -92,7 +92,7 @@ export default function BlackHolePage() {
                       • The board consists of 21 circles arranged in a pyramid (rows 1-6)
                     </li>
                     <li>
-                      • Player 1 (Blue) and Player 2 (Red) take turns placing numbers
+                      • Player 1 and Player 2 take turns placing numbers
                     </li>
                     <li>
                       • Each player places numbers 1 through 10 in sequence
