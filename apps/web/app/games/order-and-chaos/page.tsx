@@ -11,7 +11,7 @@ import {
   recordGame,
   resetStatistics,
 } from '@/lib/games/order-and-chaos/stats';
-import type { PieceColor } from '@/lib/games/order-and-chaos/types';
+import type { PieceColor, DisplayMode } from '@/lib/games/order-and-chaos/types';
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -37,6 +37,11 @@ export default function OrderAndChaosPage() {
     [engine]
   );
 
+  const handleStart = useCallback(() => {
+    engine.startGame();
+    setGameState(engine.getState());
+  }, [engine]);
+
   const handleReset = useCallback(() => {
     engine.reset();
     setGameState(engine.getState());
@@ -53,6 +58,11 @@ export default function OrderAndChaosPage() {
   const handleColorSelect = useCallback((color: PieceColor) => {
     setSelectedColor(color);
   }, []);
+
+  const handleDisplayModeChange = useCallback((mode: DisplayMode) => {
+    engine.setDisplayMode(mode);
+    setGameState(engine.getState());
+  }, [engine]);
 
   // Record game when it ends
   useEffect(() => {
@@ -194,6 +204,7 @@ export default function OrderAndChaosPage() {
               selectedColor={selectedColor}
               onColorSelect={handleColorSelect}
               isGameEnded={gameState.status === 'ended'}
+              isSetup={gameState.status === 'setup'}
             />
             {!isMobile && (
               <GameStats
@@ -212,6 +223,7 @@ export default function OrderAndChaosPage() {
               onCellClick={handleCellClick}
               isGameEnded={gameState.status === 'ended'}
               selectedColor={selectedColor}
+              displayMode={gameState.displayMode}
             />
           </div>
 
@@ -219,8 +231,12 @@ export default function OrderAndChaosPage() {
           <div className={`space-y-6 ${isMobile ? 'order-3' : ''}`}>
             <GameControls
               onReset={handleReset}
+              onStart={handleStart}
               winner={gameState.winner}
               isGameEnded={gameState.status === 'ended'}
+              gameStatus={gameState.status}
+              displayMode={gameState.displayMode}
+              onDisplayModeChange={handleDisplayModeChange}
             />
             {isMobile && (
               <GameStats

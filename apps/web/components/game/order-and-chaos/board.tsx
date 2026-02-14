@@ -1,4 +1,4 @@
-import type { Cell, PieceColor } from '@/lib/games/order-and-chaos/types';
+import type { Cell, PieceColor, DisplayMode } from '@/lib/games/order-and-chaos/types';
 import { CellComponent } from './cell';
 
 interface BoardProps {
@@ -6,6 +6,7 @@ interface BoardProps {
   onCellClick: (row: number, col: number, color: PieceColor) => void;
   isGameEnded: boolean;
   selectedColor: PieceColor | null;
+  displayMode: DisplayMode;
 }
 
 export function Board({
@@ -13,6 +14,7 @@ export function Board({
   onCellClick,
   isGameEnded,
   selectedColor,
+  displayMode,
 }: BoardProps) {
   return (
     <div className="inline-block rounded-lg border-2 border-foreground/20 bg-background p-4 shadow-lg">
@@ -29,6 +31,7 @@ export function Board({
               }}
               isDisabled={isGameEnded || cell.color !== null}
               selectedColor={selectedColor}
+              displayMode={displayMode}
             />
           ))
         )}
