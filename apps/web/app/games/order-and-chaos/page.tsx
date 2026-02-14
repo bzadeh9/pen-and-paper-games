@@ -112,15 +112,15 @@ export default function OrderAndChaosPage() {
               <h3 className="text-lg font-semibold mb-2">The Core Concept</h3>
               <p className="mb-4">
                 Order and Chaos is a masterpiece of asymmetric design. The game is played with shared pieces
-                (cherry blossom and dusty mauve markers). Unlike Tic-Tac-Toe, where you &quot;own&quot; a symbol,
-                in Order and Chaos, both players can use both colors.
+                (cherry blossom and dusty mauve markers, or X and O symbols). Unlike Tic-Tac-Toe, where you &quot;own&quot; a symbol,
+                in Order and Chaos, both players can use both colors or symbols.
               </p>
 
               <h3 className="text-lg font-semibold mb-2">The Roles</h3>
               <ul className="mb-4 space-y-2">
                 <li>
                   <strong className="text-cherry-blossom">Order:</strong> The builder. Order&apos;s goal is to create
-                  a sequence of five-in-a-row of the same color (horizontal, vertical, or diagonal).
+                  a sequence of five-in-a-row of the same color or symbol (horizontal, vertical, or diagonal).
                 </li>
                 <li>
                   <strong className="text-dusty-mauve">Chaos:</strong> The spoiler. Chaos&apos;s goal is to prevent
@@ -131,17 +131,21 @@ export default function OrderAndChaosPage() {
               <h3 className="text-lg font-semibold mb-2">How to Play</h3>
               <ul className="mb-4 space-y-2">
                 <li>
-                  <strong>The Turn:</strong> On your turn, select a color (cherry blossom or dusty mauve) and place
+                  <strong>Display Mode:</strong> Choose between Color Mode (colored circles) or X and O Mode (classic symbols).
+                  In X and O Mode, X represents cherry blossom and O represents dusty mauve.
+                </li>
+                <li>
+                  <strong>The Turn:</strong> On your turn, select a color (cherry blossom or dusty mauve) or symbol (X or O) and place
                   it in any empty cell on the 6×6 grid.
                 </li>
                 <li>
-                  <strong>The Flexibility:</strong> You are never locked into one color. You might play cherry blossom
-                  on turn one and dusty mauve on turn two if it helps your objective.
+                  <strong>The Flexibility:</strong> You are never locked into one color or symbol. You might play cherry blossom (or X)
+                  on turn one and dusty mauve (or O) on turn two if it helps your objective.
                 </li>
                 <li>
                   <strong>Winning:</strong>
                   <ul className="mt-2 ml-4 space-y-1">
-                    <li>• As soon as a line of five same-colored pieces appears, Order wins immediately.</li>
+                    <li>• As soon as a line of five same-colored pieces (or same symbols) appears, Order wins immediately.</li>
                     <li>• If the 36th piece is placed and no five-in-a-row exists, Chaos wins.</li>
                   </ul>
                 </li>
@@ -205,6 +209,7 @@ export default function OrderAndChaosPage() {
               onColorSelect={handleColorSelect}
               isGameEnded={gameState.status === 'ended'}
               isSetup={gameState.status === 'setup'}
+              displayMode={gameState.displayMode}
             />
             {!isMobile && (
               <GameStats

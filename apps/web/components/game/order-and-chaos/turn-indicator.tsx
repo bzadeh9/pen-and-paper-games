@@ -1,4 +1,4 @@
-import type { Player, PieceColor } from '@/lib/games/order-and-chaos/types';
+import type { Player, PieceColor, DisplayMode } from '@/lib/games/order-and-chaos/types';
 
 interface TurnIndicatorProps {
   currentPlayer: Player;
@@ -6,6 +6,7 @@ interface TurnIndicatorProps {
   onColorSelect: (color: PieceColor) => void;
   isGameEnded: boolean;
   isSetup: boolean;
+  displayMode: DisplayMode;
 }
 
 export function TurnIndicator({
@@ -14,8 +15,19 @@ export function TurnIndicator({
   onColorSelect,
   isGameEnded,
   isSetup,
+  displayMode,
 }: TurnIndicatorProps) {
   const playerName = currentPlayer === 'order' ? 'Order' : 'Chaos';
+
+  const renderPiecePreview = (color: PieceColor) => {
+    if (displayMode === 'symbol') {
+      const symbol = color === 'cherry-blossom' ? 'X' : 'O';
+      const colorClass = color === 'cherry-blossom' ? 'text-cherry-blossom' : 'text-dusty-mauve';
+      return <span className={`text-3xl font-bold ${colorClass}`}>{symbol}</span>;
+    }
+    const bgClass = color === 'cherry-blossom' ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
+    return <div className={`h-10 w-10 rounded-full ${bgClass}`} />;
+  };
 
   return (
     <div className="rounded-lg border border-foreground/20 bg-background p-6">
@@ -36,7 +48,9 @@ export function TurnIndicator({
 
           {!isGameEnded && (
             <div className="space-y-3">
-              <p className="text-sm text-foreground/60">Select a color to place:</p>
+              <p className="text-sm text-foreground/60">
+                {displayMode === 'symbol' ? 'Select X or O to place:' : 'Select a color to place:'}
+              </p>
               <div className="flex gap-4">
                 <button
                   onClick={() => onColorSelect('cherry-blossom')}
@@ -48,9 +62,9 @@ export function TurnIndicator({
                         : 'border-foreground/20 hover:border-cherry-blossom hover:scale-105'
                     }
                   `}
-                  aria-label="Select cherry blossom color"
+                  aria-label={displayMode === 'symbol' ? 'Select X' : 'Select cherry blossom color'}
                 >
-                  <div className="h-10 w-10 rounded-full bg-cherry-blossom" />
+                  {renderPiecePreview('cherry-blossom')}
                 </button>
                 <button
                   onClick={() => onColorSelect('dusty-mauve')}
@@ -62,9 +76,9 @@ export function TurnIndicator({
                         : 'border-foreground/20 hover:border-dusty-mauve hover:scale-105'
                     }
                   `}
-                  aria-label="Select dusty mauve color"
+                  aria-label={displayMode === 'symbol' ? 'Select O' : 'Select dusty mauve color'}
                 >
-                  <div className="h-10 w-10 rounded-full bg-dusty-mauve" />
+                  {renderPiecePreview('dusty-mauve')}
                 </button>
               </div>
             </div>
