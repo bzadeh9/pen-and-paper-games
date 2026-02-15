@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { KnightChaseEngine } from '@/lib/games/knight-chase/engine';
 import { PLAYER_COLORS, PlayerColor } from '@/lib/games/knight-chase/types';
 import type { Position, Player } from '@/lib/games/knight-chase/types';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 interface GameBoardProps {
   player1Color: PlayerColor;
@@ -37,7 +38,6 @@ export function GameBoard({
   const engine = useMemo(() => new KnightChaseEngine(), []);
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPossibleMoves, setShowPossibleMoves] = useState(false);
   const [shakeKnight, setShakeKnight] = useState(false);
 
@@ -51,10 +51,10 @@ export function GameBoard({
   }, [gameState.status, gameState.winner, onGameEnd, onGameStateChange]);
 
   useEffect(() => {
-    if (errorMessage) {
+    if (shakePlayer) {
       const timer = setTimeout(() => {
-        setErrorMessage(null);
-      }, 3000);
+        setShakePlayer(null);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, [errorMessage]);
@@ -79,7 +79,7 @@ export function GameBoard({
 
     if (engine.makeMove(pos)) {
       setGameState(engine.getState());
-      setErrorMessage(null);
+      setShakePlayer(null);
       playSound();
     }
   };

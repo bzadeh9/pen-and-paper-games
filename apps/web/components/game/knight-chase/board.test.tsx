@@ -25,9 +25,9 @@ const audioContextMock = {
   currentTime: 0,
 };
 
-// @ts-ignore
+// @ts-expect-error AudioContext mock for tests
 window.AudioContext = vi.fn().mockImplementation(() => audioContextMock);
-// @ts-ignore
+// @ts-expect-error webkitAudioContext mock for tests
 window.webkitAudioContext = vi.fn().mockImplementation(() => audioContextMock);
 
 describe('KnightChase GameBoard', () => {

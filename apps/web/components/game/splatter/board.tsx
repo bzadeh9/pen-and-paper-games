@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   SplatterEngine,
   Position,
@@ -38,6 +38,9 @@ export function GameBoard({
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
   const [showAreaPreview, setShowAreaPreview] = useState(false);
+  const longPressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressActiveRef = useRef(false);
+  const suppressClickRef = useRef(false);
 
   useEffect(() => {
     setGameState(engine.getState());
@@ -85,6 +88,7 @@ export function GameBoard({
     engine.reset();
     setGameState(engine.getState());
     setHoveredCell(null);
+    setShowAreaPreview(false);
   };
 
   const currentPlayerColor =
@@ -262,8 +266,11 @@ export function GameBoard({
                         : ''
                     }
                     onMouseEnter={() => setHoveredCell({ row, col })}
-                    onMouseLeave={() => setHoveredCell(null)}
                     onClick={(e) => {
+                      if (suppressClickRef.current) {
+                        suppressClickRef.current = false;
+                        return;
+                      }
                       if (gameState.status === 'setup') {
                         handleCellClick({ row, col }, true);
                       } else if (canSelect) {
@@ -280,6 +287,24 @@ export function GameBoard({
                       }
                     }}
                     onMouseDown={(e) => {
+                      if (longPressTimeoutRef.current) {
+                        clearTimeout(longPressTimeoutRef.current);
+                      }
+                      if (
+                        e.button === 0 &&
+                        canSelect &&
+                        gameState.status === 'playing' &&
+                        !e.ctrlKey &&
+                        !e.metaKey &&
+                        !e.shiftKey
+                      ) {
+                        longPressActiveRef.current = false;
+                        longPressTimeoutRef.current = setTimeout(() => {
+                          longPressActiveRef.current = true;
+                          suppressClickRef.current = true;
+                          setShowAreaPreview(true);
+                        }, 400);
+                      }
                       // Show area preview on right-click or modifier key press
                       if (
                         e.button === 2 ||
@@ -291,6 +316,23 @@ export function GameBoard({
                       }
                     }}
                     onMouseUp={() => {
+                      if (longPressTimeoutRef.current) {
+                        clearTimeout(longPressTimeoutRef.current);
+                      }
+                      if (longPressActiveRef.current) {
+                        if (canSelect && gameState.status === 'playing') {
+                          handleCellClick({ row, col }, false);
+                        }
+                        longPressActiveRef.current = false;
+                      }
+                      setShowAreaPreview(false);
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredCell(null);
+                      if (longPressTimeoutRef.current) {
+                        clearTimeout(longPressTimeoutRef.current);
+                      }
+                      longPressActiveRef.current = false;
                       setShowAreaPreview(false);
                     }}
                   />
@@ -303,7 +345,8 @@ export function GameBoard({
         {/* Instructions overlay */}
         {gameState.status === 'playing' && (
           <div className="mt-2 text-center text-xs text-foreground/60">
-            Click: Single Splatter | Right-click/Ctrl+Click: Area Splatter
+            Click: Single Splatter | Long-press/Right-click/Ctrl+Click: Area
+            Splatter
           </div>
         )}
       </div>

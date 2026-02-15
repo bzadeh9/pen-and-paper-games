@@ -161,32 +161,34 @@ export class HoldTheLineEngine {
     // First move: any position is valid
     if (this.state.pathEnds === null) return true;
 
-    // Subsequent moves: must be adjacent to one of the path ends
-    const adjacentToEnd1 = this.isAdjacent(pos, this.state.pathEnds[0]);
-    const adjacentToEnd2 = this.isAdjacent(pos, this.state.pathEnds[1]);
+    return this.getValidConnectionEnds(pos).length > 0;
+  }
 
-    if (!adjacentToEnd1 && !adjacentToEnd2) {
-      return false;
-    }
+  getValidConnectionEnds(pos: Position): Position[] {
+    if (this.state.status !== 'playing') return [];
+    if (!this.isValidPosition(pos)) return [];
 
-    // Check for line intersection
-    // If adjacent to both ends, check valid connections to either
-    // A move is valid if it can connect to AT LEAST one end without intersection
-    let validConnection1 = false;
-    if (adjacentToEnd1) {
-      if (!this.wouldIntersectExistingLines(this.state.pathEnds[0], pos)) {
-        validConnection1 = true;
+    const key = this.positionKey(pos);
+    if (this.state.visitedDots.has(key)) return [];
+
+    if (this.state.pathEnds === null) return [];
+
+    const [end1, end2] = this.state.pathEnds;
+    const validEnds: Position[] = [];
+
+    if (this.isAdjacent(pos, end1)) {
+      if (!this.wouldIntersectExistingLines(end1, pos)) {
+        validEnds.push(end1);
       }
     }
 
-    let validConnection2 = false;
-    if (adjacentToEnd2) {
-      if (!this.wouldIntersectExistingLines(this.state.pathEnds[1], pos)) {
-        validConnection2 = true;
+    if (this.isAdjacent(pos, end2)) {
+      if (!this.wouldIntersectExistingLines(end2, pos)) {
+        validEnds.push(end2);
       }
     }
 
-    return validConnection1 || validConnection2;
+    return validEnds;
   }
 
   startGame(): void {
@@ -209,8 +211,33 @@ export class HoldTheLineEngine {
     return validMoves;
   }
 
-  makeMove(pos: Position): boolean {
+  makeMove(pos: Position, chosenEnd?: Position): boolean {
     if (!this.isValidMove(pos)) return false;
+
+    let connectedEnd: Position | null = null;
+    let end1: Position | null = null;
+    let end2: Position | null = null;
+
+    if (this.state.pathEnds !== null) {
+      [end1, end2] = this.state.pathEnds;
+      const validEnds = this.getValidConnectionEnds(pos);
+
+      if (validEnds.length === 0) {
+        return false;
+      }
+
+      if (chosenEnd) {
+        connectedEnd =
+          validEnds.find(
+            (end) => end.row === chosenEnd.row && end.col === chosenEnd.col
+          ) ?? null;
+        if (!connectedEnd) {
+          return false;
+        }
+      } else {
+        connectedEnd = validEnds[0];
+      }
+    }
 
     const key = this.positionKey(pos);
     this.state.visitedDots.add(key);
@@ -220,43 +247,18 @@ export class HoldTheLineEngine {
     if (this.state.pathEnds === null) {
       // First move: this position is both ends of the path
       this.state.pathEnds = [pos, pos];
-    } else {
-      // Determine which end to replace
-      const [end1, end2] = this.state.pathEnds;
-
-      let connectedEnd: Position | null = null;
-
-      // Check which connections are valid (non-intersecting)
-      const adjacentToEnd1 = this.isAdjacent(pos, end1);
-      const adjacentToEnd2 = this.isAdjacent(pos, end2);
-
-      let canConnectToEnd1 = false;
-      if (adjacentToEnd1) {
-        canConnectToEnd1 = !this.wouldIntersectExistingLines(end1, pos);
-      }
-
-      let canConnectToEnd2 = false;
-      if (adjacentToEnd2) {
-        canConnectToEnd2 = !this.wouldIntersectExistingLines(end2, pos);
-      }
-
-      if (canConnectToEnd1) {
-        // Replace end1 with the new position
+    } else if (connectedEnd && end1 && end2) {
+      if (connectedEnd.row === end1.row && connectedEnd.col === end1.col) {
         this.state.pathEnds = [pos, end2];
-        connectedEnd = end1;
-      } else if (canConnectToEnd2) {
-        // Replace end2 with the new position
+      } else {
         this.state.pathEnds = [end1, pos];
-        connectedEnd = end2;
       }
 
-      if (connectedEnd) {
-        this.state.lines.push({
-          start: connectedEnd,
-          end: pos,
-          player: this.state.currentPlayer,
-        });
-      }
+      this.state.lines.push({
+        start: connectedEnd,
+        end: pos,
+        player: this.state.currentPlayer,
+      });
     }
 
     // Check if there are any valid moves left for the next player
