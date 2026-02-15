@@ -166,6 +166,53 @@ describe('HoldTheLineEngine', () => {
     });
   });
 
+  describe('chosen end selection', () => {
+    beforeEach(() => {
+      engine.startGame();
+      engine.makeMove({ row: 1, col: 1 });
+      engine.makeMove({ row: 1, col: 2 });
+    });
+
+    it('returns both valid ends when a move is adjacent to both', () => {
+      const ends = engine.getValidConnectionEnds({ row: 0, col: 1 });
+      expect(ends).toHaveLength(2);
+      expect(ends).toContainEqual({ row: 1, col: 1 });
+      expect(ends).toContainEqual({ row: 1, col: 2 });
+    });
+
+    it('uses the chosen end when provided', () => {
+      const move = { row: 0, col: 1 };
+      const chosenEnd = { row: 1, col: 2 };
+      expect(engine.makeMove(move, chosenEnd)).toBe(true);
+
+      const state = engine.getState();
+      expect(state.pathEnds).toContainEqual({ row: 1, col: 1 });
+      expect(state.pathEnds).toContainEqual(move);
+      expect(state.pathEnds).not.toContainEqual(chosenEnd);
+
+      const lastLine = state.lines[state.lines.length - 1];
+      const connectsChosenEnd =
+        (lastLine.start.row === chosenEnd.row &&
+          lastLine.start.col === chosenEnd.col) ||
+        (lastLine.end.row === chosenEnd.row &&
+          lastLine.end.col === chosenEnd.col);
+      expect(connectsChosenEnd).toBe(true);
+    });
+
+    it('rejects a chosen end that is not a valid connection', () => {
+      const move = { row: 0, col: 1 };
+      const invalidEnd = { row: 2, col: 2 };
+      const beforeState = engine.getState();
+
+      expect(engine.makeMove(move, invalidEnd)).toBe(false);
+
+      const afterState = engine.getState();
+      expect(afterState.moveHistory).toEqual(beforeState.moveHistory);
+      expect(afterState.lines).toEqual(beforeState.lines);
+      expect(afterState.pathEnds).toEqual(beforeState.pathEnds);
+    });
+  });
+
   describe('winning condition (normal play)', () => {
     beforeEach(() => {
       // Start the game
