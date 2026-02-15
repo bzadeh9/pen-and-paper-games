@@ -15,6 +15,18 @@ interface GameBoardProps {
   onGameStateChange?: (status: 'setup' | 'playing' | 'ended') => void;
 }
 
+// Tooltip component for invalid move feedback
+const InvalidMoveTooltip = () => (
+  <div
+    role="tooltip"
+    aria-live="polite"
+    className="absolute -top-12 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
+  >
+    Invalid move
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600"></div>
+  </div>
+);
+
 export function GameBoard({
   player1Color,
   player2Color,
@@ -27,7 +39,8 @@ export function GameBoard({
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
   const [showPossibleMoves, setShowPossibleMoves] = useState(false);
-  const [shakePlayer, setShakePlayer] = useState<Player | null>(null);
+  const [shakeKnight, setShakeKnight] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
@@ -39,25 +52,35 @@ export function GameBoard({
   }, [gameState.status, gameState.winner, onGameEnd, onGameStateChange]);
 
   useEffect(() => {
-    if (shakePlayer) {
+    if (errorMessage) {
       const timer = setTimeout(() => {
-        setShakePlayer(null);
-      }, 400);
+        setErrorMessage(null);
+      }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [shakePlayer]);
+  }, [errorMessage]);
+
+  useEffect(() => {
+    if (shakeKnight) {
+      const timer = setTimeout(() => {
+        setShakeKnight(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [shakeKnight]);
 
   const handleCellClick = (pos: Position) => {
     if (gameState.status !== 'playing') return;
 
     if (!engine.isValidMove(pos)) {
-      setShakePlayer(gameState.currentPlayer);
+      setErrorMessage('Invalid move: Must be a valid L-shaped knight move.');
+      setShakeKnight(true);
       return;
     }
 
     if (engine.makeMove(pos)) {
       setGameState(engine.getState());
-      setShakePlayer(null);
+      setErrorMessage(null);
       playSound();
     }
   };
@@ -107,9 +130,11 @@ export function GameBoard({
       ? PLAYER_COLORS[player1Color]
       : PLAYER_COLORS[player2Color];
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
-  const CELL_SIZE = isMobile ? 40 : 60;
-  const KNIGHT_SIZE = isMobile ? 28 : 40;
+  const currentPlayerPosition =
+    gameState.playerPositions[gameState.currentPlayer];
+
+  const CELL_SIZE = 60;
+  const KNIGHT_SIZE = 40;
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -167,13 +192,16 @@ export function GameBoard({
       )}
 
       {/* Game board */}
-      <div
-        className="grid gap-0 border-2 border-foreground/40"
-        style={{
-          gridTemplateColumns: `repeat(${gameState.gridSize}, ${CELL_SIZE}px)`,
-          gridTemplateRows: `repeat(${gameState.gridSize}, ${CELL_SIZE}px)`,
-        }}
-      >
+      <div className="w-full max-w-full overflow-x-auto flex justify-center">
+        <div
+          className="grid gap-0 border-2 border-foreground/40"
+          style={{
+            gridTemplateColumns: `repeat(${gameState.gridSize}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${gameState.gridSize}, minmax(0, 1fr))`,
+            width: 'min(480px, 100vw - 2rem)',
+            aspectRatio: '1 / 1',
+          }}
+        >
         {Array.from({ length: gameState.gridSize }).map((_, row) =>
           Array.from({ length: gameState.gridSize }).map((_, col) => {
             const cellState = gameState.grid[row][col];
@@ -184,6 +212,10 @@ export function GameBoard({
             const isPlayer1 = cellState === 1;
             const isPlayer2 = cellState === 2;
             const isExhausted = cellState === 'exhausted';
+            const isCurrentPlayerKnight =
+              (isPlayer1 && gameState.currentPlayer === 1) ||
+              (isPlayer2 && gameState.currentPlayer === 2);
+            const showTooltip = errorMessage && isCurrentPlayerKnight && gameState.status === 'playing';
 
             return (
               <div
@@ -196,8 +228,8 @@ export function GameBoard({
                       : 'bg-background cursor-default'
                 } ${isHovered && isValid ? 'ring-2 ring-green-500' : ''}`}
                 style={{
-                  width: CELL_SIZE,
-                  height: CELL_SIZE,
+                  minWidth: '40px',
+                  minHeight: '40px',
                 }}
                 onClick={() => handleCellClick(pos)}
                 onMouseEnter={() => setHoveredCell(pos)}
@@ -205,7 +237,7 @@ export function GameBoard({
               >
                 {isExhausted && (
                   <svg
-                    className="absolute inset-0 h-full w-full p-4 text-foreground/50"
+                    className="absolute inset-0 h-full w-full p-2 md:p-4 text-foreground/50"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -219,37 +251,48 @@ export function GameBoard({
                   </svg>
                 )}
                 {isPlayer1 && (
-                  <div
-                    className={`rounded-full flex items-center justify-center text-white font-bold ${
-                      shakePlayer === 1 ? 'shake' : ''
-                    }`}
-                    style={{
-                      width: KNIGHT_SIZE,
-                      height: KNIGHT_SIZE,
-                      backgroundColor: PLAYER_COLORS[player1Color],
-                    }}
-                  >
-                    ♞
+                  <div className="relative flex items-center justify-center w-full h-full">
+                    {showTooltip && <InvalidMoveTooltip />}
+                    <div
+                      className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
+                        shakeKnight && isCurrentPlayerKnight ? 'animate-shake' : ''
+                      }`}
+                      style={{
+                        width: '70%',
+                        height: '70%',
+                        maxWidth: KNIGHT_SIZE,
+                        maxHeight: KNIGHT_SIZE,
+                        backgroundColor: PLAYER_COLORS[player1Color],
+                      }}
+                    >
+                      ♞
+                    </div>
                   </div>
                 )}
                 {isPlayer2 && (
-                  <div
-                    className={`rounded-full flex items-center justify-center text-white font-bold ${
-                      shakePlayer === 2 ? 'shake' : ''
-                    }`}
-                    style={{
-                      width: KNIGHT_SIZE,
-                      height: KNIGHT_SIZE,
-                      backgroundColor: PLAYER_COLORS[player2Color],
-                    }}
-                  >
-                    ♞
+                  <div className="relative flex items-center justify-center w-full h-full">
+                    {showTooltip && <InvalidMoveTooltip />}
+                    <div
+                      className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
+                        shakeKnight && isCurrentPlayerKnight ? 'animate-shake' : ''
+                      }`}
+                      style={{
+                        width: '70%',
+                        height: '70%',
+                        maxWidth: KNIGHT_SIZE,
+                        maxHeight: KNIGHT_SIZE,
+                        backgroundColor: PLAYER_COLORS[player2Color],
+                      }}
+                    >
+                      ♞
+                    </div>
                   </div>
                 )}
               </div>
             );
           })
         )}
+        </div>
       </div>
 
       {/* Game info */}

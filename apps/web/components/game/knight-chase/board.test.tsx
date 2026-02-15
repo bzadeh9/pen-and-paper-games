@@ -84,18 +84,38 @@ describe('KnightChase GameBoard', () => {
     expect(highlightedCells.length).toBe(2);
   });
 
-  it('shakes the current player piece on invalid move', () => {
+  it('shows tooltip on invalid move instead of error banner', () => {
     const { container } = render(<GameBoard {...defaultProps} />);
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText('Start Game')); // Start game
+    
+    // Before invalid move, no tooltip should be present
+    let tooltip = screen.queryByRole('tooltip');
+    expect(tooltip).toBeNull();
+    
+    // Click on an invalid cell (0,1) - not a valid knight move from (0,0)
+    const cells = container.querySelectorAll('[class*="relative"]');
+    if (cells[1]) {
+      fireEvent.click(cells[1]);
+    }
+    
+    // Tooltip should now be visible
+    tooltip = screen.queryByRole('tooltip');
+    expect(tooltip).not.toBeNull();
+    expect(tooltip?.textContent).toContain('Invalid move');
+  });
 
-    const playerOnePiece = container.querySelector('.shake');
-    expect(playerOnePiece).toBeNull();
-
-    const cell = container.querySelector('div.grid > div');
-    expect(cell).not.toBeNull();
-    fireEvent.click(cell as HTMLElement);
-
-    const shakenPiece = container.querySelector('.shake');
-    expect(shakenPiece).not.toBeNull();
+  it('board is responsive with fluid dimensions', () => {
+    const { container } = render(<GameBoard {...defaultProps} />);
+    
+    // Find the board grid element
+    const boardGrid = container.querySelector('[style*="aspect-ratio"]');
+    expect(boardGrid).toBeDefined();
+    
+    // Check that aspect ratio is set for responsive square board
+    const style = boardGrid?.getAttribute('style');
+    expect(style).toContain('aspect-ratio: 1 / 1');
+    
+    // Check that grid uses fractional units for responsiveness
+    expect(style).toContain('repeat(8, minmax(0, 1fr))');
   });
 });
