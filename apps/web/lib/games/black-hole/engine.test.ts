@@ -84,7 +84,7 @@ describe('BlackHoleEngine', () => {
       const state = engine.getState();
       expect(state.status).toBe('ended');
       expect(state.blackHoleId).toBe(20);
-      
+
       // Scores should be calculated based on adjacent circles
       expect(state.player1Score).toBeGreaterThanOrEqual(0);
       expect(state.player2Score).toBeGreaterThanOrEqual(0);
@@ -112,7 +112,7 @@ describe('BlackHoleEngine', () => {
     it('should declare winner with higher score in highest mode', () => {
       // Create engine with highest mode
       const highestEngine = new BlackHoleEngine('highest');
-      
+
       // Simulate a game
       for (let i = 0; i < 20; i++) {
         highestEngine.makeMove(i);
@@ -154,7 +154,7 @@ describe('BlackHoleEngine', () => {
       engine.setMode('highest');
       engine.makeMove(0);
       engine.reset();
-      
+
       const state = engine.getState();
       expect(state.mode).toBe('highest');
     });

@@ -53,32 +53,36 @@ describe('KnightChase GameBoard', () => {
 
   it('renders highlight toggle unchecked by default', () => {
     render(<GameBoard {...defaultProps} />);
-    const toggle = screen.getByLabelText('Highlight Possible Moves') as HTMLInputElement;
+    const toggle = screen.getByLabelText(
+      'Highlight Possible Moves'
+    ) as HTMLInputElement;
     expect(toggle).toBeDefined();
     expect(toggle.checked).toBe(false);
   });
 
   it('toggles highlight state when clicked', () => {
     render(<GameBoard {...defaultProps} />);
-    const toggle = screen.getByLabelText('Highlight Possible Moves') as HTMLInputElement;
+    const toggle = screen.getByLabelText(
+      'Highlight Possible Moves'
+    ) as HTMLInputElement;
     fireEvent.click(toggle);
     expect(toggle.checked).toBe(true);
     fireEvent.click(toggle);
     expect(toggle.checked).toBe(false);
   });
-  
+
   it('highlights valid moves only when toggle is enabled', () => {
     const { container } = render(<GameBoard {...defaultProps} />);
     fireEvent.click(screen.getByText('Start Game')); // Start game
-    
+
     // Default: Toggle OFF. No cell should have bg-green-100.
     let highlightedCells = container.querySelectorAll('.bg-green-100');
     expect(highlightedCells.length).toBe(0);
-    
+
     // Enable toggle
     const toggle = screen.getByLabelText('Highlight Possible Moves');
     fireEvent.click(toggle);
-    
+
     highlightedCells = container.querySelectorAll('.bg-green-100');
     // Expect 2 valid moves for Knight at corner (2,1) and (1,2)
     expect(highlightedCells.length).toBe(2);
@@ -87,17 +91,17 @@ describe('KnightChase GameBoard', () => {
   it('shows tooltip on invalid move instead of error banner', () => {
     const { container } = render(<GameBoard {...defaultProps} />);
     fireEvent.click(screen.getByText('Start Game')); // Start game
-    
+
     // Before invalid move, no tooltip should be present
     let tooltip = screen.queryByRole('tooltip');
     expect(tooltip).toBeNull();
-    
+
     // Click on an invalid cell (0,1) - not a valid knight move from (0,0)
     const cells = container.querySelectorAll('[class*="relative"]');
     if (cells[1]) {
       fireEvent.click(cells[1]);
     }
-    
+
     // Tooltip should now be visible
     tooltip = screen.queryByRole('tooltip');
     expect(tooltip).not.toBeNull();
@@ -106,15 +110,15 @@ describe('KnightChase GameBoard', () => {
 
   it('board is responsive with fluid dimensions', () => {
     const { container } = render(<GameBoard {...defaultProps} />);
-    
+
     // Find the board grid element
     const boardGrid = container.querySelector('[style*="aspect-ratio"]');
     expect(boardGrid).toBeDefined();
-    
+
     // Check that aspect ratio is set for responsive square board
     const style = boardGrid?.getAttribute('style');
     expect(style).toContain('aspect-ratio: 1 / 1');
-    
+
     // Check that grid uses fractional units for responsiveness
     expect(style).toContain('repeat(8, minmax(0, 1fr))');
   });

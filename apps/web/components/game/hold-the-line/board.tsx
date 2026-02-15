@@ -526,17 +526,17 @@ export function GameBoard({
                   />
 
                   {/* Highlight valid moves - drawn after dot so it doesn't block clicks */}
-                    {valid && !visited && gameState.status === 'playing' && (
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r={DOT_SIZE + 6}
-                        fill={currentPlayerColor}
-                        opacity={hovered || isPending ? 0.4 : 0.2}
-                        className="transition-opacity"
-                        style={{ pointerEvents: 'none' }}
-                      />
-                    )}
+                  {valid && !visited && gameState.status === 'playing' && (
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r={DOT_SIZE + 6}
+                      fill={currentPlayerColor}
+                      opacity={hovered || isPending ? 0.4 : 0.2}
+                      className="transition-opacity"
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
 
                   {/* Show move order number on visited dots */}
                   {visited && (

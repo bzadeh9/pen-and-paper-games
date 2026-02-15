@@ -11,7 +11,10 @@ import {
   recordGame,
   resetStatistics,
 } from '@/lib/games/order-and-chaos/stats';
-import type { PieceColor, DisplayMode } from '@/lib/games/order-and-chaos/types';
+import type {
+  PieceColor,
+  DisplayMode,
+} from '@/lib/games/order-and-chaos/types';
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -59,10 +62,13 @@ export default function OrderAndChaosPage() {
     setSelectedColor(color);
   }, []);
 
-  const handleDisplayModeChange = useCallback((mode: DisplayMode) => {
-    engine.setDisplayMode(mode);
-    setGameState(engine.getState());
-  }, [engine]);
+  const handleDisplayModeChange = useCallback(
+    (mode: DisplayMode) => {
+      engine.setDisplayMode(mode);
+      setGameState(engine.getState());
+    },
+    [engine]
+  );
 
   // Record game when it ends
   useEffect(() => {
@@ -111,89 +117,121 @@ export default function OrderAndChaosPage() {
             <div className="prose prose-sm max-w-none text-foreground/80">
               <h3 className="text-lg font-semibold mb-2">The Core Concept</h3>
               <p className="mb-4">
-                Order and Chaos is a masterpiece of asymmetric design. The game is played with shared pieces
-                (cherry blossom and dusty mauve markers, or X and O symbols). Unlike Tic-Tac-Toe, where you &quot;own&quot; a symbol,
-                in Order and Chaos, both players can use both colors or symbols.
+                Order and Chaos is a masterpiece of asymmetric design. The game
+                is played with shared pieces (cherry blossom and dusty mauve
+                markers, or X and O symbols). Unlike Tic-Tac-Toe, where you
+                &quot;own&quot; a symbol, in Order and Chaos, both players can
+                use both colors or symbols.
               </p>
 
               <h3 className="text-lg font-semibold mb-2">The Roles</h3>
               <ul className="mb-4 space-y-2">
                 <li>
-                  <strong className="text-cherry-blossom">Order:</strong> The builder. Order&apos;s goal is to create
-                  a sequence of five-in-a-row of the same color or symbol (horizontal, vertical, or diagonal).
+                  <strong className="text-cherry-blossom">Order:</strong> The
+                  builder. Order&apos;s goal is to create a sequence of
+                  five-in-a-row of the same color or symbol (horizontal,
+                  vertical, or diagonal).
                 </li>
                 <li>
-                  <strong className="text-dusty-mauve">Chaos:</strong> The spoiler. Chaos&apos;s goal is to prevent
-                  Order from completing a line until the entire board is filled.
+                  <strong className="text-dusty-mauve">Chaos:</strong> The
+                  spoiler. Chaos&apos;s goal is to prevent Order from completing
+                  a line until the entire board is filled.
                 </li>
               </ul>
 
               <h3 className="text-lg font-semibold mb-2">How to Play</h3>
               <ul className="mb-4 space-y-2">
                 <li>
-                  <strong>Display Mode:</strong> Choose between Color Mode (colored circles) or X and O Mode (classic symbols).
-                  In X and O Mode, X represents cherry blossom and O represents dusty mauve.
+                  <strong>Display Mode:</strong> Choose between Color Mode
+                  (colored circles) or X and O Mode (classic symbols). In X and
+                  O Mode, X represents cherry blossom and O represents dusty
+                  mauve.
                 </li>
                 <li>
-                  <strong>The Turn:</strong> On your turn, select a color (cherry blossom or dusty mauve) or symbol (X or O) and place
+                  <strong>The Turn:</strong> On your turn, select a color
+                  (cherry blossom or dusty mauve) or symbol (X or O) and place
                   it in any empty cell on the 6×6 grid.
                 </li>
                 <li>
-                  <strong>The Flexibility:</strong> You are never locked into one color or symbol. You might play cherry blossom (or X)
-                  on turn one and dusty mauve (or O) on turn two if it helps your objective.
+                  <strong>The Flexibility:</strong> You are never locked into
+                  one color or symbol. You might play cherry blossom (or X) on
+                  turn one and dusty mauve (or O) on turn two if it helps your
+                  objective.
                 </li>
                 <li>
                   <strong>Winning:</strong>
                   <ul className="mt-2 ml-4 space-y-1">
-                    <li>• As soon as a line of five same-colored pieces (or same symbols) appears, Order wins immediately.</li>
-                    <li>• If the 36th piece is placed and no five-in-a-row exists, Chaos wins.</li>
+                    <li>
+                      • As soon as a line of five same-colored pieces (or same
+                      symbols) appears, Order wins immediately.
+                    </li>
+                    <li>
+                      • If the 36th piece is placed and no five-in-a-row exists,
+                      Chaos wins.
+                    </li>
                   </ul>
                 </li>
               </ul>
 
               <h3 className="text-lg font-semibold mb-2">Strategic Depth</h3>
               <p className="mb-4">
-                Because the board is only 6×6, the margin for error is razor-thin. It is mathematically proven that
-                the game favors Order if played perfectly, but for human players, the psychological battle is intense.
+                Because the board is only 6×6, the margin for error is
+                razor-thin. It is mathematically proven that the game favors
+                Order if played perfectly, but for human players, the
+                psychological battle is intense.
               </p>
 
-              <h3 className="text-lg font-semibold mb-2">Strategies for Order</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Strategies for Order
+              </h3>
               <ul className="mb-4 space-y-2">
                 <li>
-                  <strong>The Fork:</strong> Attempt to build two potential lines of four simultaneously. If Chaos
-                  blocks one, you complete the other.
+                  <strong>The Fork:</strong> Attempt to build two potential
+                  lines of four simultaneously. If Chaos blocks one, you
+                  complete the other.
                 </li>
                 <li>
-                  <strong>The Open-Ended Four:</strong> A line of three pieces with empty spaces on both ends. This
-                  is a powerful setup because Chaos can only block one side at a time.
+                  <strong>The Open-Ended Four:</strong> A line of three pieces
+                  with empty spaces on both ends. This is a powerful setup
+                  because Chaos can only block one side at a time.
                 </li>
                 <li>
-                  <strong>The Decoy:</strong> Start building a cherry blossom line to force Chaos to react, then
-                  suddenly pivot to a dusty mauve line on the other side of the board.
+                  <strong>The Decoy:</strong> Start building a cherry blossom
+                  line to force Chaos to react, then suddenly pivot to a dusty
+                  mauve line on the other side of the board.
                 </li>
               </ul>
 
-              <h3 className="text-lg font-semibold mb-2">Strategies for Chaos</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Strategies for Chaos
+              </h3>
               <ul className="mb-4 space-y-2">
                 <li>
-                  <strong>The Splitter:</strong> Never let Order get three pieces in a row. As soon as a pair is
-                  formed, place the opposite color at one end to &quot;pollute&quot; the line.
+                  <strong>The Splitter:</strong> Never let Order get three
+                  pieces in a row. As soon as a pair is formed, place the
+                  opposite color at one end to &quot;pollute&quot; the line.
                 </li>
                 <li>
-                  <strong>Edge Management:</strong> Push Order&apos;s builds toward the edges of the board where there
-                  is less room to complete a full line of five.
+                  <strong>Edge Management:</strong> Push Order&apos;s builds
+                  toward the edges of the board where there is less room to
+                  complete a full line of five.
                 </li>
                 <li>
-                  <strong>Neutrality:</strong> Avoid placing pieces that contribute to a long chain unless you are
-                  forced to block. Your goal is to keep the board &quot;messy.&quot;
+                  <strong>Neutrality:</strong> Avoid placing pieces that
+                  contribute to a long chain unless you are forced to block.
+                  Your goal is to keep the board &quot;messy.&quot;
                 </li>
               </ul>
 
-              <h3 className="text-lg font-semibold mb-2">Why It&apos;s Unique</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Why It&apos;s Unique
+              </h3>
               <p>
-                Order and Chaos is often used in game theory and AI research because it removes the &quot;ownership&quot;
-                of pieces. It forces you to think about the entire board state rather than just your own moves.
-                It&apos;s a game where every move you make could potentially be used against you by your opponent.
+                Order and Chaos is often used in game theory and AI research
+                because it removes the &quot;ownership&quot; of pieces. It
+                forces you to think about the entire board state rather than
+                just your own moves. It&apos;s a game where every move you make
+                could potentially be used against you by your opponent.
               </p>
             </div>
           </CollapsibleContent>
@@ -222,7 +260,9 @@ export default function OrderAndChaosPage() {
           </div>
 
           {/* Center - Board */}
-          <div className={`flex items-start justify-center ${isMobile ? 'order-2' : ''}`}>
+          <div
+            className={`flex items-start justify-center ${isMobile ? 'order-2' : ''}`}
+          >
             <Board
               board={gameState.board}
               onCellClick={handleCellClick}

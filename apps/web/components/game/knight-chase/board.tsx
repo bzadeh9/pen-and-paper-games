@@ -202,96 +202,103 @@ export function GameBoard({
             aspectRatio: '1 / 1',
           }}
         >
-        {Array.from({ length: gameState.gridSize }).map((_, row) =>
-          Array.from({ length: gameState.gridSize }).map((_, col) => {
-            const cellState = gameState.grid[row][col];
-            const pos: Position = { row, col };
-            const isValid = isValidMove(pos);
-            const isHovered =
-              hoveredCell?.row === row && hoveredCell?.col === col;
-            const isPlayer1 = cellState === 1;
-            const isPlayer2 = cellState === 2;
-            const isExhausted = cellState === 'exhausted';
-            const isCurrentPlayerKnight =
-              (isPlayer1 && gameState.currentPlayer === 1) ||
-              (isPlayer2 && gameState.currentPlayer === 2);
-            const showTooltip = errorMessage && isCurrentPlayerKnight && gameState.status === 'playing';
+          {Array.from({ length: gameState.gridSize }).map((_, row) =>
+            Array.from({ length: gameState.gridSize }).map((_, col) => {
+              const cellState = gameState.grid[row][col];
+              const pos: Position = { row, col };
+              const isValid = isValidMove(pos);
+              const isHovered =
+                hoveredCell?.row === row && hoveredCell?.col === col;
+              const isPlayer1 = cellState === 1;
+              const isPlayer2 = cellState === 2;
+              const isExhausted = cellState === 'exhausted';
+              const isCurrentPlayerKnight =
+                (isPlayer1 && gameState.currentPlayer === 1) ||
+                (isPlayer2 && gameState.currentPlayer === 2);
+              const showTooltip =
+                errorMessage &&
+                isCurrentPlayerKnight &&
+                gameState.status === 'playing';
 
-            return (
-              <div
-                key={`${row}-${col}`}
-                className={`relative flex items-center justify-center border border-foreground/20 transition-all ${
-                  isExhausted
-                    ? 'bg-foreground/5 dark:bg-foreground/10 cursor-not-allowed'
-                    : isValid && gameState.status === 'playing'
-                      ? `${showPossibleMoves ? 'bg-green-100 dark:bg-green-900/30' : 'bg-background'} cursor-pointer hover:bg-green-200 dark:hover:bg-green-900/50`
-                      : 'bg-background cursor-default'
-                } ${isHovered && isValid ? 'ring-2 ring-green-500' : ''}`}
-                style={{
-                  minWidth: '40px',
-                  minHeight: '40px',
-                }}
-                onClick={() => handleCellClick(pos)}
-                onMouseEnter={() => setHoveredCell(pos)}
-                onMouseLeave={() => setHoveredCell(null)}
-              >
-                {isExhausted && (
-                  <svg
-                    className="absolute inset-0 h-full w-full p-2 md:p-4 text-foreground/50"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                )}
-                {isPlayer1 && (
-                  <div className="relative flex items-center justify-center w-full h-full">
-                    {showTooltip && <InvalidMoveTooltip />}
-                    <div
-                      className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
-                        shakeKnight && isCurrentPlayerKnight ? 'animate-shake' : ''
-                      }`}
-                      style={{
-                        width: '70%',
-                        height: '70%',
-                        maxWidth: KNIGHT_SIZE,
-                        maxHeight: KNIGHT_SIZE,
-                        backgroundColor: PLAYER_COLORS[player1Color],
-                      }}
+              return (
+                <div
+                  key={`${row}-${col}`}
+                  className={`relative flex items-center justify-center border border-foreground/20 transition-all ${
+                    isExhausted
+                      ? 'bg-foreground/5 dark:bg-foreground/10 cursor-not-allowed'
+                      : isValid && gameState.status === 'playing'
+                        ? `${showPossibleMoves ? 'bg-green-100 dark:bg-green-900/30' : 'bg-background'} cursor-pointer hover:bg-green-200 dark:hover:bg-green-900/50`
+                        : 'bg-background cursor-default'
+                  } ${isHovered && isValid ? 'ring-2 ring-green-500' : ''}`}
+                  style={{
+                    minWidth: '40px',
+                    minHeight: '40px',
+                  }}
+                  onClick={() => handleCellClick(pos)}
+                  onMouseEnter={() => setHoveredCell(pos)}
+                  onMouseLeave={() => setHoveredCell(null)}
+                >
+                  {isExhausted && (
+                    <svg
+                      className="absolute inset-0 h-full w-full p-2 md:p-4 text-foreground/50"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      ♞
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  )}
+                  {isPlayer1 && (
+                    <div className="relative flex items-center justify-center w-full h-full">
+                      {showTooltip && <InvalidMoveTooltip />}
+                      <div
+                        className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
+                          shakeKnight && isCurrentPlayerKnight
+                            ? 'animate-shake'
+                            : ''
+                        }`}
+                        style={{
+                          width: '70%',
+                          height: '70%',
+                          maxWidth: KNIGHT_SIZE,
+                          maxHeight: KNIGHT_SIZE,
+                          backgroundColor: PLAYER_COLORS[player1Color],
+                        }}
+                      >
+                        ♞
+                      </div>
                     </div>
-                  </div>
-                )}
-                {isPlayer2 && (
-                  <div className="relative flex items-center justify-center w-full h-full">
-                    {showTooltip && <InvalidMoveTooltip />}
-                    <div
-                      className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
-                        shakeKnight && isCurrentPlayerKnight ? 'animate-shake' : ''
-                      }`}
-                      style={{
-                        width: '70%',
-                        height: '70%',
-                        maxWidth: KNIGHT_SIZE,
-                        maxHeight: KNIGHT_SIZE,
-                        backgroundColor: PLAYER_COLORS[player2Color],
-                      }}
-                    >
-                      ♞
+                  )}
+                  {isPlayer2 && (
+                    <div className="relative flex items-center justify-center w-full h-full">
+                      {showTooltip && <InvalidMoveTooltip />}
+                      <div
+                        className={`rounded-full flex items-center justify-center text-white font-bold text-xl md:text-2xl ${
+                          shakeKnight && isCurrentPlayerKnight
+                            ? 'animate-shake'
+                            : ''
+                        }`}
+                        style={{
+                          width: '70%',
+                          height: '70%',
+                          maxWidth: KNIGHT_SIZE,
+                          maxHeight: KNIGHT_SIZE,
+                          backgroundColor: PLAYER_COLORS[player2Color],
+                        }}
+                      >
+                        ♞
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

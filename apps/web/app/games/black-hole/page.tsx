@@ -88,9 +88,7 @@ export default function BlackHolePage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold tracking-tight">
-            Black Hole
-          </h1>
+          <h1 className="mb-2 text-4xl font-bold tracking-tight">Black Hole</h1>
           <p className="text-lg text-foreground/60">
             A game of reverse-area control
           </p>
@@ -115,16 +113,16 @@ export default function BlackHolePage() {
                   </h3>
                   <ul className="space-y-2 text-foreground/80">
                     <li>
-                      • The board consists of 21 circles arranged in a pyramid (rows 1-6)
+                      • The board consists of 21 circles arranged in a pyramid
+                      (rows 1-6)
                     </li>
-                    <li>
-                      • Player 1 and Player 2 take turns placing numbers
-                    </li>
+                    <li>• Player 1 and Player 2 take turns placing numbers</li>
                     <li>
                       • Each player places numbers 1 through 10 in sequence
                     </li>
                     <li>
-                      • After 20 numbers are placed, the remaining empty circle becomes the &quot;Black Hole&quot;
+                      • After 20 numbers are placed, the remaining empty circle
+                      becomes the &quot;Black Hole&quot;
                     </li>
                   </ul>
                 </div>
@@ -135,16 +133,20 @@ export default function BlackHolePage() {
                   </h3>
                   <ul className="space-y-2 text-foreground/80">
                     <li>
-                      • At the end, all numbers adjacent to the Black Hole are scored
+                      • At the end, all numbers adjacent to the Black Hole are
+                      scored
                     </li>
                     <li>
-                      • Each player&apos;s score is the sum of their numbers touching the Black Hole
+                      • Each player&apos;s score is the sum of their numbers
+                      touching the Black Hole
                     </li>
                     <li>
-                      • <strong>Lowest Score Mode:</strong> The player with the lowest score wins (reverse-area control)
+                      • <strong>Lowest Score Mode:</strong> The player with the
+                      lowest score wins (reverse-area control)
                     </li>
                     <li>
-                      • <strong>Highest Score Mode:</strong> The player with the highest score wins
+                      • <strong>Highest Score Mode:</strong> The player with the
+                      highest score wins
                     </li>
                   </ul>
                 </div>
@@ -155,10 +157,12 @@ export default function BlackHolePage() {
                   </h3>
                   <ul className="space-y-2 text-foreground/80">
                     <li>
-                      • In Lowest Score mode: Isolate your high numbers and place low numbers near potential Black Hole locations
+                      • In Lowest Score mode: Isolate your high numbers and
+                      place low numbers near potential Black Hole locations
                     </li>
                     <li>
-                      • In Highest Score mode: Aim to place your high numbers near the eventual Black Hole
+                      • In Highest Score mode: Aim to place your high numbers
+                      near the eventual Black Hole
                     </li>
                     <li>
                       • Remember: the last empty circle becomes the Black Hole!
@@ -201,7 +205,10 @@ export default function BlackHolePage() {
           <div className="flex items-center justify-center">
             <div className="w-full">
               <div className="rounded-xl border-4 border-foreground/30 bg-background">
-                <Board gameState={gameState} onCircleClick={handleCircleClick} />
+                <Board
+                  gameState={gameState}
+                  onCircleClick={handleCircleClick}
+                />
               </div>
             </div>
           </div>

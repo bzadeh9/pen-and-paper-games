@@ -10,11 +10,7 @@ interface LocalBoardProps {
   onCellClick: (cellRow: number, cellCol: number) => void;
 }
 
-export function LocalBoard({
-  board,
-  isActive,
-  onCellClick,
-}: LocalBoardProps) {
+export function LocalBoard({ board, isActive, onCellClick }: LocalBoardProps) {
   const hasWinner = board.winner !== null;
 
   const getWinnerColor = () => {

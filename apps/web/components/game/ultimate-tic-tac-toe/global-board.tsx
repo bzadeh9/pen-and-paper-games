@@ -2,9 +2,7 @@
 
 import React from 'react';
 import { LocalBoard } from './local-board';
-import type {
-  GameState,
-} from '@/lib/games/ultimate-tic-tac-toe/types';
+import type { GameState } from '@/lib/games/ultimate-tic-tac-toe/types';
 
 interface GlobalBoardProps {
   gameState: GameState;
@@ -20,13 +18,13 @@ export function GlobalBoard({ gameState, onCellClick }: GlobalBoardProps) {
   const isLocalBoardActive = (localRow: number, localCol: number): boolean => {
     if (gameState.status !== 'playing') return false;
     if (gameState.mode === 'standard') return true;
-    
+
     // In strict mode
     if (!gameState.activeBoard) {
       // Any board is active if activeBoard is null
       return gameState.localBoards[localRow][localCol].winner === null;
     }
-    
+
     // Only the active board is active
     return (
       gameState.activeBoard.row === localRow &&
@@ -42,7 +40,9 @@ export function GlobalBoard({ gameState, onCellClick }: GlobalBoardProps) {
   };
 
   return (
-    <div className={`grid grid-cols-3 gap-3 rounded-xl border-4 bg-background p-3 transition-colors duration-300 ${getBorderColor()}`}>
+    <div
+      className={`grid grid-cols-3 gap-3 rounded-xl border-4 bg-background p-3 transition-colors duration-300 ${getBorderColor()}`}
+    >
       {gameState.localBoards.map((row, rowIndex) =>
         row.map((board, colIndex) => (
           <LocalBoard

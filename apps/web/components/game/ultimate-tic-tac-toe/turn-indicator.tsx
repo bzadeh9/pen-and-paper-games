@@ -39,7 +39,9 @@ export function TurnIndicator({
 
   if (gameStatus === 'ended') {
     return (
-      <div className={`rounded-lg border-2 p-6 text-center ${getPlayerBgColor(winner === 'draw' ? null : winner)}`}>
+      <div
+        className={`rounded-lg border-2 p-6 text-center ${getPlayerBgColor(winner === 'draw' ? null : winner)}`}
+      >
         <h2 className="text-3xl font-bold">Game Over!</h2>
         {winner === 'draw' ? (
           <p className="mt-3 text-xl text-foreground/80">
@@ -47,7 +49,10 @@ export function TurnIndicator({
           </p>
         ) : (
           <p className="mt-3 text-xl text-foreground/80">
-            <span className={`text-3xl font-bold ${getPlayerColor(winner)}`}>{winner}</span> wins! 🎉
+            <span className={`text-3xl font-bold ${getPlayerColor(winner)}`}>
+              {winner}
+            </span>{' '}
+            wins! 🎉
           </p>
         )}
       </div>
@@ -55,11 +60,15 @@ export function TurnIndicator({
   }
 
   return (
-    <div className={`rounded-lg border-2 p-6 text-center ${getPlayerBgColor(currentPlayer)}`}>
+    <div
+      className={`rounded-lg border-2 p-6 text-center ${getPlayerBgColor(currentPlayer)}`}
+    >
       <h2 className="text-2xl font-semibold text-foreground/70">
         Current Turn
       </h2>
-      <div className={`mt-2 text-5xl font-bold ${getPlayerColor(currentPlayer)}`}>
+      <div
+        className={`mt-2 text-5xl font-bold ${getPlayerColor(currentPlayer)}`}
+      >
         {currentPlayer}
       </div>
     </div>

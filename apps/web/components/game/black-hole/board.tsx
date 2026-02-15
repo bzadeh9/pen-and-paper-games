@@ -26,7 +26,10 @@ export function Board({ gameState, onCircleClick }: BoardProps) {
   };
 
   const isClickable = (circleId: number) => {
-    return gameState.status === 'playing' && gameState.circles[circleId].value === null;
+    return (
+      gameState.status === 'playing' &&
+      gameState.circles[circleId].value === null
+    );
   };
 
   const showSetupOverlay = gameState.status === 'setup';
@@ -54,9 +57,13 @@ export function Board({ gameState, onCircleClick }: BoardProps) {
                 className={cn(
                   'w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center text-xl font-bold transition-all duration-200',
                   getCircleColor(circle.id),
-                  isBlackHole(circle.id) && 'bg-black dark:bg-gray-950 ring-4 ring-yellow-400 animate-pulse',
-                  isClickable(circle.id) && 'hover:scale-110 hover:shadow-lg cursor-pointer',
-                  !isClickable(circle.id) && gameState.status === 'playing' && 'cursor-not-allowed opacity-90',
+                  isBlackHole(circle.id) &&
+                    'bg-black dark:bg-gray-950 ring-4 ring-yellow-400 animate-pulse',
+                  isClickable(circle.id) &&
+                    'hover:scale-110 hover:shadow-lg cursor-pointer',
+                  !isClickable(circle.id) &&
+                    gameState.status === 'playing' &&
+                    'cursor-not-allowed opacity-90',
                   circle.value !== null && 'scale-100 hover:scale-105'
                 )}
                 aria-label={

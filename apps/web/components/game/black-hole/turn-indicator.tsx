@@ -1,7 +1,11 @@
 'use client';
 
 import React from 'react';
-import type { Player, GameStatus, GameMode } from '@/lib/games/black-hole/types';
+import type {
+  Player,
+  GameStatus,
+  GameMode,
+} from '@/lib/games/black-hole/types';
 
 interface TurnIndicatorProps {
   currentPlayer: Player;
@@ -26,8 +30,9 @@ export function TurnIndicator({
   player1Score,
   player2Score,
 }: TurnIndicatorProps) {
-  const modeText = mode === 'lowest' ? 'Lowest score wins' : 'Highest score wins';
-  
+  const modeText =
+    mode === 'lowest' ? 'Lowest score wins' : 'Highest score wins';
+
   if (gameStatus === 'ended') {
     return (
       <div className="rounded-lg border-2 border-foreground/20 bg-background p-6 text-center">
@@ -51,15 +56,15 @@ export function TurnIndicator({
             <span className="text-yellow-500">It&apos;s a Draw!</span>
           ) : (
             <span
-              className={winner === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'}
+              className={
+                winner === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'
+              }
             >
               Player {winner} Wins! 🎉
             </span>
           )}
         </div>
-        <p className="mt-2 text-sm text-foreground/60">
-          ({modeText})
-        </p>
+        <p className="mt-2 text-sm text-foreground/60">({modeText})</p>
       </div>
     );
   }
@@ -67,9 +72,15 @@ export function TurnIndicator({
   return (
     <div className="rounded-lg border-2 border-foreground/20 bg-background p-4">
       <div className="mb-3 text-center">
-        <div className="text-sm text-foreground/60">Turn {currentTurnNumber} of 20</div>
+        <div className="text-sm text-foreground/60">
+          Turn {currentTurnNumber} of 20
+        </div>
         <div className="mt-2 text-2xl font-bold">
-          <span className={currentPlayer === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'}>
+          <span
+            className={
+              currentPlayer === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'
+            }
+          >
             Player {currentPlayer}&apos;s Turn
           </span>
         </div>
