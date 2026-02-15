@@ -40,6 +40,7 @@ export function GameBoard({
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
   const [showPossibleMoves, setShowPossibleMoves] = useState(false);
   const [shakeKnight, setShakeKnight] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
@@ -51,10 +52,10 @@ export function GameBoard({
   }, [gameState.status, gameState.winner, onGameEnd, onGameStateChange]);
 
   useEffect(() => {
-    if (shakePlayer) {
+    if (errorMessage) {
       const timer = setTimeout(() => {
-        setShakePlayer(null);
-      }, 400);
+        setErrorMessage(null);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [errorMessage]);
@@ -79,7 +80,7 @@ export function GameBoard({
 
     if (engine.makeMove(pos)) {
       setGameState(engine.getState());
-      setShakePlayer(null);
+      setErrorMessage(null);
       playSound();
     }
   };
