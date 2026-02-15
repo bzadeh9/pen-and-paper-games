@@ -19,25 +19,25 @@ export function GameStats({ stats, onReset }: GameStatsProps) {
   return (
     <div className="rounded-lg border border-foreground/20 bg-background p-4">
       <h3 className="mb-4 text-lg font-semibold">Statistics</h3>
-      
+
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-foreground/70">Games Played:</span>
           <span className="font-bold">{stats.gamesPlayed}</span>
         </div>
-        
+
         <div className="h-px bg-foreground/10" />
-        
+
         <div className="flex items-center justify-between">
           <span className="text-foreground/70">X Wins:</span>
           <span className="font-bold text-cherry-blossom">{stats.xWins}</span>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <span className="text-foreground/70">O Wins:</span>
           <span className="font-bold text-dusty-mauve">{stats.oWins}</span>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <span className="text-foreground/70">Draws:</span>
           <span className="font-bold text-foreground/60">{stats.draws}</span>

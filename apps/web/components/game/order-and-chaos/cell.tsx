@@ -1,4 +1,8 @@
-import type { Cell, PieceColor, DisplayMode } from '@/lib/games/order-and-chaos/types';
+import type {
+  Cell,
+  PieceColor,
+  DisplayMode,
+} from '@/lib/games/order-and-chaos/types';
 
 interface CellProps {
   cell: Cell;
@@ -17,9 +21,7 @@ export function CellComponent({
 }: CellProps) {
   const getColorClass = (color: PieceColor | null) => {
     if (!color) return 'bg-background';
-    return color === 'cherry-blossom'
-      ? 'bg-cherry-blossom'
-      : 'bg-dusty-mauve';
+    return color === 'cherry-blossom' ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
   };
 
   const getSymbol = (color: PieceColor | null) => {
@@ -28,7 +30,7 @@ export function CellComponent({
   };
 
   const showPreview = !cell.color && selectedColor && !isDisabled;
-  
+
   const getPreviewClass = () => {
     if (!showPreview) return '';
     return selectedColor === 'cherry-blossom'
@@ -65,10 +67,14 @@ export function CellComponent({
       }`}
     >
       {cell.color && displayMode === 'color' && (
-        <div className={`h-10 w-10 md:h-12 md:w-12 rounded-full ${getColorClass(cell.color)}`} />
+        <div
+          className={`h-10 w-10 md:h-12 md:w-12 rounded-full ${getColorClass(cell.color)}`}
+        />
       )}
       {cell.color && displayMode === 'symbol' && (
-        <span className={`text-3xl md:text-4xl font-bold ${getTextColor(cell.color)}`}>
+        <span
+          className={`text-3xl md:text-4xl font-bold ${getTextColor(cell.color)}`}
+        >
           {getSymbol(cell.color)}
         </span>
       )}

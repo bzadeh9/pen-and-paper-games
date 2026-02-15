@@ -194,7 +194,7 @@ export class OrderAndChaosEngine {
       const col = startCol + i * colDelta;
 
       if (row < 0 || row >= 6 || col < 0 || col >= 6) return false;
-      
+
       const cellColor = this.state.board[row][col].color;
       // If the cell has the opposite color, this line can't be made
       if (cellColor !== null && cellColor !== color) return false;

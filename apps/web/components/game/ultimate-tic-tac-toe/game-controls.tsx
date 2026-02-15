@@ -25,7 +25,10 @@ export function GameControls({
       <div className="rounded-lg border border-foreground/20 bg-background p-4">
         <h3 className="mb-3 text-lg font-semibold">Game Mode</h3>
         <div className="space-y-2">
-          <label htmlFor="mode-standard" className="flex items-center gap-2 cursor-pointer">
+          <label
+            htmlFor="mode-standard"
+            className="flex items-center gap-2 cursor-pointer"
+          >
             <input
               id="mode-standard"
               type="radio"
@@ -36,11 +39,16 @@ export function GameControls({
               disabled={!isModeChangeable}
               className="h-4 w-4"
             />
-            <span className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}>
+            <span
+              className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}
+            >
               <strong>Standard (Casual):</strong> Play anywhere on the board
             </span>
           </label>
-          <label htmlFor="mode-strict" className="flex items-center gap-2 cursor-pointer">
+          <label
+            htmlFor="mode-strict"
+            className="flex items-center gap-2 cursor-pointer"
+          >
             <input
               id="mode-strict"
               type="radio"
@@ -51,7 +59,9 @@ export function GameControls({
               disabled={!isModeChangeable}
               className="h-4 w-4"
             />
-            <span className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}>
+            <span
+              className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}
+            >
               <strong>Strict (Classic):</strong> Follow the board rules
             </span>
           </label>
@@ -64,11 +74,7 @@ export function GameControls({
       </div>
 
       {/* Reset Button */}
-      <Button
-        onClick={onReset}
-        className="w-full"
-        variant="default"
-      >
+      <Button onClick={onReset} className="w-full" variant="default">
         {gameStatus === 'ended' ? 'Play Again' : 'Reset Game'}
       </Button>
     </div>

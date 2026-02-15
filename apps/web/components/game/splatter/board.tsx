@@ -38,7 +38,9 @@ export function GameBoard({
   const [gameState, setGameState] = useState(engine.getState());
   const [hoveredCell, setHoveredCell] = useState<Position | null>(null);
   const [showAreaPreview, setShowAreaPreview] = useState(false);
-  const longPressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
   const longPressActiveRef = useRef(false);
   const suppressClickRef = useRef(false);
 

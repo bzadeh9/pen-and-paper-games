@@ -23,8 +23,9 @@ describe('UltimateTicTacToeEngine', () => {
           expect(board.cells.length).toBe(3);
           expect(board.cells[0].length).toBe(3);
           expect(board.winner).toBeNull();
-          expect(board.cells.every((row) => row.every((cell) => cell === null)))
-            .toBe(true);
+          expect(
+            board.cells.every((row) => row.every((cell) => cell === null))
+          ).toBe(true);
         }
       }
     });
@@ -244,7 +245,7 @@ describe('UltimateTicTacToeEngine', () => {
       // Use standard mode for easier testing
       engine.setMode('standard');
       engine.startGame();
-      
+
       // Fill board (0,0) with pattern that creates a draw: X X O / O O X / X O X
       // This ensures no 3-in-a-row for either player
       const moves = [

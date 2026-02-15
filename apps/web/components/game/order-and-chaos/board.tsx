@@ -1,4 +1,8 @@
-import type { Cell, PieceColor, DisplayMode } from '@/lib/games/order-and-chaos/types';
+import type {
+  Cell,
+  PieceColor,
+  DisplayMode,
+} from '@/lib/games/order-and-chaos/types';
 import { CellComponent } from './cell';
 
 interface BoardProps {

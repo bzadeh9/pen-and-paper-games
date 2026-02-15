@@ -1,6 +1,5 @@
 {
   "name": "pen-and-paper-games",
-  "packageManager": "pnpm@9.0.0",
   "version": "0.1.0",
   "private": true,
   "scripts": {

@@ -81,7 +81,7 @@ export class BlackHoleEngine {
     if (row < 5) {
       const bottomLeftId = this.getCircleIdAt(row + 1, col);
       if (bottomLeftId !== null) adjacent.push(bottomLeftId);
-      
+
       const bottomRightId = this.getCircleIdAt(row + 1, col + 1);
       if (bottomRightId !== null) adjacent.push(bottomRightId);
     }
@@ -132,7 +132,9 @@ export class BlackHoleEngine {
     this.state.currentTurnNumber++;
 
     // Check if game is over (20 circles filled)
-    const filledCount = this.state.circles.filter((c) => c.value !== null).length;
+    const filledCount = this.state.circles.filter(
+      (c) => c.value !== null
+    ).length;
     if (filledCount === 20) {
       // Find the black hole (empty circle)
       const blackHole = this.state.circles.find((c) => c.value === null);
@@ -152,7 +154,7 @@ export class BlackHoleEngine {
 
   private calculateScores(blackHoleId: number): void {
     const adjacentIds = this.getAdjacentCircleIds(blackHoleId);
-    
+
     let player1Score = 0;
     let player2Score = 0;
 

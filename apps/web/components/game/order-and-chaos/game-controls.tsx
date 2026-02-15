@@ -1,4 +1,8 @@
-import type { Player, DisplayMode, GameStatus } from '@/lib/games/order-and-chaos/types';
+import type {
+  Player,
+  DisplayMode,
+  GameStatus,
+} from '@/lib/games/order-and-chaos/types';
 
 interface GameControlsProps {
   onReset: () => void;
@@ -28,7 +32,10 @@ export function GameControls({
       <div className="rounded-lg border border-foreground/20 bg-background p-4">
         <h3 className="mb-3 text-lg font-semibold">Display Mode</h3>
         <div className="space-y-2">
-          <label htmlFor="mode-color" className="flex items-center gap-2 cursor-pointer">
+          <label
+            htmlFor="mode-color"
+            className="flex items-center gap-2 cursor-pointer"
+          >
             <input
               id="mode-color"
               type="radio"
@@ -39,11 +46,16 @@ export function GameControls({
               disabled={!isModeChangeable}
               className="h-4 w-4"
             />
-            <span className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}>
+            <span
+              className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}
+            >
               <strong>Color Mode:</strong> Use colored pieces
             </span>
           </label>
-          <label htmlFor="mode-symbol" className="flex items-center gap-2 cursor-pointer">
+          <label
+            htmlFor="mode-symbol"
+            className="flex items-center gap-2 cursor-pointer"
+          >
             <input
               id="mode-symbol"
               type="radio"
@@ -54,7 +66,9 @@ export function GameControls({
               disabled={!isModeChangeable}
               className="h-4 w-4"
             />
-            <span className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}>
+            <span
+              className={`text-sm ${!isModeChangeable ? 'text-foreground/60' : ''}`}
+            >
               <strong>X and O Mode:</strong> Use X and O symbols
             </span>
           </label>

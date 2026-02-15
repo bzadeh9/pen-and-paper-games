@@ -172,7 +172,9 @@ export default function UltimateTicTacToePage() {
           </div>
 
           {/* Center: Game Board (on mobile: first position) */}
-          <div className={`flex items-center justify-center ${isMobile ? 'order-1 md:order-2' : ''}`}>
+          <div
+            className={`flex items-center justify-center ${isMobile ? 'order-1 md:order-2' : ''}`}
+          >
             <div className="w-full max-w-2xl">
               <GlobalBoard
                 gameState={gameState}

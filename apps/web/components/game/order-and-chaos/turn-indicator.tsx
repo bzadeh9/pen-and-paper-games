@@ -1,4 +1,8 @@
-import type { Player, PieceColor, DisplayMode } from '@/lib/games/order-and-chaos/types';
+import type {
+  Player,
+  PieceColor,
+  DisplayMode,
+} from '@/lib/games/order-and-chaos/types';
 
 interface TurnIndicatorProps {
   currentPlayer: Player;
@@ -22,10 +26,14 @@ export function TurnIndicator({
   const renderPiecePreview = (color: PieceColor) => {
     if (displayMode === 'symbol') {
       const symbol = color === 'cherry-blossom' ? 'X' : 'O';
-      const colorClass = color === 'cherry-blossom' ? 'text-cherry-blossom' : 'text-dusty-mauve';
-      return <span className={`text-3xl font-bold ${colorClass}`}>{symbol}</span>;
+      const colorClass =
+        color === 'cherry-blossom' ? 'text-cherry-blossom' : 'text-dusty-mauve';
+      return (
+        <span className={`text-3xl font-bold ${colorClass}`}>{symbol}</span>
+      );
     }
-    const bgClass = color === 'cherry-blossom' ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
+    const bgClass =
+      color === 'cherry-blossom' ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
     return <div className={`h-10 w-10 rounded-full ${bgClass}`} />;
   };
 
@@ -43,13 +51,16 @@ export function TurnIndicator({
       ) : (
         <>
           <h2 className="mb-4 text-2xl font-semibold">
-            Current Turn: <span className="text-cherry-blossom">{playerName}</span>
+            Current Turn:{' '}
+            <span className="text-cherry-blossom">{playerName}</span>
           </h2>
 
           {!isGameEnded && (
             <div className="space-y-3">
               <p className="text-sm text-foreground/60">
-                {displayMode === 'symbol' ? 'Select X or O to place:' : 'Select a color to place:'}
+                {displayMode === 'symbol'
+                  ? 'Select X or O to place:'
+                  : 'Select a color to place:'}
               </p>
               <div className="flex gap-4">
                 <button
@@ -62,7 +73,11 @@ export function TurnIndicator({
                         : 'border-foreground/20 hover:border-cherry-blossom hover:scale-105'
                     }
                   `}
-                  aria-label={displayMode === 'symbol' ? 'Select X' : 'Select cherry blossom color'}
+                  aria-label={
+                    displayMode === 'symbol'
+                      ? 'Select X'
+                      : 'Select cherry blossom color'
+                  }
                 >
                   {renderPiecePreview('cherry-blossom')}
                 </button>
@@ -76,7 +91,11 @@ export function TurnIndicator({
                         : 'border-foreground/20 hover:border-dusty-mauve hover:scale-105'
                     }
                   `}
-                  aria-label={displayMode === 'symbol' ? 'Select O' : 'Select dusty mauve color'}
+                  aria-label={
+                    displayMode === 'symbol'
+                      ? 'Select O'
+                      : 'Select dusty mauve color'
+                  }
                 >
                   {renderPiecePreview('dusty-mauve')}
                 </button>

@@ -14,7 +14,7 @@ describe('OrderAndChaosEngine', () => {
       const state = engine.getState();
       expect(state.board).toHaveLength(6);
       expect(state.board[0]).toHaveLength(6);
-      
+
       // Check all cells are empty
       for (let row = 0; row < 6; row++) {
         for (let col = 0; col < 6; col++) {
@@ -49,7 +49,7 @@ describe('OrderAndChaosEngine', () => {
     it('should place a piece on an empty cell', () => {
       const success = engine.makeMove(0, 0, 'cherry-blossom');
       expect(success).toBe(true);
-      
+
       const state = engine.getState();
       expect(state.board[0][0].color).toBe('cherry-blossom');
     });
@@ -58,7 +58,7 @@ describe('OrderAndChaosEngine', () => {
       engine.makeMove(0, 0, 'cherry-blossom');
       const success = engine.makeMove(0, 0, 'dusty-mauve');
       expect(success).toBe(false);
-      
+
       const state = engine.getState();
       expect(state.board[0][0].color).toBe('cherry-blossom');
     });
@@ -67,7 +67,7 @@ describe('OrderAndChaosEngine', () => {
       engine.makeMove(0, 0, 'cherry-blossom');
       let state = engine.getState();
       expect(state.currentPlayer).toBe('chaos');
-      
+
       engine.makeMove(0, 1, 'dusty-mauve');
       state = engine.getState();
       expect(state.currentPlayer).toBe('order');
@@ -77,7 +77,7 @@ describe('OrderAndChaosEngine', () => {
       engine.makeMove(0, 0, 'cherry-blossom');
       let state = engine.getState();
       expect(state.movesCount).toBe(1);
-      
+
       engine.makeMove(0, 1, 'dusty-mauve');
       state = engine.getState();
       expect(state.movesCount).toBe(2);
@@ -97,7 +97,7 @@ describe('OrderAndChaosEngine', () => {
       for (let col = 0; col < 5; col++) {
         engine.makeMove(0, col, 'cherry-blossom');
       }
-      
+
       const state = engine.getState();
       expect(state.status).toBe('ended');
       expect(state.winner).toBe('order');
@@ -108,7 +108,7 @@ describe('OrderAndChaosEngine', () => {
       for (let row = 0; row < 5; row++) {
         engine.makeMove(row, 0, 'dusty-mauve');
       }
-      
+
       const state = engine.getState();
       expect(state.status).toBe('ended');
       expect(state.winner).toBe('order');
@@ -119,7 +119,7 @@ describe('OrderAndChaosEngine', () => {
       for (let i = 0; i < 5; i++) {
         engine.makeMove(i, i, 'cherry-blossom');
       }
-      
+
       const state = engine.getState();
       expect(state.status).toBe('ended');
       expect(state.winner).toBe('order');
@@ -127,16 +127,18 @@ describe('OrderAndChaosEngine', () => {
 
     it('should detect when board is full (Chaos wins)', () => {
       // Fill the board without creating five in a row
-      const pattern: Array<[number, number, 'cherry-blossom' | 'dusty-mauve']> = [];
-      
+      const pattern: Array<[number, number, 'cherry-blossom' | 'dusty-mauve']> =
+        [];
+
       for (let row = 0; row < 6; row++) {
         for (let col = 0; col < 6; col++) {
           // Alternate colors in a checkerboard pattern to avoid five in a row
-          const color = (row + col) % 2 === 0 ? 'cherry-blossom' : 'dusty-mauve';
+          const color =
+            (row + col) % 2 === 0 ? 'cherry-blossom' : 'dusty-mauve';
           pattern.push([row, col, color]);
         }
       }
-      
+
       // Make moves
       for (const [row, col, color] of pattern) {
         const state = engine.getState();
@@ -144,7 +146,7 @@ describe('OrderAndChaosEngine', () => {
           engine.makeMove(row, col, color);
         }
       }
-      
+
       const finalState = engine.getState();
       // If no five in a row was created, Chaos should win
       if (finalState.movesCount >= 36) {
@@ -157,15 +159,15 @@ describe('OrderAndChaosEngine', () => {
     it('should reset the game to setup state', () => {
       engine.makeMove(0, 0, 'cherry-blossom');
       engine.makeMove(0, 1, 'dusty-mauve');
-      
+
       engine.reset();
-      
+
       const state = engine.getState();
       expect(state.currentPlayer).toBe('order');
       expect(state.status).toBe('setup');
       expect(state.winner).toBeNull();
       expect(state.movesCount).toBe(0);
-      
+
       // Check board is empty
       for (let row = 0; row < 6; row++) {
         for (let col = 0; col < 6; col++) {
@@ -191,7 +193,7 @@ describe('OrderAndChaosEngine', () => {
       for (let col = 0; col < 5; col++) {
         engine.makeMove(0, col, 'cherry-blossom');
       }
-      
+
       expect(engine.isValidMove(1, 0)).toBe(false);
     });
   });
@@ -234,7 +236,7 @@ describe('OrderAndChaosEngine', () => {
       engine.setDisplayMode('symbol');
       engine.makeMove(0, 0, 'cherry-blossom');
       engine.reset();
-      
+
       const state = engine.getState();
       expect(state.displayMode).toBe('symbol');
     });
