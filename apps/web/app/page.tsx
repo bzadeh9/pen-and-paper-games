@@ -106,6 +106,107 @@ export default function Home() {
             </div>
           </Link>
 
+          <Link
+            href="/games/ultimate-tic-tac-toe"
+            className="group rounded-lg border border-foreground/20 bg-background p-6 transition-all hover:border-foreground/40 hover:shadow-lg"
+          >
+            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-powder-petal/20">
+              <svg
+                className="h-8 w-8 text-powder-petal"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-2xl font-semibold">
+              Ultimate Tic-Tac-Toe
+            </h2>
+            <p className="text-sm text-foreground/60">
+              A strategic twist on the classic game!
+            </p>
+            <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
+              <span>Play Now</span>
+              <span className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </div>
+          </Link>
+
+          <Link
+            href="/games/black-hole"
+            className="group rounded-lg border border-foreground/20 bg-background p-6 transition-all hover:border-foreground/40 hover:shadow-lg"
+          >
+            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-dusty-mauve/20">
+              <svg
+                className="h-8 w-8 text-dusty-mauve"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-2xl font-semibold">Black Hole</h2>
+            <p className="text-sm text-foreground/60">
+              A game of reverse-area control - isolate your high numbers!
+            </p>
+            <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
+              <span>Play Now</span>
+              <span className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </div>
+          </Link>
+
+          <Link
+            href="/games/order-and-chaos"
+            className="group rounded-lg border border-foreground/20 bg-background p-6 transition-all hover:border-foreground/40 hover:shadow-lg"
+          >
+            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-pastel-pink/20">
+              <svg
+                className="h-8 w-8 text-pastel-pink"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-2xl font-semibold">Order and Chaos</h2>
+            <p className="text-sm text-foreground/60">
+              Asymmetric strategy - build or block five in a row!
+            </p>
+            <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
+              <span>Play Now</span>
+              <span className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </div>
+          </Link>
+
           <div className="rounded-lg border border-dashed border-foreground/20 bg-background/50 p-6 opacity-50">
             <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-foreground/10">
               <svg
@@ -131,7 +232,7 @@ export default function Home() {
 
         {/* Footer */}
         <div className="mt-12 text-sm text-foreground/40">
-          <p>Developed by Leon &amp; Maya</p>
+          <p>Developed by Leon &amp; Maya 😜</p>
         </div>
       </main>
     </div>

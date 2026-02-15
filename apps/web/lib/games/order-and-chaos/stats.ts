@@ -1,0 +1,57 @@
+import type { Player } from './types';
+
+interface GameStats {
+  orderWins: number;
+  chaosWins: number;
+  gamesPlayed: number;
+}
+
+const STORAGE_KEY = 'order-and-chaos-stats';
+
+export function getGameStatistics(): GameStats {
+  if (typeof window === 'undefined') {
+    return { orderWins: 0, chaosWins: 0, gamesPlayed: 0 };
+  }
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Failed to load game statistics:', error);
+  }
+
+  return { orderWins: 0, chaosWins: 0, gamesPlayed: 0 };
+}
+
+export function recordGame(winner: Player): GameStats {
+  const stats = getGameStatistics();
+
+  stats.gamesPlayed += 1;
+  if (winner === 'order') {
+    stats.orderWins += 1;
+  } else if (winner === 'chaos') {
+    stats.chaosWins += 1;
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    } catch (error) {
+      console.error('Failed to save game statistics:', error);
+    }
+  }
+
+  return stats;
+}
+
+export function resetStatistics(): void {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      console.error('Failed to reset statistics:', error);
+    }
+  }
+}
