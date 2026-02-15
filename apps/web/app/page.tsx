@@ -1,6 +1,12 @@
 import Link from 'next/link';
+import { games } from '@/config/games';
 
 export default function Home() {
+  // Create a lookup map for quick access to game metadata
+  const gamesMap = games.reduce((acc, game) => {
+    acc[game.id] = game;
+    return acc;
+  }, {} as Record<string, typeof games[0]>);
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center bg-background p-4">
       <main className="w-full max-w-4xl text-center">
@@ -36,6 +42,11 @@ export default function Home() {
             <p className="text-sm text-foreground/60">
               Connect the dots strategically to make the last legal move!
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                {gamesMap['hold-the-line']?.category}
+              </span>
+            </div>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
               <span className="transition-transform group-hover:translate-x-1">
@@ -67,6 +78,11 @@ export default function Home() {
             <p className="text-sm text-foreground/60">
               Strategic elimination game - be the last one standing!
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                {gamesMap['splatter']?.category}
+              </span>
+            </div>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
               <span className="transition-transform group-hover:translate-x-1">
@@ -98,6 +114,11 @@ export default function Home() {
             <p className="text-sm text-foreground/60">
               Strategic knight movement with a twist!
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                {gamesMap['knight-chase']?.category}
+              </span>
+            </div>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
               <span className="transition-transform group-hover:translate-x-1">
@@ -131,6 +152,11 @@ export default function Home() {
             <p className="text-sm text-foreground/60">
               A strategic twist on the classic game!
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                {gamesMap['ultimate-tic-tac-toe']?.category}
+              </span>
+            </div>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
               <span className="transition-transform group-hover:translate-x-1">
@@ -168,6 +194,11 @@ export default function Home() {
             <p className="text-sm text-foreground/60">
               A game of reverse-area control - isolate your high numbers!
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                {gamesMap['black-hole']?.category}
+              </span>
+            </div>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
               <span className="transition-transform group-hover:translate-x-1">
@@ -199,6 +230,11 @@ export default function Home() {
             <p className="text-sm text-foreground/60">
               Asymmetric strategy - build or block five in a row!
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                {gamesMap['order-and-chaos']?.category}
+              </span>
+            </div>
             <div className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground/80">
               <span>Play Now</span>
               <span className="transition-transform group-hover:translate-x-1">
