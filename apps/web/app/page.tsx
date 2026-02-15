@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { games } from '@/config/games';
 
+// Create a lookup map for quick access to game metadata
+const gamesMap = games.reduce((acc, game) => {
+  acc[game.id] = game;
+  return acc;
+}, {} as Record<string, typeof games[0]>);
+
 export default function Home() {
-  // Create a lookup map for quick access to game metadata
-  const gamesMap = games.reduce((acc, game) => {
-    acc[game.id] = game;
-    return acc;
-  }, {} as Record<string, typeof games[0]>);
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center bg-background p-4">
       <main className="w-full max-w-4xl text-center">
