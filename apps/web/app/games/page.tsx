@@ -1,43 +1,23 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useState, useMemo } from 'react';
 import { GameCard } from '@/components/game-card';
+import { games, type GameCategory } from '@/config/games';
 
-const games = [
-  {
-    name: 'Hold the Line',
-    description: 'Connect the dots, and be the last one to move!',
-    href: '/games/hold-the-line',
-  },
-  {
-    name: 'Ultimate Tic-Tac-Toe',
-    description: 'A strategic twist on the classic game!',
-    href: '/games/ultimate-tic-tac-toe',
-  },
-  {
-    name: 'Order and Chaos',
-    description: 'Asymmetric strategy on a 6x6 grid',
-    href: '/games/order-and-chaos',
-  },
-  {
-    name: 'Knight Chase',
-    description: 'Strategic knight movement with a twist!',
-    href: '/games/knight-chase',
-  },
-  {
-    name: 'Splatter',
-    description: 'Strategic elimination - be the last one standing!',
-    href: '/games/splatter',
-  },
-  {
-    name: 'Black Hole',
-    description: 'A game of reverse-area control',
-    href: '/games/black-hole',
-  },
-];
+const categories: (GameCategory | 'All')[] = ['All', 'Strategy', 'Puzzle', 'Party', 'Abstract'];
 
 export default function GamesPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<GameCategory | 'All'>('All');
+
+  const filteredGames = useMemo(() => {
+    return games.filter((game) => {
+      const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
@@ -50,16 +30,56 @@ export default function GamesPage() {
           </p>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search games..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2 text-foreground placeholder:text-foreground/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+
+        {/* Category Filters */}
+        <div className="mb-8 flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                selectedCategory === category
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* Games Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {games.map((game) => (
+          {filteredGames.map((game) => (
             <GameCard
-              key={game.name}
+              key={game.id}
               name={game.name}
               description={game.description}
               href={game.href}
+              category={game.category}
+              tags={game.tags}
             />
           ))}
         </div>
+
+        {/* No Results Message */}
+        {filteredGames.length === 0 && (
+          <div className="py-12 text-center">
+            <p className="text-lg text-foreground/60">
+              No games found matching your criteria.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
