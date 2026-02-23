@@ -1,5 +1,6 @@
 'use client';
 
+import { GameIcon, gameColors } from '@/components/game-icon';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Board } from '@/components/game/black-hole/board';
 import { TurnIndicator } from '@/components/game/black-hole/turn-indicator';
@@ -88,6 +89,11 @@ export default function BlackHolePage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className={`flex h-16 w-16 items-center justify-center rounded-full ${gameColors['black-hole'].bg}`}>
+              <GameIcon id="black-hole" className={`h-8 w-8 ${gameColors['black-hole'].text}`} />
+            </div>
+          </div>
           <h1 className="mb-2 text-4xl font-bold tracking-tight">Black Hole</h1>
           <p className="text-lg text-foreground/60">
             A game of reverse-area control

@@ -1,5 +1,6 @@
 'use client';
 
+import { GameIcon, gameColors } from '@/components/game-icon';
 import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/splatter/board';
 import { PlayerCustomization } from '@/components/game/splatter/player-customization';
@@ -52,6 +53,11 @@ export default function SplatterPage() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className={`flex h-16 w-16 items-center justify-center rounded-full ${gameColors['splatter'].bg}`}>
+              <GameIcon id="splatter" className={`h-8 w-8 ${gameColors['splatter'].text}`} />
+            </div>
+          </div>
           <h1 className="mb-2 text-4xl font-bold tracking-tight">Splatter</h1>
           <p className="text-lg text-foreground/60">
             Strategic elimination - be the last one standing!

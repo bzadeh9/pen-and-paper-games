@@ -1,5 +1,6 @@
 'use client';
 
+import { GameIcon, gameColors } from '@/components/game-icon';
 import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/hold-the-line/board';
 import { PlayerCustomization } from '@/components/game/hold-the-line/player-customization';
@@ -82,6 +83,11 @@ export default function HoldTheLinePage() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className={`flex h-16 w-16 items-center justify-center rounded-full ${gameColors['hold-the-line'].bg}`}>
+              <GameIcon id="hold-the-line" className={`h-8 w-8 ${gameColors['hold-the-line'].text}`} />
+            </div>
+          </div>
           <h1 className="mb-2 text-4xl font-bold tracking-tight">
             Hold The Line
           </h1>

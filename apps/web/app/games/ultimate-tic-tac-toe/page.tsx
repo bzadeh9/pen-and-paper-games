@@ -1,5 +1,6 @@
 'use client';
 
+import { GameIcon, gameColors } from '@/components/game-icon';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { GlobalBoard } from '@/components/game/ultimate-tic-tac-toe/global-board';
 import { TurnIndicator } from '@/components/game/ultimate-tic-tac-toe/turn-indicator';
@@ -87,6 +88,11 @@ export default function UltimateTicTacToePage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className={`flex h-16 w-16 items-center justify-center rounded-full ${gameColors['ultimate-tic-tac-toe'].bg}`}>
+              <GameIcon id="ultimate-tic-tac-toe" className={`h-8 w-8 ${gameColors['ultimate-tic-tac-toe'].text}`} />
+            </div>
+          </div>
           <h1 className="mb-2 text-4xl font-bold tracking-tight">
             Ultimate Tic-Tac-Toe
           </h1>
