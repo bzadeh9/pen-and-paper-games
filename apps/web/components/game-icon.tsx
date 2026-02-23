@@ -172,7 +172,7 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeWidth={2}
       />
       {/* O piece */}
-      <circle cx="17.5" cy="6" r="3" strokeWidth={2} />
+      <circle cx="17.5" cy="6" r="3" strokeWidth={2} fill="none" />
       {/* Question mark – hook */}
       <path
         d="M10 14.5c0-2 1-3 2.5-3s2.5 1 2.5 2.5c0 2-2.5 2-2.5 4"
