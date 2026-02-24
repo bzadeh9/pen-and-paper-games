@@ -1,5 +1,5 @@
 export type GameCategory = 'Strategy' | 'Puzzle' | 'Party' | 'Abstract';
-export type GameTag = '2-Player' | 'Quick' | 'Complex' | 'Chess-like' | 'Area Control' | 'Abstract';
+export type GameTag = '2-Player' | 'Quick' | 'Complex' | 'Chess-like' | 'Area Control' | 'Abstract' | 'Family';
 
 export interface GameMetadata {
   id: string;
@@ -58,5 +58,13 @@ export const games: GameMetadata[] = [
     href: '/games/black-hole',
     category: 'Puzzle',
     tags: ['2-Player', 'Abstract'],
+  },
+  {
+    id: 'bee-game',
+    name: 'Abbee & Dot',
+    description: 'A Baha\'i Ayyam-i-ha bee chase game for families!',
+    href: '/games/bee-game',
+    category: 'Party',
+    tags: ['2-Player', 'Family'],
   },
 ];
