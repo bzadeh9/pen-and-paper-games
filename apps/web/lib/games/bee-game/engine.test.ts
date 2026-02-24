@@ -61,21 +61,14 @@ describe('BeeGameEngine', () => {
       }
     });
 
-    it('should have home tile null during setup (placed after game starts)', () => {
+    it('should place home tile adjacent to chaser start during setup', () => {
       const state = engine.getState();
-      expect(state.home).toBeNull();
-    });
-
-    it('should place home tile adjacent to chaser start once game begins', () => {
-      const eng = new BeeGameEngine(createSeededRng(42));
-      eng.startGame();
-      const state = eng.getState();
-      expect(state.home).not.toBeNull();
-      // Chaser (player 2) starts at bottom-right; home should be adjacent
+      expect(state.home).toBeDefined();
+      // Player 1 is runner at (0,0), so player 2 is chaser at (7,7)
       const chaserPos = state.players[2].position;
       const dist =
-        Math.abs(state.home!.row - chaserPos.row) +
-        Math.abs(state.home!.col - chaserPos.col);
+        Math.abs(state.home.row - chaserPos.row) +
+        Math.abs(state.home.col - chaserPos.col);
       expect(dist).toBeGreaterThanOrEqual(1);
       expect(dist).toBeLessThanOrEqual(2);
     });
@@ -83,14 +76,13 @@ describe('BeeGameEngine', () => {
     it('should place home adjacent to chaser when player 2 is runner', () => {
       const eng = new BeeGameEngine(createSeededRng(42));
       eng.setStartingRunner(2); // player 1 becomes chaser
-      eng.startGame();
       const state = eng.getState();
-      expect(state.home).not.toBeNull();
-      // Chaser (player 1) starts at top-left; home should be adjacent
+      expect(state.home).toBeDefined();
+      // Chaser (player 1) starts at top-left (0,0)
       const chaserPos = state.players[1].position;
       const dist =
-        Math.abs(state.home!.row - chaserPos.row) +
-        Math.abs(state.home!.col - chaserPos.col);
+        Math.abs(state.home.row - chaserPos.row) +
+        Math.abs(state.home.col - chaserPos.col);
       expect(dist).toBeGreaterThanOrEqual(1);
       expect(dist).toBeLessThanOrEqual(2);
     });
@@ -409,7 +401,6 @@ describe('BeeGameEngine', () => {
 
       const state = eng.getState();
       const home = state.home;
-      if (!home) return; // home is placed at startGame, should not be null here
       const runnerPos = state.players[1].position;
       const dist =
         Math.abs(home.row - runnerPos.row) + Math.abs(home.col - runnerPos.col);
@@ -442,20 +433,17 @@ describe('BeeGameEngine', () => {
   });
 
   describe('home tile placement', () => {
-    it('should preserve home tile position after reset when roles unchanged', () => {
+    it('should keep home in same area after reset when roles unchanged', () => {
       const eng = new BeeGameEngine(createSeededRng(42));
-      eng.startGame();
-      const homeAfterStart = eng.getState().home;
+      const homeBeforeReset = eng.getState().home;
 
+      eng.startGame();
       eng.reset();
-      // After reset, home goes back to null (placed again when next game starts)
-      expect(eng.getState().home).toBeNull();
+      const homeAfterReset = eng.getState().home;
 
-      eng.startGame();
-      const homeAfterRestart = eng.getState().home;
-      // With same roles, home should be adjacent to same chaser corner
-      expect(homeAfterStart).not.toBeNull();
-      expect(homeAfterRestart).not.toBeNull();
+      // Both should be near the same chaser corner (player 2 default)
+      expect(homeBeforeReset.row).toBeGreaterThanOrEqual(GRID_SIZE - 2);
+      expect(homeAfterReset.row).toBeGreaterThanOrEqual(GRID_SIZE - 2);
     });
   });
 

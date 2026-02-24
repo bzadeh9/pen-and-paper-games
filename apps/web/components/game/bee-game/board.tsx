@@ -77,7 +77,6 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     );
 
   const isHome = (pos: Position) =>
-    gameState.home !== null &&
     gameState.home.row === pos.row &&
     gameState.home.col === pos.col;
 

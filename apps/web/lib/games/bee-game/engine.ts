@@ -18,6 +18,11 @@ export class BeeGameEngine {
 
   private createInitialState(): GameState {
     const virtueZones = this.placeVirtueZones();
+    const chaserPos =
+      this.startingRunner === 1
+        ? { row: GRID_SIZE - 1, col: GRID_SIZE - 1 } // player 2 is chaser
+        : { row: 0, col: 0 }; // player 1 is chaser
+    const home = this.placeHome(virtueZones, chaserPos);
 
     return {
       gridSize: GRID_SIZE,
@@ -38,8 +43,7 @@ export class BeeGameEngine {
       status: 'setup',
       winner: null,
       virtueZones,
-      // Home tile is placed when the game starts, adjacent to the chaser
-      home: null,
+      home,
       moveHistory: [],
       swapCount: 0,
       justSwapped: false,
@@ -129,7 +133,7 @@ export class BeeGameEngine {
         ...z,
         position: { ...z.position },
       })),
-      home: this.state.home ? { ...this.state.home } : null,
+      home: { ...this.state.home },
       moveHistory: this.state.moveHistory.map((m) => ({
         ...m,
         from: { ...m.from },
@@ -143,17 +147,12 @@ export class BeeGameEngine {
 
   startGame(): void {
     if (this.state.status !== 'setup') return;
-    // Place the Home tile adjacent to the chaser's starting position now that
-    // roles are locked in. It won't move for the rest of the game.
-    const chaserPlayer = this.state.players[1].role === 'chaser' ? 1 : 2;
-    const chaserPos = this.state.players[chaserPlayer].position;
-    this.state.home = this.placeHome(this.state.virtueZones, chaserPos);
     this.state.status = 'playing';
   }
 
   /**
    * Choose which player starts as runner. Only usable in setup state.
-   * Updates roles without re-randomising the board.
+   * Updates roles and recomputes home position (always next to the chaser).
    */
   setStartingRunner(player: Player): void {
     if (this.state.status !== 'setup') return;
@@ -163,6 +162,12 @@ export class BeeGameEngine {
     this.state.players[2].role = player === 2 ? 'runner' : 'chaser';
     // Runner always goes first
     this.state.currentPlayer = player;
+    // Recompute home — it must always be adjacent to the chaser
+    const chaserPos =
+      player === 1
+        ? { row: GRID_SIZE - 1, col: GRID_SIZE - 1 }
+        : { row: 0, col: 0 };
+    this.state.home = this.placeHome(this.state.virtueZones, chaserPos);
   }
 
   private isInBounds(pos: Position): boolean {
@@ -348,7 +353,6 @@ export class BeeGameEngine {
 
       // Check if runner reached Home with at least 1 virtue
       if (
-        this.state.home !== null &&
         pos.row === this.state.home.row &&
         pos.col === this.state.home.col &&
         this.state.players[currentPlayer].collectedVirtues.length > 0
