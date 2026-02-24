@@ -19,6 +19,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   },
   'black-hole': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'order-and-chaos': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
+  scribbl: { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
 };
 
 const iconPaths: Record<string, React.ReactNode> = {
@@ -183,6 +184,29 @@ const iconPaths: Record<string, React.ReactNode> = {
       />
       {/* Question mark – dot */}
       <circle cx="12.5" cy="20.5" r="0.9" fill="currentColor" stroke="none" />
+    </>
+  ),
+
+  /**
+   * Scribbl – a pencil (pointing upper-right → lower-left) with a wavy curved
+   * line below it, representing the scribble-and-complete drawing activity.
+   */
+  scribbl: (
+    <>
+      {/* Pencil body */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+      />
+      {/* Curved line just drawn by the pencil */}
+      <path
+        d="M3 21c1.5-2.5 4-1.5 5.5-4"
+        fill="none"
+        strokeLinecap="round"
+        strokeWidth={2}
+      />
     </>
   ),
 };

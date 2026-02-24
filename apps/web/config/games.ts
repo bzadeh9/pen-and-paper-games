@@ -59,4 +59,12 @@ export const games: GameMetadata[] = [
     category: 'Puzzle',
     tags: ['2-Player', 'Abstract'],
   },
+  {
+    id: 'scribbl',
+    name: 'Scribbl',
+    description: 'Complete a scribble into a drawing!',
+    href: '/games/scribbl',
+    category: 'Party',
+    tags: ['2-Player', 'Quick'],
+  },
 ];
