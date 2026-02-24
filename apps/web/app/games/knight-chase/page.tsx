@@ -1,5 +1,6 @@
 'use client';
 
+import { GameIcon, gameColors } from '@/components/game-icon';
 import React, { useState, useCallback } from 'react';
 import { GameBoard } from '@/components/game/knight-chase/board';
 import { PlayerCustomization } from '@/components/game/knight-chase/player-customization';
@@ -44,6 +45,11 @@ export default function KnightChasePage() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className={`flex h-16 w-16 items-center justify-center rounded-full ${gameColors['knight-chase'].bg}`}>
+              <GameIcon id="knight-chase" className={`h-8 w-8 ${gameColors['knight-chase'].text}`} />
+            </div>
+          </div>
           <h1 className="mb-2 text-4xl font-bold tracking-tight">
             Knight Chase
           </h1>

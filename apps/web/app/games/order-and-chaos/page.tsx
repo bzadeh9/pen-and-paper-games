@@ -1,5 +1,6 @@
 'use client';
 
+import { GameIcon, gameColors } from '@/components/game-icon';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Board } from '@/components/game/order-and-chaos/board';
 import { TurnIndicator } from '@/components/game/order-and-chaos/turn-indicator';
@@ -85,6 +86,11 @@ export default function OrderAndChaosPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className={`flex h-16 w-16 items-center justify-center rounded-full ${gameColors['order-and-chaos'].bg}`}>
+              <GameIcon id="order-and-chaos" className={`h-8 w-8 ${gameColors['order-and-chaos'].text}`} />
+            </div>
+          </div>
           <h1 className="mb-2 text-4xl font-bold tracking-tight">
             Order and Chaos
           </h1>

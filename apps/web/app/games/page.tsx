@@ -63,6 +63,7 @@ export default function GamesPage() {
           {filteredGames.map((game) => (
             <GameCard
               key={game.id}
+              id={game.id}
               name={game.name}
               description={game.description}
               href={game.href}
