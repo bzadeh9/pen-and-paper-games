@@ -11,7 +11,7 @@ export const GRID_SIZE = 8;
 export const RUNNER_SPEED = 2;
 export const CHASER_SPEED = 3;
 
-/** Pool of virtues from which 5 are randomly selected each game. */
+/** Pool of virtues from which 6 are randomly selected each game. */
 export const VIRTUES = [
   'Kindness',
   'Generosity',
@@ -46,7 +46,8 @@ export interface GameState {
   status: GameStatus;
   winner: Player | null;
   virtueZones: VirtueZone[];
-  serviceActivity: Position;
+  /** The 'Home' tile — placed once near the chaser start and never moves. */
+  home: Position;
   moveHistory: { player: Player; from: Position; to: Position }[];
   swapCount: number;
   /** Set to true on the turn a role swap just occurred, cleared on next move. */

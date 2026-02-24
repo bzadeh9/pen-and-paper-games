@@ -58,6 +58,23 @@ export default function BeeGamePage() {
           </p>
         </div>
 
+        {/* Backstory */}
+        <div className="mb-6 rounded-lg border border-foreground/20 bg-powder-petal/30 px-6 py-5">
+          <h2 className="mb-2 text-lg font-semibold">The Story of Abbee &amp; Dot</h2>
+          <p className="text-sm leading-relaxed text-foreground/80">
+            Every year during Ayyam-i-ha, two tiny bees named Abbee and Dot
+            wake up from their winter nap. Their hive has given them a special
+            mission: fly across the garden, visit flowers that hold different
+            virtues, and bring those virtues back Home before the celebration
+            begins. But there&apos;s a twist — only one bee can be the
+            collector at a time! If the chasing bee catches the collector,
+            they swap jobs and the new collector must keep gathering. The
+            first bee to collect at least one virtue and buzz all the way Home
+            wins the admiration of the whole hive. Ready to help Abbee and Dot
+            complete their mission?
+          </p>
+        </div>
+
         {/* Game rules */}
         <Collapsible
           defaultOpen={!isMobile}
@@ -73,12 +90,11 @@ export default function BeeGamePage() {
               <ul className="space-y-2 text-foreground/80">
                 <li>
                   • <strong>Runner (🐝)</strong> moves up to 2 spaces per turn,
-                  collecting virtue zones and heading toward the Service
-                  Activity.
+                  collecting virtue zones and heading toward Home.
                 </li>
                 <li>
                   • <strong>Chaser (🐝)</strong> moves up to 3 spaces per turn,
-                  trying to tag the runner.
+                  trying to tag the runner. The chaser cannot enter virtue zones.
                 </li>
                 <li>
                   • The chaser <strong>cannot tag</strong> the runner inside a
@@ -90,8 +106,11 @@ export default function BeeGamePage() {
                   virtue zone.
                 </li>
                 <li>
+                  • If all virtues are collected, new ones appear in fresh spots!
+                </li>
+                <li>
                   • The runner wins by collecting at least one virtue and
-                  reaching the <strong>Service Activity</strong> square.
+                  reaching the <strong>Home</strong> square.
                 </li>
               </ul>
             </div>
@@ -106,8 +125,8 @@ export default function BeeGamePage() {
               <h3 className="mb-2 text-lg font-semibold">About the Game</h3>
               <p className="text-sm text-foreground/70">
                 Abbee &amp; Dot are two plushie bees who visit during the
-                Ayyam-i-ha celebration. In this game, they chase each other
-                across a grid collecting virtues!
+                Ayyam-i-ha celebration. Help them fly across the garden,
+                gather virtues and buzz Home!
               </p>
             </div>
           </div>

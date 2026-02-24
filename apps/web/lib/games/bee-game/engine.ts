@@ -17,7 +17,7 @@ export class BeeGameEngine {
 
   private createInitialState(): GameState {
     const virtueZones = this.placeVirtueZones();
-    const serviceActivity = this.placeServiceActivity(virtueZones);
+    const home = this.placeHome(virtueZones);
 
     return {
       gridSize: GRID_SIZE,
@@ -37,7 +37,7 @@ export class BeeGameEngine {
       status: 'setup',
       winner: null,
       virtueZones,
-      serviceActivity,
+      home,
       moveHistory: [],
       swapCount: 0,
       justSwapped: false,
@@ -51,7 +51,7 @@ export class BeeGameEngine {
     occupied.add('0,0');
     occupied.add(`${GRID_SIZE - 1},${GRID_SIZE - 1}`);
 
-    const virtueCount = 5;
+    const virtueCount = 6;
     const shuffled = [...VIRTUES].sort(() => this.rng() - 0.5);
 
     for (let i = 0; i < virtueCount && i < shuffled.length; i++) {
@@ -74,7 +74,16 @@ export class BeeGameEngine {
     return zones;
   }
 
-  private placeServiceActivity(zones: VirtueZone[]): Position {
+  /** Place the Home tile adjacent to the chaser's starting corner. Fixed for the entire game. */
+  private placeHome(zones: VirtueZone[]): Position {
+    const chaserStart = { row: GRID_SIZE - 1, col: GRID_SIZE - 1 };
+    // Candidate positions adjacent to chaser start
+    const candidates: Position[] = [
+      { row: chaserStart.row - 1, col: chaserStart.col },
+      { row: chaserStart.row, col: chaserStart.col - 1 },
+      { row: chaserStart.row - 1, col: chaserStart.col - 1 },
+    ];
+
     const occupied = new Set<string>();
     occupied.add('0,0');
     occupied.add(`${GRID_SIZE - 1},${GRID_SIZE - 1}`);
@@ -82,19 +91,13 @@ export class BeeGameEngine {
       occupied.add(`${z.position.row},${z.position.col}`);
     }
 
-    let pos: Position;
-    let key: string;
-    let attempts = 0;
-    do {
-      pos = {
-        row: Math.floor(this.rng() * GRID_SIZE),
-        col: Math.floor(this.rng() * GRID_SIZE),
-      };
-      key = `${pos.row},${pos.col}`;
-      attempts++;
-    } while (occupied.has(key) && attempts < 100);
+    for (const pos of candidates) {
+      const key = `${pos.row},${pos.col}`;
+      if (!occupied.has(key)) return pos;
+    }
 
-    return pos;
+    // Fallback (should not happen on an 8x8 grid)
+    return candidates[0];
   }
 
   getState(): GameState {
@@ -116,7 +119,7 @@ export class BeeGameEngine {
         ...z,
         position: { ...z.position },
       })),
-      serviceActivity: { ...this.state.serviceActivity },
+      home: { ...this.state.home },
       moveHistory: this.state.moveHistory.map((m) => ({
         ...m,
         from: { ...m.from },
@@ -174,6 +177,8 @@ export class BeeGameEngine {
 
     const currentPos = this.state.players[this.state.currentPlayer].position;
     const maxDist = this.getCurrentSpeed();
+    const isChaser =
+      this.state.players[this.state.currentPlayer].role === 'chaser';
     const moves: Position[] = [];
 
     for (let row = 0; row < GRID_SIZE; row++) {
@@ -181,6 +186,8 @@ export class BeeGameEngine {
         const pos = { row, col };
         const dist = this.getManhattanDistance(currentPos, pos);
         if (dist >= 1 && dist <= maxDist) {
+          // Chaser cannot land on uncollected virtue zones
+          if (isChaser && this.isOnVirtueZone(pos)) continue;
           moves.push(pos);
         }
       }
@@ -217,6 +224,46 @@ export class BeeGameEngine {
     };
   }
 
+  /** If all virtue zones are collected, spawn a fresh set in new random positions. */
+  private respawnVirtuesIfNeeded(): void {
+    const allCollected = this.state.virtueZones.every((z) => z.collected);
+    if (!allCollected) return;
+
+    const occupied = new Set<string>();
+    // Reserve player positions, home tile
+    occupied.add(
+      `${this.state.players[1].position.row},${this.state.players[1].position.col}`
+    );
+    occupied.add(
+      `${this.state.players[2].position.row},${this.state.players[2].position.col}`
+    );
+    occupied.add(`${this.state.home.row},${this.state.home.col}`);
+
+    const virtueCount = 6;
+    const shuffled = [...VIRTUES].sort(() => this.rng() - 0.5);
+    const newZones: VirtueZone[] = [];
+
+    for (let i = 0; i < virtueCount && i < shuffled.length; i++) {
+      let pos: Position;
+      let key: string;
+      let attempts = 0;
+      do {
+        pos = {
+          row: Math.floor(this.rng() * GRID_SIZE),
+          col: Math.floor(this.rng() * GRID_SIZE),
+        };
+        key = `${pos.row},${pos.col}`;
+        attempts++;
+      } while (occupied.has(key) && attempts < 100);
+
+      occupied.add(key);
+      newZones.push({ position: pos, virtue: shuffled[i], collected: false });
+    }
+
+    // Replace old collected zones with fresh ones
+    this.state.virtueZones = newZones;
+  }
+
   makeMove(pos: Position): boolean {
     if (!this.isValidMove(pos)) return false;
 
@@ -250,12 +297,15 @@ export class BeeGameEngine {
         this.state.players[currentPlayer].collectedVirtues.push(
           this.state.virtueZones[zoneIndex].virtue
         );
+
+        // Respawn new virtues if all are collected
+        this.respawnVirtuesIfNeeded();
       }
 
-      // Check if runner reached service activity with at least 1 virtue
+      // Check if runner reached Home with at least 1 virtue
       if (
-        pos.row === this.state.serviceActivity.row &&
-        pos.col === this.state.serviceActivity.col &&
+        pos.row === this.state.home.row &&
+        pos.col === this.state.home.col &&
         this.state.players[currentPlayer].collectedVirtues.length > 0
       ) {
         this.state.status = 'ended';

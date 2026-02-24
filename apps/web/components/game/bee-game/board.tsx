@@ -19,8 +19,8 @@ function BeeToken({ player, role }: { player: Player; role: string }) {
       <div
         className={`flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full border-2 ${
           isAbbee
-            ? 'border-cherry-blossom bg-cherry-blossom/30'
-            : 'border-dusty-mauve bg-dusty-mauve/30'
+            ? 'border-bee-amber bg-bee-amber/30'
+            : 'border-bee-sky bg-bee-sky/30'
         }`}
       >
         <span className="text-base md:text-lg" role="img" aria-label={isAbbee ? 'Abbee bee' : 'Dot bee'}>
@@ -29,7 +29,7 @@ function BeeToken({ player, role }: { player: Player; role: string }) {
       </div>
       <span
         className={`absolute -bottom-1 text-[8px] font-bold leading-none ${
-          isAbbee ? 'text-cherry-blossom' : 'text-dusty-mauve'
+          isAbbee ? 'text-bee-amber' : 'text-bee-sky'
         }`}
       >
         {isAbbee ? 'A' : 'D'}
@@ -76,9 +76,9 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
         z.position.col === pos.col
     );
 
-  const isServiceActivity = (pos: Position) =>
-    gameState.serviceActivity.row === pos.row &&
-    gameState.serviceActivity.col === pos.col;
+  const isHome = (pos: Position) =>
+    gameState.home.row === pos.row &&
+    gameState.home.col === pos.col;
 
   const getPlayerAt = (pos: Position): Player | null => {
     if (
@@ -120,8 +120,8 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {gameState.status === 'playing' && (
         <div className="text-center">
           {gameState.justSwapped && (
-            <div className="mb-3 rounded-lg border-2 border-cherry-blossom bg-cherry-blossom/10 px-4 py-3 animate-pulse" role="alert">
-              <p className="text-base font-bold text-cherry-blossom">
+            <div className="mb-3 rounded-lg border-2 border-bee-amber bg-bee-amber/10 px-4 py-3 animate-pulse" role="alert">
+              <p className="text-base font-bold text-bee-amber">
                 🔄 Roles Swapped!
               </p>
               <p className="text-sm text-foreground/70">
@@ -131,7 +131,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             </div>
           )}
           <p className="text-lg font-semibold">
-            <span className={gameState.currentPlayer === 1 ? 'text-cherry-blossom' : 'text-dusty-mauve'}>
+            <span className={gameState.currentPlayer === 1 ? 'text-bee-amber' : 'text-bee-sky'}>
               {currentPlayerName}
             </span>
             &apos;s Turn ({currentPlayerState.role})
@@ -164,11 +164,11 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-foreground/70">
         <div className="flex items-center gap-1">
-          <div className="h-4 w-4 rounded-full border-2 border-cherry-blossom bg-cherry-blossom/30" />
+          <div className="h-4 w-4 rounded-full border-2 border-bee-amber bg-bee-amber/30" />
           <span>Abbee</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="h-4 w-4 rounded-full border-2 border-dusty-mauve bg-dusty-mauve/30" />
+          <div className="h-4 w-4 rounded-full border-2 border-bee-sky bg-bee-sky/30" />
           <span>Dot</span>
         </div>
         <div className="flex items-center gap-1">
@@ -177,7 +177,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
         </div>
         <div className="flex items-center gap-1">
           <div className="h-4 w-4 rounded-full bg-dusty-mauve/40 border border-dusty-mauve" />
-          <span>Service Activity</span>
+          <span>Home</span>
         </div>
       </div>
 
@@ -185,7 +185,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       <div className="flex flex-wrap gap-4 text-sm">
         {([1, 2] as Player[]).map((p) => (
           <div key={p} className="text-center">
-            <span className={`font-semibold ${p === 1 ? 'text-cherry-blossom' : 'text-dusty-mauve'}`}>
+            <span className={`font-semibold ${p === 1 ? 'text-bee-amber' : 'text-bee-sky'}`}>
               {p === 1 ? 'Abbee' : 'Dot'}:
             </span>
             {gameState.players[p].collectedVirtues.length > 0 ? (
@@ -219,7 +219,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
               const isHovered =
                 hoveredCell?.row === row && hoveredCell?.col === col;
               const virtueZone = getVirtueZoneAt(pos);
-              const isSA = isServiceActivity(pos);
+              const isHomeTile = isHome(pos);
               const playerAt = getPlayerAt(pos);
 
               return (
@@ -228,7 +228,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                   className={`relative flex items-center justify-center border border-foreground/20 transition-all ${
                     virtueZone
                       ? 'bg-cherry-blossom/20'
-                      : isSA
+                      : isHomeTile
                         ? 'bg-dusty-mauve/20'
                         : valid && showPossibleMoves && gameState.status === 'playing'
                           ? 'bg-powder-petal/50 hover:bg-cherry-blossom/30'
@@ -241,16 +241,16 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                   onMouseEnter={() => setHoveredCell(pos)}
                   onMouseLeave={() => setHoveredCell(null)}
                   role="gridcell"
-                  aria-label={`Cell ${row + 1},${col + 1}${virtueZone ? ` - ${virtueZone.virtue} virtue zone` : ''}${isSA ? ' - Service Activity' : ''}${playerAt ? ` - ${playerAt === 1 ? 'Abbee' : 'Dot'}` : ''}`}
+                  aria-label={`Cell ${row + 1},${col + 1}${virtueZone ? ` - ${virtueZone.virtue} virtue zone` : ''}${isHomeTile ? ' - Home' : ''}${playerAt ? ` - ${playerAt === 1 ? 'Abbee' : 'Dot'}` : ''}`}
                 >
                   {virtueZone && !playerAt && (
                     <span className="text-[9px] md:text-[10px] font-medium text-cherry-blossom leading-tight text-center select-none">
                       {virtueZone.virtue}
                     </span>
                   )}
-                  {isSA && !playerAt && (
+                  {isHomeTile && !playerAt && (
                     <span className="text-[9px] md:text-[10px] font-medium text-dusty-mauve leading-tight text-center select-none">
-                      Service
+                      Home
                     </span>
                   )}
                   {playerAt && (
@@ -268,7 +268,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
 
       {/* Controls */}
       <div className="text-center text-sm text-foreground/60">
-        <div className="mb-4 flex items-center justify-center gap-2">
+        <div className="mb-4 flex items-center justify-center gap-4">
           <label className="flex cursor-pointer items-center gap-2 select-none">
             <input
               type="checkbox"
@@ -280,9 +280,18 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
               Highlight Possible Moves
             </span>
           </label>
+          {gameState.status === 'playing' && (
+            <button
+              onClick={handleReset}
+              className="rounded-md border border-foreground/30 px-3 py-1 text-xs font-medium text-foreground/70 transition-colors hover:bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+              aria-label="Restart Game"
+            >
+              Restart
+            </button>
+          )}
         </div>
         <p>Runner moves up to 2 spaces · Chaser moves up to 3 spaces</p>
-        <p className="mt-1">Collect virtues and reach the Service Activity to win!</p>
+        <p className="mt-1">Collect virtues and reach Home to win!</p>
       </div>
     </div>
   );
