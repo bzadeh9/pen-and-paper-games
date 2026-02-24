@@ -104,6 +104,40 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           <p className="mb-4 text-lg font-semibold">
             Ready to play Abbee &amp; Dot?
           </p>
+          {/* Role selection */}
+          <div className="mb-6">
+            <p className="mb-2 text-sm font-medium text-foreground/70">Who starts as runner?</p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => {
+                  engine.setStartingRunner(1);
+                  setGameState(engine.getState());
+                }}
+                className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all ${
+                  gameState.startingRunner === 1
+                    ? 'border-bee-amber bg-bee-amber/20 text-bee-amber'
+                    : 'border-foreground/20 text-foreground/60 hover:border-foreground/40'
+                }`}
+                aria-pressed={gameState.startingRunner === 1}
+              >
+                🐝 Abbee (runner)
+              </button>
+              <button
+                onClick={() => {
+                  engine.setStartingRunner(2);
+                  setGameState(engine.getState());
+                }}
+                className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all ${
+                  gameState.startingRunner === 2
+                    ? 'border-bee-sky bg-bee-sky/20 text-bee-sky'
+                    : 'border-foreground/20 text-foreground/60 hover:border-foreground/40'
+                }`}
+                aria-pressed={gameState.startingRunner === 2}
+              >
+                🐝 Dot (runner)
+              </button>
+            </div>
+          </div>
           <button
             onClick={() => {
               engine.startGame();
@@ -221,12 +255,16 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
               const virtueZone = getVirtueZoneAt(pos);
               const isHomeTile = isHome(pos);
               const playerAt = getPlayerAt(pos);
+              const isRunnerSafe =
+                gameState.runnerSafePosition !== null &&
+                gameState.runnerSafePosition.row === row &&
+                gameState.runnerSafePosition.col === col;
 
               return (
                 <div
                   key={`${row}-${col}`}
                   className={`relative flex items-center justify-center border border-foreground/20 transition-all ${
-                    virtueZone
+                    virtueZone || isRunnerSafe
                       ? 'bg-cherry-blossom/20'
                       : isHomeTile
                         ? 'bg-dusty-mauve/20'
@@ -241,17 +279,20 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                   onMouseEnter={() => setHoveredCell(pos)}
                   onMouseLeave={() => setHoveredCell(null)}
                   role="gridcell"
-                  aria-label={`Cell ${row + 1},${col + 1}${virtueZone ? ` - ${virtueZone.virtue} virtue zone` : ''}${isHomeTile ? ' - Home' : ''}${playerAt ? ` - ${playerAt === 1 ? 'Abbee' : 'Dot'}` : ''}`}
+                  aria-label={`Cell ${row + 1},${col + 1}${virtueZone ? ` - ${virtueZone.virtue} virtue zone` : ''}${isRunnerSafe ? ' - safe zone' : ''}${isHomeTile ? ' - Home' : ''}${playerAt ? ` - ${playerAt === 1 ? 'Abbee' : 'Dot'}` : ''}`}
                 >
-                  {virtueZone && !playerAt && (
+                  {(virtueZone || isRunnerSafe) && !playerAt && (
                     <span className="text-[9px] md:text-[10px] font-medium text-cherry-blossom leading-tight text-center select-none">
-                      {virtueZone.virtue}
+                      {virtueZone ? virtueZone.virtue : '🛡️'}
                     </span>
                   )}
                   {isHomeTile && !playerAt && (
-                    <span className="text-[9px] md:text-[10px] font-medium text-dusty-mauve leading-tight text-center select-none">
-                      Home
-                    </span>
+                    <div className="flex flex-col items-center gap-0 leading-none">
+                      <span className="text-sm select-none" aria-hidden="true">🏠</span>
+                      <span className="text-[8px] font-medium text-dusty-mauve leading-tight text-center select-none">
+                        Home
+                      </span>
+                    </div>
                   )}
                   {playerAt && (
                     <BeeToken

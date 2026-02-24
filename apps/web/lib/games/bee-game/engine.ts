@@ -9,6 +9,7 @@ import { GRID_SIZE, RUNNER_SPEED, CHASER_SPEED, VIRTUES } from './types';
 export class BeeGameEngine {
   private state: GameState;
   private rng: () => number;
+  private startingRunner: Player = 1;
 
   constructor(rng?: () => number) {
     this.rng = rng ?? Math.random;
@@ -24,16 +25,17 @@ export class BeeGameEngine {
       players: {
         1: {
           position: { row: 0, col: 0 },
-          role: 'runner',
+          role: this.startingRunner === 1 ? 'runner' : 'chaser',
           collectedVirtues: [],
         },
         2: {
           position: { row: GRID_SIZE - 1, col: GRID_SIZE - 1 },
-          role: 'chaser',
+          role: this.startingRunner === 2 ? 'runner' : 'chaser',
           collectedVirtues: [],
         },
       },
-      currentPlayer: 1,
+      // Runner always takes the first turn
+      currentPlayer: this.startingRunner,
       status: 'setup',
       winner: null,
       virtueZones,
@@ -41,6 +43,8 @@ export class BeeGameEngine {
       moveHistory: [],
       swapCount: 0,
       justSwapped: false,
+      runnerSafePosition: null,
+      startingRunner: this.startingRunner,
     };
   }
 
@@ -125,12 +129,29 @@ export class BeeGameEngine {
         from: { ...m.from },
         to: { ...m.to },
       })),
+      runnerSafePosition: this.state.runnerSafePosition
+        ? { ...this.state.runnerSafePosition }
+        : null,
     };
   }
 
   startGame(): void {
     if (this.state.status !== 'setup') return;
     this.state.status = 'playing';
+  }
+
+  /**
+   * Choose which player starts as runner. Only usable in setup state.
+   * Updates roles without re-randomising the board.
+   */
+  setStartingRunner(player: Player): void {
+    if (this.state.status !== 'setup') return;
+    this.startingRunner = player;
+    this.state.startingRunner = player;
+    this.state.players[1].role = player === 1 ? 'runner' : 'chaser';
+    this.state.players[2].role = player === 2 ? 'runner' : 'chaser';
+    // Runner always goes first
+    this.state.currentPlayer = player;
   }
 
   private isInBounds(pos: Position): boolean {
@@ -161,12 +182,10 @@ export class BeeGameEngine {
 
     if (dist < 1 || dist > maxDist) return false;
 
-    // Chaser cannot land on uncollected virtue zones
-    if (
-      this.state.players[this.state.currentPlayer].role === 'chaser' &&
-      this.isOnVirtueZone(pos)
-    ) {
-      return false;
+    // Chaser cannot land on uncollected virtue zones or runner's safe position
+    if (this.state.players[this.state.currentPlayer].role === 'chaser') {
+      if (this.isOnVirtueZone(pos)) return false;
+      if (this.isRunnerSafeAt(pos)) return false;
     }
 
     return true;
@@ -186,8 +205,8 @@ export class BeeGameEngine {
         const pos = { row, col };
         const dist = this.getManhattanDistance(currentPos, pos);
         if (dist >= 1 && dist <= maxDist) {
-          // Chaser cannot land on uncollected virtue zones
-          if (isChaser && this.isOnVirtueZone(pos)) continue;
+          // Chaser cannot land on uncollected virtue zones or runner's safe position
+          if (isChaser && (this.isOnVirtueZone(pos) || this.isRunnerSafeAt(pos))) continue;
           moves.push(pos);
         }
       }
@@ -201,6 +220,11 @@ export class BeeGameEngine {
       (z) =>
         !z.collected && z.position.row === pos.row && z.position.col === pos.col
     );
+  }
+
+  private isRunnerSafeAt(pos: Position): boolean {
+    const safe = this.state.runnerSafePosition;
+    return safe !== null && safe.row === pos.row && safe.col === pos.col;
   }
 
   private getRunnerPlayer(): Player {
@@ -271,8 +295,14 @@ export class BeeGameEngine {
     this.state.justSwapped = false;
 
     const currentPlayer = this.state.currentPlayer;
+    const currentRole = this.state.players[currentPlayer].role;
     const currentPos = this.state.players[currentPlayer].position;
     const opponent: Player = currentPlayer === 1 ? 2 : 1;
+
+    // Runner is leaving their current tile — clear the safe position
+    if (currentRole === 'runner') {
+      this.state.runnerSafePosition = null;
+    }
 
     // Record the move
     this.state.moveHistory.push({
@@ -298,6 +328,9 @@ export class BeeGameEngine {
           this.state.virtueZones[zoneIndex].virtue
         );
 
+        // Runner stays safe on this tile until they move away
+        this.state.runnerSafePosition = { ...pos };
+
         // Respawn new virtues if all are collected
         this.respawnVirtuesIfNeeded();
       }
@@ -318,8 +351,8 @@ export class BeeGameEngine {
     const opponentPos = this.state.players[opponent].position;
     if (this.state.players[currentPlayer].role === 'chaser') {
       if (pos.row === opponentPos.row && pos.col === opponentPos.col) {
-        // Can't tag in a virtue zone
-        if (!this.isOnVirtueZone(pos)) {
+        // Can't tag on an uncollected virtue zone or runner's safe position
+        if (!this.isOnVirtueZone(pos) && !this.isRunnerSafeAt(opponentPos)) {
           this.swapRoles();
           this.state.justSwapped = true;
           this.state.currentPlayer = opponent;
@@ -338,6 +371,9 @@ export class BeeGameEngine {
     this.state.players[1].role = p1Role === 'runner' ? 'chaser' : 'runner';
     this.state.players[2].role = p1Role === 'runner' ? 'runner' : 'chaser';
     this.state.swapCount++;
+
+    // Clear safe position — the new runner will be placed on a new tile
+    this.state.runnerSafePosition = null;
 
     // New runner starts on a random virtue zone
     const newRunner = this.getRunnerPlayer();

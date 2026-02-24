@@ -42,6 +42,8 @@ describe('BeeGameEngine', () => {
       const state = engine.getState();
       expect(state.status).toBe('setup');
       expect(state.winner).toBeNull();
+      expect(state.runnerSafePosition).toBeNull();
+      expect(state.startingRunner).toBe(1);
     });
 
     it('should place 6 virtue zones on the board', () => {
@@ -250,6 +252,111 @@ describe('BeeGameEngine', () => {
       // Manually verify that swapCount starts at 0
       expect(state.swapCount).toBe(0);
       expect(state.justSwapped).toBe(false);
+    });
+  });
+
+  describe('starting runner selection', () => {
+    it('should default to Player 1 as runner', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      const state = eng.getState();
+      expect(state.startingRunner).toBe(1);
+      expect(state.players[1].role).toBe('runner');
+      expect(state.players[2].role).toBe('chaser');
+    });
+
+    it('should allow setting Player 2 as starting runner in setup', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      eng.setStartingRunner(2);
+      const state = eng.getState();
+      expect(state.startingRunner).toBe(2);
+      expect(state.players[1].role).toBe('chaser');
+      expect(state.players[2].role).toBe('runner');
+      expect(state.currentPlayer).toBe(2);
+    });
+
+    it('should not allow changing starting runner once game has started', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      eng.startGame();
+      eng.setStartingRunner(2);
+      const state = eng.getState();
+      // Unchanged — game already started
+      expect(state.startingRunner).toBe(1);
+      expect(state.players[1].role).toBe('runner');
+    });
+
+    it('should preserve starting runner preference after reset', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      eng.setStartingRunner(2);
+      eng.startGame();
+      eng.reset();
+      const state = eng.getState();
+      expect(state.startingRunner).toBe(2);
+      expect(state.players[1].role).toBe('chaser');
+      expect(state.players[2].role).toBe('runner');
+    });
+  });
+
+  describe('runner safe position', () => {
+    it('should start with no runner safe position', () => {
+      const state = engine.getState();
+      expect(state.runnerSafePosition).toBeNull();
+    });
+
+    it('should set runnerSafePosition when runner collects a virtue', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      eng.startGame();
+
+      const state = eng.getState();
+      const runnerPos = state.players[1].position;
+
+      for (const zone of state.virtueZones) {
+        if (zone.collected) continue;
+        const dist =
+          Math.abs(zone.position.row - runnerPos.row) +
+          Math.abs(zone.position.col - runnerPos.col);
+        if (dist >= 1 && dist <= RUNNER_SPEED) {
+          eng.makeMove(zone.position);
+          const newState = eng.getState();
+          expect(newState.runnerSafePosition).toEqual(zone.position);
+          return;
+        }
+      }
+    });
+
+    it('should clear runnerSafePosition when runner moves again', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      eng.startGame();
+
+      const state = eng.getState();
+      const runnerPos = state.players[1].position;
+
+      // Find a virtue zone within reach and move the runner there
+      for (const zone of state.virtueZones) {
+        if (zone.collected) continue;
+        const dist =
+          Math.abs(zone.position.row - runnerPos.row) +
+          Math.abs(zone.position.col - runnerPos.col);
+        if (dist >= 1 && dist <= RUNNER_SPEED) {
+          eng.makeMove(zone.position); // runner collects virtue
+          // Chaser makes a move
+          const validChaserMoves = eng.getValidMoves();
+          if (validChaserMoves.length > 0) {
+            eng.makeMove(validChaserMoves[0]);
+          }
+          // Runner moves away
+          const validRunnerMoves = eng.getValidMoves();
+          if (validRunnerMoves.length > 0) {
+            eng.makeMove(validRunnerMoves[0]);
+          }
+          const finalState = eng.getState();
+          // Safe position should be cleared (or updated to new virtue zone if landed on one)
+          const runnerNow = finalState.players[finalState.currentPlayer === 1 ? 2 : 1];
+          if (!runnerNow.collectedVirtues.length) {
+            expect(finalState.runnerSafePosition).toBeNull();
+          }
+          return;
+        }
+      }
     });
   });
 

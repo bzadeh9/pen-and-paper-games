@@ -52,4 +52,11 @@ export interface GameState {
   swapCount: number;
   /** Set to true on the turn a role swap just occurred, cleared on next move. */
   justSwapped: boolean;
+  /**
+   * Tile the runner just collected a virtue on; they remain safe here until
+   * they move away (chaser cannot tag or land on this tile while it is set).
+   */
+  runnerSafePosition: Position | null;
+  /** Which player starts as runner (1 = Abbee, 2 = Dot). Configurable in setup. */
+  startingRunner: Player;
 }
