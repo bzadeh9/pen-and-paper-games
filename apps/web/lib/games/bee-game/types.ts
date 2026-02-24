@@ -49,4 +49,6 @@ export interface GameState {
   serviceActivity: Position;
   moveHistory: { player: Player; from: Position; to: Position }[];
   swapCount: number;
+  /** Set to true on the turn a role swap just occurred, cleared on next move. */
+  justSwapped: boolean;
 }

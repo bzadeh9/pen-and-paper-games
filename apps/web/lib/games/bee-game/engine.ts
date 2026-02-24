@@ -40,6 +40,7 @@ export class BeeGameEngine {
       serviceActivity,
       moveHistory: [],
       swapCount: 0,
+      justSwapped: false,
     };
   }
 
@@ -155,7 +156,17 @@ export class BeeGameEngine {
     const maxDist = this.getCurrentSpeed();
     const dist = this.getManhattanDistance(currentPos, pos);
 
-    return dist >= 1 && dist <= maxDist;
+    if (dist < 1 || dist > maxDist) return false;
+
+    // Chaser cannot land on uncollected virtue zones
+    if (
+      this.state.players[this.state.currentPlayer].role === 'chaser' &&
+      this.isOnVirtueZone(pos)
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   getValidMoves(): Position[] {
@@ -209,6 +220,9 @@ export class BeeGameEngine {
   makeMove(pos: Position): boolean {
     if (!this.isValidMove(pos)) return false;
 
+    // Clear swap flag from previous turn
+    this.state.justSwapped = false;
+
     const currentPlayer = this.state.currentPlayer;
     const currentPos = this.state.players[currentPlayer].position;
     const opponent: Player = currentPlayer === 1 ? 2 : 1;
@@ -257,6 +271,7 @@ export class BeeGameEngine {
         // Can't tag in a virtue zone
         if (!this.isOnVirtueZone(pos)) {
           this.swapRoles();
+          this.state.justSwapped = true;
           this.state.currentPlayer = opponent;
           return true;
         }

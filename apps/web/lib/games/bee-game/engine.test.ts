@@ -194,6 +194,48 @@ describe('BeeGameEngine', () => {
     });
   });
 
+  describe('chaser movement restrictions', () => {
+    it('should not allow chaser to land on uncollected virtue zones', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      eng.startGame();
+
+      // Move runner first (player 1)
+      eng.makeMove({ row: 0, col: 1 });
+
+      // Now it's chaser's turn (player 2). Find a virtue zone within range.
+      const chaserState = eng.getState();
+      const chaserPos = chaserState.players[2].position;
+      for (const zone of chaserState.virtueZones) {
+        if (zone.collected) continue;
+        const dist =
+          Math.abs(zone.position.row - chaserPos.row) +
+          Math.abs(zone.position.col - chaserPos.col);
+        if (dist >= 1 && dist <= 3) {
+          // Chaser should NOT be allowed to move to a virtue zone
+          expect(eng.isValidMove(zone.position)).toBe(false);
+        }
+      }
+    });
+
+    it('should allow runner to land on uncollected virtue zones', () => {
+      const eng = new BeeGameEngine(createSeededRng(42));
+      eng.startGame();
+
+      const state = eng.getState();
+      const runnerPos = state.players[1].position;
+      for (const zone of state.virtueZones) {
+        if (zone.collected) continue;
+        const dist =
+          Math.abs(zone.position.row - runnerPos.row) +
+          Math.abs(zone.position.col - runnerPos.col);
+        if (dist >= 1 && dist <= RUNNER_SPEED) {
+          // Runner should be allowed to move to a virtue zone
+          expect(eng.isValidMove(zone.position)).toBe(true);
+        }
+      }
+    });
+  });
+
   describe('role swapping', () => {
     it('should swap roles when chaser tags runner outside virtue zone', () => {
       // Create a controlled scenario
@@ -203,6 +245,7 @@ describe('BeeGameEngine', () => {
       const state = eng.getState();
       // Manually verify that swapCount starts at 0
       expect(state.swapCount).toBe(0);
+      expect(state.justSwapped).toBe(false);
     });
   });
 

@@ -16,10 +16,22 @@ function BeeToken({ player, role }: { player: Player; role: string }) {
       className="flex items-center justify-center"
       aria-label={`${isAbbee ? 'Abbee' : 'Dot'} (${role})`}
     >
-      <span className="text-xl md:text-2xl" role="img" aria-label={isAbbee ? 'Abbee bee' : 'Dot bee'}>
-        🐝
-      </span>
-      <span className="absolute -bottom-1 text-[8px] font-bold leading-none text-foreground/80">
+      <div
+        className={`flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full border-2 ${
+          isAbbee
+            ? 'border-cherry-blossom bg-cherry-blossom/30'
+            : 'border-dusty-mauve bg-dusty-mauve/30'
+        }`}
+      >
+        <span className="text-base md:text-lg" role="img" aria-label={isAbbee ? 'Abbee bee' : 'Dot bee'}>
+          🐝
+        </span>
+      </div>
+      <span
+        className={`absolute -bottom-1 text-[8px] font-bold leading-none ${
+          isAbbee ? 'text-cherry-blossom' : 'text-dusty-mauve'
+        }`}
+      >
         {isAbbee ? 'A' : 'D'}
       </span>
     </div>
@@ -107,8 +119,22 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
 
       {gameState.status === 'playing' && (
         <div className="text-center">
+          {gameState.justSwapped && (
+            <div className="mb-3 rounded-lg border-2 border-cherry-blossom bg-cherry-blossom/10 px-4 py-3 animate-pulse" role="alert">
+              <p className="text-base font-bold text-cherry-blossom">
+                🔄 Roles Swapped!
+              </p>
+              <p className="text-sm text-foreground/70">
+                {gameState.currentPlayer === 1 ? 'Abbee' : 'Dot'} is now the runner ·{' '}
+                {gameState.currentPlayer === 1 ? 'Dot' : 'Abbee'} is now the chaser
+              </p>
+            </div>
+          )}
           <p className="text-lg font-semibold">
-            {currentPlayerName}&apos;s Turn ({currentPlayerState.role})
+            <span className={gameState.currentPlayer === 1 ? 'text-cherry-blossom' : 'text-dusty-mauve'}>
+              {currentPlayerName}
+            </span>
+            &apos;s Turn ({currentPlayerState.role})
           </p>
           <p className="text-sm text-foreground/60">
             Move up to{' '}
@@ -138,6 +164,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-foreground/70">
         <div className="flex items-center gap-1">
+          <div className="h-4 w-4 rounded-full border-2 border-cherry-blossom bg-cherry-blossom/30" />
+          <span>Abbee</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="h-4 w-4 rounded-full border-2 border-dusty-mauve bg-dusty-mauve/30" />
+          <span>Dot</span>
+        </div>
+        <div className="flex items-center gap-1">
           <div className="h-4 w-4 rounded-full bg-cherry-blossom/40 border border-cherry-blossom" />
           <span>Virtue Zone</span>
         </div>
@@ -151,7 +185,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       <div className="flex flex-wrap gap-4 text-sm">
         {([1, 2] as Player[]).map((p) => (
           <div key={p} className="text-center">
-            <span className="font-semibold">
+            <span className={`font-semibold ${p === 1 ? 'text-cherry-blossom' : 'text-dusty-mauve'}`}>
               {p === 1 ? 'Abbee' : 'Dot'}:
             </span>
             {gameState.players[p].collectedVirtues.length > 0 ? (
