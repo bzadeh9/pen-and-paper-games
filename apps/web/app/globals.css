@@ -14,6 +14,10 @@
   --cherry-blossom: #ffb3c1;
   --dusty-mauve: #c9a0dc;
 
+  /* Bee Game Token Colors */
+  --bee-amber: #f59e0b;
+  --bee-sky: #0ea5e9;
+
   --background: #ffffff;
   --foreground: var(--ink-black);
 }
@@ -34,6 +38,10 @@
   --color-pastel-pink: var(--pastel-pink);
   --color-cherry-blossom: var(--cherry-blossom);
   --color-dusty-mauve: var(--dusty-mauve);
+
+  /* Bee Game Tokens */
+  --color-bee-amber: var(--bee-amber);
+  --color-bee-sky: var(--bee-sky);
   
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
