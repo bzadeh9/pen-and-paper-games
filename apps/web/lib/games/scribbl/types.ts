@@ -1,4 +1,5 @@
 export type GamePhase = 'scribble' | 'complete' | 'done';
+export type GameMode = 'normal' | 'expert';
 
 export interface DrawColor {
   name: string;

@@ -61,7 +61,7 @@ export const games: GameMetadata[] = [
   },
   {
     id: 'scribbl',
-    name: 'Scribbl',
+    name: 'Scribble',
     description: 'Complete a scribble into a drawing!',
     href: '/games/scribbl',
     category: 'Party',
