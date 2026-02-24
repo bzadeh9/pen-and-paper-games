@@ -18,7 +18,6 @@ export class BeeGameEngine {
 
   private createInitialState(): GameState {
     const virtueZones = this.placeVirtueZones();
-    const home = this.placeHome(virtueZones);
 
     return {
       gridSize: GRID_SIZE,
@@ -39,7 +38,8 @@ export class BeeGameEngine {
       status: 'setup',
       winner: null,
       virtueZones,
-      home,
+      // Home tile is placed when the game starts, adjacent to the chaser
+      home: null,
       moveHistory: [],
       swapCount: 0,
       justSwapped: false,
@@ -78,19 +78,25 @@ export class BeeGameEngine {
     return zones;
   }
 
-  /** Place the Home tile adjacent to the chaser's starting corner. Fixed for the entire game. */
-  private placeHome(zones: VirtueZone[]): Position {
-    const chaserStart = { row: GRID_SIZE - 1, col: GRID_SIZE - 1 };
-    // Candidate positions adjacent to chaser start
+  /**
+   * Place the Home tile adjacent to the chaser's current position.
+   * Called once when the game starts; the tile never moves after that.
+   */
+  private placeHome(zones: VirtueZone[], chaserPos: Position): Position {
+    // Candidate positions adjacent to the chaser's starting corner
     const candidates: Position[] = [
-      { row: chaserStart.row - 1, col: chaserStart.col },
-      { row: chaserStart.row, col: chaserStart.col - 1 },
-      { row: chaserStart.row - 1, col: chaserStart.col - 1 },
-    ];
+      { row: chaserPos.row - 1, col: chaserPos.col },
+      { row: chaserPos.row, col: chaserPos.col - 1 },
+      { row: chaserPos.row - 1, col: chaserPos.col - 1 },
+      { row: chaserPos.row + 1, col: chaserPos.col },
+      { row: chaserPos.row, col: chaserPos.col + 1 },
+    ].filter((p) => this.isInBounds(p));
 
     const occupied = new Set<string>();
+    // Reserve both player corners
     occupied.add('0,0');
     occupied.add(`${GRID_SIZE - 1},${GRID_SIZE - 1}`);
+    occupied.add(`${chaserPos.row},${chaserPos.col}`);
     for (const z of zones) {
       occupied.add(`${z.position.row},${z.position.col}`);
     }
@@ -123,7 +129,7 @@ export class BeeGameEngine {
         ...z,
         position: { ...z.position },
       })),
-      home: { ...this.state.home },
+      home: this.state.home ? { ...this.state.home } : null,
       moveHistory: this.state.moveHistory.map((m) => ({
         ...m,
         from: { ...m.from },
@@ -137,6 +143,11 @@ export class BeeGameEngine {
 
   startGame(): void {
     if (this.state.status !== 'setup') return;
+    // Place the Home tile adjacent to the chaser's starting position now that
+    // roles are locked in. It won't move for the rest of the game.
+    const chaserPlayer = this.state.players[1].role === 'chaser' ? 1 : 2;
+    const chaserPos = this.state.players[chaserPlayer].position;
+    this.state.home = this.placeHome(this.state.virtueZones, chaserPos);
     this.state.status = 'playing';
   }
 
@@ -337,6 +348,7 @@ export class BeeGameEngine {
 
       // Check if runner reached Home with at least 1 virtue
       if (
+        this.state.home !== null &&
         pos.row === this.state.home.row &&
         pos.col === this.state.home.col &&
         this.state.players[currentPlayer].collectedVirtues.length > 0

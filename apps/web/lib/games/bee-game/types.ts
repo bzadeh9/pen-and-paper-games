@@ -47,7 +47,7 @@ export interface GameState {
   winner: Player | null;
   virtueZones: VirtueZone[];
   /** The 'Home' tile — placed once near the chaser start and never moves. */
-  home: Position;
+  home: Position | null;
   moveHistory: { player: Player; from: Position; to: Position }[];
   swapCount: number;
   /** Set to true on the turn a role swap just occurred, cleared on next move. */
