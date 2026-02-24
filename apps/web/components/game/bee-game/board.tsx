@@ -17,7 +17,7 @@ function BeeToken({ player, role }: { player: Player; role: string }) {
       aria-label={`${isAbbee ? 'Abbee' : 'Dot'} (${role})`}
     >
       <span className="text-xl md:text-2xl" role="img" aria-label={isAbbee ? 'Abbee bee' : 'Dot bee'}>
-        {isAbbee ? '🐝' : '🐝'}
+        🐝
       </span>
       <span className="absolute -bottom-1 text-[8px] font-bold leading-none text-foreground/80">
         {isAbbee ? 'A' : 'D'}
@@ -197,9 +197,9 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                       : isSA
                         ? 'bg-dusty-mauve/20'
                         : valid && showPossibleMoves && gameState.status === 'playing'
-                          ? 'bg-powder-petal/50 cursor-pointer hover:bg-cherry-blossom/30'
-                          : 'bg-background cursor-default'
-                  } ${valid && gameState.status === 'playing' ? 'cursor-pointer' : ''} ${
+                          ? 'bg-powder-petal/50 hover:bg-cherry-blossom/30'
+                          : 'bg-background'
+                  } ${valid && gameState.status === 'playing' ? 'cursor-pointer' : 'cursor-default'} ${
                     isHovered && valid ? 'ring-2 ring-cherry-blossom' : ''
                   }`}
                   style={{ minWidth: '40px', minHeight: '40px' }}

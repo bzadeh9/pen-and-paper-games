@@ -11,6 +11,7 @@ export const GRID_SIZE = 8;
 export const RUNNER_SPEED = 2;
 export const CHASER_SPEED = 3;
 
+/** Pool of virtues from which 5 are randomly selected each game. */
 export const VIRTUES = [
   'Kindness',
   'Generosity',
