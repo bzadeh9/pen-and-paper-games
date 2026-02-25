@@ -3,7 +3,12 @@
 import { GameIcon, gameColors } from '@/components/game-icon';
 import React, { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import type { Player } from '@/lib/games/hide-and-seek/types';
+import type { Player, GameStatus } from '@/lib/games/hide-and-seek/types';
+import {
+  MIN_GRID_SIZE,
+  MAX_GRID_SIZE,
+  DEFAULT_GRID_SIZE,
+} from '@/lib/games/hide-and-seek/types';
 import {
   getGameStatistics,
   recordGame,
@@ -31,6 +36,8 @@ const GameBoard = dynamic(
 
 export default function HideAndSeekPage() {
   const [stats, setStats] = useState(() => getGameStatistics());
+  const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
+  const [gameStatus, setGameStatus] = useState<GameStatus>('hiding');
   const isMobile = useMediaQuery('(max-width: 767px)');
 
   const handleGameEnd = useCallback(
@@ -40,6 +47,10 @@ export default function HideAndSeekPage() {
     },
     []
   );
+
+  const handleStatusChange = useCallback((status: GameStatus) => {
+    setGameStatus(status);
+  }, []);
 
   const handleResetStats = () => {
     if (confirm('Are you sure you want to reset all statistics?')) {
@@ -112,8 +123,7 @@ export default function HideAndSeekPage() {
                 <li>
                   •{' '}
                   <strong>Handover:</strong> Pass the device to the seeker
-                  (Dot) and tap <em>Start Seeking</em> — the gems will be
-                  hidden from view.
+                  (Dot) — the gems are now hidden!
                 </li>
                 <li>
                   •{' '}
@@ -137,7 +147,7 @@ export default function HideAndSeekPage() {
 
         {/* Main game area */}
         <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr]">
-          {/* Left pane: Stats */}
+          {/* Left pane: Stats + Grid Size */}
           <div className="flex flex-col gap-4">
             <div className="rounded-lg border border-foreground/20 bg-background p-4">
               <h3 className="mb-3 text-lg font-semibold">Stats</h3>
@@ -164,11 +174,43 @@ export default function HideAndSeekPage() {
                 </button>
               )}
             </div>
+
+            {/* Grid Size Picker */}
+            <div className="rounded-lg border border-foreground/20 bg-background p-4">
+              <h3 className="mb-3 text-sm font-semibold">Grid Size</h3>
+              <div className="flex flex-wrap gap-2">
+                {Array.from(
+                  { length: MAX_GRID_SIZE - MIN_GRID_SIZE + 1 },
+                  (_, i) => MIN_GRID_SIZE + i
+                ).map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setGridSize(size)}
+                    disabled={gameStatus !== 'hiding'}
+                    className={`rounded-md border px-2 py-1 text-xs font-medium transition-all disabled:cursor-not-allowed ${
+                      gridSize === size
+                        ? 'border-cherry-blossom bg-cherry-blossom/20 text-cherry-blossom'
+                        : 'border-foreground/20 text-foreground/50 hover:border-foreground/40 hover:text-foreground/70 disabled:opacity-50'
+                    }`}
+                    aria-pressed={gridSize === size}
+                  >
+                    {size}×{size}
+                  </button>
+                ))}
+              </div>
+              {gameStatus !== 'hiding' && (
+                <p className="mt-2 text-xs text-foreground/40">Locked during game</p>
+              )}
+            </div>
           </div>
 
           {/* Center: Game board */}
           <div className="flex items-start justify-center">
-            <GameBoard onGameEnd={handleGameEnd} />
+            <GameBoard
+              gridSize={gridSize}
+              onGameEnd={handleGameEnd}
+              onStatusChange={handleStatusChange}
+            />
           </div>
 
           {/* Right pane: Legend */}

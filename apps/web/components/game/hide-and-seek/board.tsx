@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { HideAndSeekEngine } from '@/lib/games/hide-and-seek/engine';
-import type { Position, Player } from '@/lib/games/hide-and-seek/types';
-import { MIN_GRID_SIZE, MAX_GRID_SIZE, GEMS_TO_HIDE } from '@/lib/games/hide-and-seek/types';
+import type { Position, Player, GameStatus } from '@/lib/games/hide-and-seek/types';
+import { DEFAULT_GRID_SIZE, GEMS_TO_HIDE } from '@/lib/games/hide-and-seek/types';
 
 interface GameBoardProps {
+  gridSize?: number;
   onGameEnd?: (winner: Player) => void;
+  onStatusChange?: (status: GameStatus) => void;
 }
 
 const GEM_EMOJI = '💎';
@@ -19,16 +21,31 @@ function hasPos(list: Position[], pos: Position): boolean {
   return list.some((p) => p.row === pos.row && p.col === pos.col);
 }
 
-export function GameBoard({ onGameEnd }: GameBoardProps) {
-  const engine = useMemo(() => new HideAndSeekEngine(), []);
+export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProps) {
+  const engine = useMemo(() => new HideAndSeekEngine(1, gridSize ?? DEFAULT_GRID_SIZE), []);
   const [gameState, setGameState] = useState(() => engine.getState());
   const [lastGuessCorrect, setLastGuessCorrect] = useState<number | null>(null);
+  /** When true, show all gem locations to the seeker before starting a new game */
+  const [restartRevealMode, setRestartRevealMode] = useState(false);
 
   const refresh = () => setGameState(engine.getState());
 
+  // Sync external gridSize prop into engine (only takes effect during hiding phase)
+  useEffect(() => {
+    engine.setGridSize(gridSize ?? DEFAULT_GRID_SIZE);
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gridSize]);
+
+  // Notify parent when game phase changes
+  useEffect(() => {
+    onStatusChange?.(gameState.status);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState.status]);
+
   const hiderName = gameState.hider === 1 ? 'Abbee' : 'Dot';
   const seekerName = gameState.seeker === 1 ? 'Abbee' : 'Dot';
-  const gridSize = gameState.gridSize;
+  const currentGridSize = gameState.gridSize;
 
   const handleHidingClick = (pos: Position) => {
     engine.toggleHidingGem(pos);
@@ -40,7 +57,6 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     refresh();
   };
 
-  // Change 3: skip transition — confirm hiding and immediately start seeking
   const handleConfirmHiding = () => {
     if (engine.confirmHiding()) {
       engine.startSeeking();
@@ -64,24 +80,25 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
   const handleReset = () => {
     engine.reset();
     setLastGuessCorrect(null);
+    setRestartRevealMode(false);
     refresh();
   };
 
   const handleSwitchRoles = () => {
     engine.switchRoles();
     setLastGuessCorrect(null);
+    setRestartRevealMode(false);
     refresh();
   };
 
-  const handleSetGridSize = (size: number) => {
-    engine.setGridSize(size);
-    refresh();
-  };
-
-  // Change 1: hint
   const handleUseHint = () => {
     engine.useHint();
     refresh();
+  };
+
+  /** Reveal gem locations before confirming restart */
+  const handleRestartRequest = () => {
+    setRestartRevealMode(true);
   };
 
   const renderGrid = () => {
@@ -91,61 +108,62 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     return (
       <div
         className="grid gap-1"
-        style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${currentGridSize}, minmax(0, 1fr))` }}
         role="grid"
         aria-label="Hide and seek grid"
       >
-        {Array.from({ length: gridSize }).map((_, row) =>
-          Array.from({ length: gridSize }).map((_, col) => {
+        {Array.from({ length: currentGridSize }).map((_, row) =>
+          Array.from({ length: currentGridSize }).map((_, col) => {
             const pos: Position = { row, col };
             const key = posKey(pos);
 
             const isHiddenGem = hasPos(hiddenGems, pos);
             const isSelected = hasPos(currentSelection, pos);
             const wasInLastGuess = lastGuess ? hasPos(lastGuess.positions, pos) : false;
-            const isRevealed = status === 'ended' && isHiddenGem;
+            const isRevealed = (status === 'ended' || restartRevealMode) && isHiddenGem;
             const isHinted =
+              !restartRevealMode &&
               hintPosition !== null &&
               hintPosition.row === row &&
               hintPosition.col === col;
 
             let cellClass =
-              'relative flex items-center justify-center rounded-full border-2 aspect-square transition-all cursor-pointer select-none ';
+              'relative flex items-center justify-center rounded-full border-2 aspect-square transition-all select-none ';
 
             if (status === 'hiding') {
               if (isHiddenGem) {
-                cellClass +=
-                  'border-cherry-blossom bg-cherry-blossom/40 scale-105 shadow-md';
+                cellClass += 'cursor-pointer border-cherry-blossom bg-cherry-blossom/40 scale-105 shadow-md';
               } else {
-                cellClass +=
-                  'border-foreground/20 bg-background hover:border-cherry-blossom/60 hover:bg-cherry-blossom/10';
+                cellClass += 'cursor-pointer border-foreground/20 bg-background hover:border-cherry-blossom/60 hover:bg-cherry-blossom/10';
               }
             } else if (status === 'seeking') {
-              if (isHinted && !isSelected) {
-                cellClass +=
-                  'border-cherry-blossom bg-cherry-blossom/20 hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
+              if (restartRevealMode) {
+                if (isRevealed) {
+                  cellClass += 'cursor-default border-cherry-blossom bg-cherry-blossom/40';
+                } else {
+                  cellClass += 'cursor-default border-foreground/20 bg-background';
+                }
+              } else if (isHinted && !isSelected) {
+                cellClass += 'cursor-pointer border-cherry-blossom bg-cherry-blossom/20 hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
               } else if (isSelected) {
-                cellClass +=
-                  'border-dusty-mauve bg-dusty-mauve/40 scale-105 shadow-md';
+                cellClass += 'cursor-pointer border-dusty-mauve bg-dusty-mauve/40 scale-105 shadow-md';
               } else if (wasInLastGuess) {
-                cellClass +=
-                  'border-foreground/30 bg-foreground/5 hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
+                cellClass += 'cursor-pointer border-foreground/30 bg-foreground/5 hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
               } else {
-                cellClass +=
-                  'border-foreground/20 bg-background hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
+                cellClass += 'cursor-pointer border-foreground/20 bg-background hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
               }
             } else if (status === 'ended') {
               if (isRevealed) {
-                cellClass += 'border-cherry-blossom bg-cherry-blossom/40';
+                cellClass += 'cursor-default border-cherry-blossom bg-cherry-blossom/40';
               } else {
-                cellClass += 'border-foreground/20 bg-background cursor-default';
+                cellClass += 'cursor-default border-foreground/20 bg-background';
               }
             }
 
             const onClick =
               status === 'hiding'
                 ? () => handleHidingClick(pos)
-                : status === 'seeking'
+                : status === 'seeking' && !restartRevealMode
                   ? () => handleSeekingClick(pos)
                   : undefined;
 
@@ -156,19 +174,24 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 style={{ minWidth: '36px', minHeight: '36px' }}
                 onClick={onClick}
                 role="gridcell"
-                aria-label={`Cell ${row + 1},${col + 1}${isHiddenGem && (status === 'hiding' || status === 'ended') ? ' - gem' : ''}${isSelected ? ' - selected' : ''}${isHinted ? ' - hint' : ''}`}
+                aria-label={`Cell ${row + 1},${col + 1}${isRevealed ? ' - gem' : ''}${isSelected ? ' - selected' : ''}${isHinted ? ' - hint' : ''}`}
               >
                 {status === 'hiding' && isHiddenGem && (
                   <span className="text-sm md:text-base" aria-hidden="true">
                     {GEM_EMOJI}
                   </span>
                 )}
-                {status === 'seeking' && isHinted && !isSelected && (
+                {restartRevealMode && isRevealed && (
+                  <span className="text-sm md:text-base" aria-hidden="true">
+                    {GEM_EMOJI}
+                  </span>
+                )}
+                {status === 'seeking' && !restartRevealMode && isHinted && !isSelected && (
                   <span className="text-sm md:text-base" aria-hidden="true" title="Hint from Abbee!">
                     🐝
                   </span>
                 )}
-                {status === 'seeking' && isSelected && (
+                {status === 'seeking' && !restartRevealMode && isSelected && (
                   <span className="text-sm md:text-base" aria-hidden="true">
                     ✨
                   </span>
@@ -190,7 +213,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     <div className="flex flex-col items-center gap-6 w-full max-w-md">
       {/* Phase header */}
       {gameState.status === 'hiding' && (
-        <div className="text-center w-full">
+        <div className="text-center">
           <p className="text-lg font-semibold">
             <span className="text-cherry-blossom">{hiderName}</span> is hiding the gems!
           </p>
@@ -201,33 +224,13 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             </span>{' '}
             placed.
           </p>
-
-          {/* Grid size selector */}
-          <div className="mt-3 flex items-center justify-center gap-2">
-            <span className="text-xs text-foreground/50">Grid size:</span>
-            {Array.from({ length: MAX_GRID_SIZE - MIN_GRID_SIZE + 1 }, (_, i) => MIN_GRID_SIZE + i).map((size) => (
-              <button
-                key={size}
-                onClick={() => handleSetGridSize(size)}
-                className={`rounded-md border px-2 py-0.5 text-xs font-medium transition-all ${
-                  gridSize === size
-                    ? 'border-cherry-blossom bg-cherry-blossom/20 text-cherry-blossom'
-                    : 'border-foreground/20 text-foreground/50 hover:border-foreground/40 hover:text-foreground/70'
-                }`}
-                aria-pressed={gridSize === size}
-              >
-                {size}×{size}
-              </button>
-            ))}
-          </div>
         </div>
       )}
 
-      {gameState.status === 'seeking' && (
+      {gameState.status === 'seeking' && !restartRevealMode && (
         <div className="text-center">
           <p className="text-lg font-semibold">
-            <span className="text-dusty-mauve">{seekerName}</span> is
-            searching!
+            <span className="text-dusty-mauve">{seekerName}</span> is searching!
           </p>
           {lastGuessCorrect !== null && (
             <p className="mt-2 rounded-lg border border-foreground/20 bg-background px-4 py-2 text-sm font-medium">
@@ -238,6 +241,17 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
               correct · Attempt {gameState.guesses.length}
             </p>
           )}
+        </div>
+      )}
+
+      {gameState.status === 'seeking' && restartRevealMode && (
+        <div className="text-center">
+          <p className="text-lg font-semibold text-cherry-blossom">
+            Here&apos;s where the gems were! 💎
+          </p>
+          <p className="text-sm text-foreground/60">
+            {hiderName} had hidden the gems in these spots.
+          </p>
         </div>
       )}
 
@@ -268,7 +282,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           </button>
         )}
 
-        {gameState.status === 'seeking' && (
+        {gameState.status === 'seeking' && !restartRevealMode && (
           <div className="flex w-full gap-3">
             <button
               onClick={handleSubmitGuess}
@@ -277,7 +291,6 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             >
               Reveal! 🔍
             </button>
-            {/* Change 1: Hint button */}
             <button
               onClick={handleUseHint}
               disabled={gameState.hintUsed}
@@ -286,15 +299,23 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             >
               🐝 Hint
             </button>
-            {/* Change 2: Restart button */}
             <button
-              onClick={handleReset}
+              onClick={handleRestartRequest}
               title="Restart the game"
               className="rounded-lg border border-foreground/30 px-3 py-3 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
             >
               ↺
             </button>
           </div>
+        )}
+
+        {gameState.status === 'seeking' && restartRevealMode && (
+          <button
+            onClick={handleReset}
+            className="w-full rounded-lg bg-foreground px-6 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+          >
+            New Game
+          </button>
         )}
 
         {gameState.status === 'ended' && (
@@ -316,7 +337,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       </div>
 
       {/* Guess history */}
-      {gameState.guesses.length > 0 && (
+      {gameState.guesses.length > 0 && !restartRevealMode && (
         <div className="w-full">
           <h3 className="mb-2 text-sm font-semibold text-foreground/70">
             Guess History
