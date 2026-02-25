@@ -67,4 +67,12 @@ export const games: GameMetadata[] = [
     category: 'Party',
     tags: ['2-Player', 'Family'],
   },
+  {
+    id: 'hide-and-seek',
+    name: 'Ayyam-i-Ha Hide & Seek',
+    description: 'Hide gems in the garden — can Dot find them all?',
+    href: '/games/hide-and-seek',
+    category: 'Party',
+    tags: ['2-Player', 'Family'],
+  },
 ];
