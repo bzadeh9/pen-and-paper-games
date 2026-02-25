@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { HideAndSeekEngine } from './engine';
-import { GRID_SIZE, GEMS_TO_HIDE } from './types';
+import { GRID_SIZE, GEMS_TO_HIDE, MIN_GRID_SIZE, MAX_GRID_SIZE } from './types';
 
 describe('HideAndSeekEngine', () => {
   let engine: HideAndSeekEngine;
@@ -216,6 +216,56 @@ describe('HideAndSeekEngine', () => {
     it('should reset to hiding phase after switch', () => {
       engine.switchRoles();
       expect(engine.getState().status).toBe('hiding');
+    });
+
+    it('should preserve grid size after switch', () => {
+      engine.setGridSize(8);
+      engine.switchRoles();
+      expect(engine.getState().gridSize).toBe(8);
+    });
+  });
+
+  describe('setGridSize', () => {
+    it('should default to 6', () => {
+      expect(engine.getState().gridSize).toBe(6);
+    });
+
+    it('should change grid size during hiding phase', () => {
+      engine.setGridSize(8);
+      expect(engine.getState().gridSize).toBe(8);
+    });
+
+    it('should clamp to MAX_GRID_SIZE', () => {
+      engine.setGridSize(99);
+      expect(engine.getState().gridSize).toBe(8);
+    });
+
+    it('should clamp to MIN_GRID_SIZE', () => {
+      engine.setGridSize(1);
+      expect(engine.getState().gridSize).toBe(4);
+    });
+
+    it('should clear hidden gems when size changes', () => {
+      engine.toggleHidingGem({ row: 0, col: 0 });
+      expect(engine.getState().hiddenGems).toHaveLength(1);
+      engine.setGridSize(7);
+      expect(engine.getState().hiddenGems).toHaveLength(0);
+    });
+
+    it('should not change size once game has started', () => {
+      for (let i = 0; i < GEMS_TO_HIDE; i++) {
+        engine.toggleHidingGem({ row: 0, col: i });
+      }
+      engine.confirmHiding();
+      engine.startSeeking();
+      engine.setGridSize(8);
+      expect(engine.getState().gridSize).toBe(6);
+    });
+
+    it('should preserve grid size after reset', () => {
+      engine.setGridSize(7);
+      engine.reset();
+      expect(engine.getState().gridSize).toBe(7);
     });
   });
 

@@ -1,16 +1,18 @@
 import type { Position, Player, GameState, Guess } from './types';
-import { GRID_SIZE, GEMS_TO_HIDE } from './types';
+import { DEFAULT_GRID_SIZE, MIN_GRID_SIZE, MAX_GRID_SIZE, GEMS_TO_HIDE } from './types';
 
 export class HideAndSeekEngine {
   private state: GameState;
+  private gridSize: number;
 
-  constructor(hider: Player = 1) {
+  constructor(hider: Player = 1, gridSize: number = DEFAULT_GRID_SIZE) {
+    this.gridSize = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, gridSize));
     this.state = this.createInitialState(hider);
   }
 
   private createInitialState(hider: Player): GameState {
     return {
-      gridSize: GRID_SIZE,
+      gridSize: this.gridSize,
       status: 'hiding',
       hiddenGems: [],
       currentSelection: [],
@@ -31,6 +33,17 @@ export class HideAndSeekEngine {
         positions: g.positions.map((p) => ({ ...p })),
       })),
     };
+  }
+
+  /**
+   * Change the grid size. Only allowed during the hiding phase.
+   * Changing size clears any already-placed gems.
+   */
+  setGridSize(size: number): void {
+    if (this.state.status !== 'hiding') return;
+    this.gridSize = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, size));
+    this.state.gridSize = this.gridSize;
+    this.state.hiddenGems = [];
   }
 
   /** Toggle a gem position during the hiding phase. Returns true if successful. */
@@ -121,7 +134,7 @@ export class HideAndSeekEngine {
     ).length;
   }
 
-  /** Switch hider/seeker roles and reset for a new game. */
+  /** Switch hider/seeker roles and reset for a new game (preserves grid size). */
   switchRoles(): void {
     const newHider = this.state.seeker;
     this.state = this.createInitialState(newHider);
@@ -134,9 +147,9 @@ export class HideAndSeekEngine {
   private isInBounds(pos: Position): boolean {
     return (
       pos.row >= 0 &&
-      pos.row < GRID_SIZE &&
+      pos.row < this.state.gridSize &&
       pos.col >= 0 &&
-      pos.col < GRID_SIZE
+      pos.col < this.state.gridSize
     );
   }
 

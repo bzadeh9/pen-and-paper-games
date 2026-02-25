@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { HideAndSeekEngine } from '@/lib/games/hide-and-seek/engine';
 import type { Position, Player } from '@/lib/games/hide-and-seek/types';
-import { GRID_SIZE, GEMS_TO_HIDE } from '@/lib/games/hide-and-seek/types';
+import { MIN_GRID_SIZE, MAX_GRID_SIZE, GEMS_TO_HIDE } from '@/lib/games/hide-and-seek/types';
 
 interface GameBoardProps {
   onGameEnd?: (winner: Player) => void;
@@ -28,6 +28,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
 
   const hiderName = gameState.hider === 1 ? 'Abbee' : 'Dot';
   const seekerName = gameState.seeker === 1 ? 'Abbee' : 'Dot';
+  const gridSize = gameState.gridSize;
 
   const handleHidingClick = (pos: Position) => {
     engine.toggleHidingGem(pos);
@@ -75,6 +76,11 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     refresh();
   };
 
+  const handleSetGridSize = (size: number) => {
+    engine.setGridSize(size);
+    refresh();
+  };
+
   const renderGrid = () => {
     const { status, hiddenGems, currentSelection, guesses } = gameState;
     const lastGuess = guesses[guesses.length - 1];
@@ -82,12 +88,12 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     return (
       <div
         className="grid gap-1"
-        style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
         role="grid"
         aria-label="Hide and seek grid"
       >
-        {Array.from({ length: GRID_SIZE }).map((_, row) =>
-          Array.from({ length: GRID_SIZE }).map((_, col) => {
+        {Array.from({ length: gridSize }).map((_, row) =>
+          Array.from({ length: gridSize }).map((_, col) => {
             const pos: Position = { row, col };
             const key = posKey(pos);
 
@@ -108,7 +114,6 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                   'border-foreground/20 bg-background hover:border-cherry-blossom/60 hover:bg-cherry-blossom/10';
               }
             } else if (status === 'transition') {
-              // Show all gems to confirm before handing to seeker
               if (isHiddenGem) {
                 cellClass += 'border-cherry-blossom bg-cherry-blossom/40';
               } else {
@@ -144,7 +149,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
               <div
                 key={key}
                 className={cellClass}
-                style={{ minWidth: '40px', minHeight: '40px' }}
+                style={{ minWidth: '36px', minHeight: '36px' }}
                 onClick={onClick}
                 role="gridcell"
                 aria-label={`Cell ${row + 1},${col + 1}${isHiddenGem && (status === 'hiding' || status === 'transition' || status === 'ended') ? ' - gem' : ''}${isSelected ? ' - selected' : ''}`}
@@ -173,10 +178,10 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-sm">
+    <div className="flex flex-col items-center gap-6 w-full max-w-md">
       {/* Phase header */}
       {gameState.status === 'hiding' && (
-        <div className="text-center">
+        <div className="text-center w-full">
           <p className="text-lg font-semibold">
             <span className="text-cherry-blossom">{hiderName}</span> is hiding the gems!
           </p>
@@ -187,6 +192,25 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             </span>{' '}
             placed.
           </p>
+
+          {/* Grid size selector */}
+          <div className="mt-3 flex items-center justify-center gap-2">
+            <span className="text-xs text-foreground/50">Grid size:</span>
+            {Array.from({ length: MAX_GRID_SIZE - MIN_GRID_SIZE + 1 }, (_, i) => MIN_GRID_SIZE + i).map((size) => (
+              <button
+                key={size}
+                onClick={() => handleSetGridSize(size)}
+                className={`rounded-md border px-2 py-0.5 text-xs font-medium transition-all ${
+                  gridSize === size
+                    ? 'border-cherry-blossom bg-cherry-blossom/20 text-cherry-blossom'
+                    : 'border-foreground/20 text-foreground/50 hover:border-foreground/40 hover:text-foreground/70'
+                }`}
+                aria-pressed={gridSize === size}
+              >
+                {size}×{size}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -208,13 +232,6 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           <p className="text-lg font-semibold">
             <span className="text-dusty-mauve">{seekerName}</span> is
             searching!
-          </p>
-          <p className="text-sm text-foreground/60">
-            Select {GEMS_TO_HIDE} cells.{' '}
-            <span className="font-medium text-dusty-mauve">
-              {gameState.currentSelection.length}/{GEMS_TO_HIDE}
-            </span>{' '}
-            selected.
           </p>
           {lastGuessCorrect !== null && (
             <p className="mt-2 rounded-lg border border-foreground/20 bg-background px-4 py-2 text-sm font-medium">

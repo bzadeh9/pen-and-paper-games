@@ -2,7 +2,11 @@ export type Player = 1 | 2;
 
 export type GameStatus = 'hiding' | 'transition' | 'seeking' | 'ended';
 
-export const GRID_SIZE = 6;
+export const DEFAULT_GRID_SIZE = 6;
+export const MIN_GRID_SIZE = 4;
+export const MAX_GRID_SIZE = 8;
+/** Kept for backward-compatibility with existing tests. */
+export const GRID_SIZE = DEFAULT_GRID_SIZE;
 export const GEMS_TO_HIDE = 4;
 
 export interface Position {

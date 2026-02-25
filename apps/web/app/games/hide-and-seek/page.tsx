@@ -77,15 +77,16 @@ export default function HideAndSeekPage() {
             The Story of Abbee &amp; Dot
           </h2>
           <p className="text-sm leading-relaxed text-foreground/80">
-            During Ayyam-i-Ha, the joyful days of giving and generosity, two
-            little bees named <strong>Abbee</strong> and <strong>Dot</strong>{' '}
-            have a very special tradition. Abbee loves to hide sparkling gems
-            around their garden as surprise gifts, and Dot must search every
-            corner to find them! Each year they take turns — sometimes Abbee
-            hides and Dot seeks, sometimes the other way around. The bee who
-            finds all four hidden gems is celebrated by the whole hive. Will
-            Dot sniff out every last gem, or will Abbee&apos;s hiding spots
-            be too clever?
+            Abbee and Dot were buzzing along on their way to help a neighbour
+            prepare for the Ayyam-i-Ha celebration when — oh no! — they
+            accidentally dropped four sparkling gems from their basket. The
+            gems scattered across the garden path, and now they need your
+            help to find them all! <strong>Abbee</strong> remembers exactly
+            where each gem landed, so she will mark the hiding spots.
+            Then it&apos;s <strong>Dot</strong>&apos;s turn to search the
+            garden square by square until every last gem is found. The bees
+            are counting on you — will Dot sniff out all four gems before the
+            celebration begins?
           </p>
         </div>
 
@@ -105,7 +106,7 @@ export default function HideAndSeekPage() {
                 <li>
                   •{' '}
                   <strong>Phase 1 – Hiding:</strong> The hider (Abbee) selects
-                  exactly 4 gems 💎 on the 6×6 grid, then taps{' '}
+                  exactly 4 gems 💎 on the grid, then taps{' '}
                   <em>Hide Gems</em>.
                 </li>
                 <li>
