@@ -273,13 +273,22 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
       {/* Action buttons */}
       <div className="flex flex-col items-center gap-3 w-full">
         {gameState.status === 'hiding' && (
-          <button
-            onClick={handleConfirmHiding}
-            disabled={gameState.hiddenGems.length !== GEMS_TO_HIDE}
-            className="w-full rounded-lg bg-foreground px-6 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
-          >
-            Hide Gems →
-          </button>
+          <div className="flex w-full gap-3">
+            <button
+              onClick={handleSwitchRoles}
+              title="Swap who hides and who seeks"
+              className="rounded-lg border border-foreground/30 px-4 py-3 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2 whitespace-nowrap"
+            >
+              🔄 Switch Roles
+            </button>
+            <button
+              onClick={handleConfirmHiding}
+              disabled={gameState.hiddenGems.length !== GEMS_TO_HIDE}
+              className="flex-1 rounded-lg bg-foreground px-6 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+            >
+              Hide Gems →
+            </button>
+          </div>
         )}
 
         {gameState.status === 'seeking' && !restartRevealMode && (
