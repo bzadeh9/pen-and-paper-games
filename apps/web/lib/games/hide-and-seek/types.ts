@@ -33,4 +33,8 @@ export interface GameState {
   hider: Player;
   /** Player who is seeking (Dot by default) */
   seeker: Player;
+  /** A single gem position hinted to the seeker (null until hint is used) */
+  hintPosition: Position | null;
+  /** Whether the hint has already been used this game */
+  hintUsed: boolean;
 }

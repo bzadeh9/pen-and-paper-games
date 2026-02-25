@@ -40,16 +40,13 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     refresh();
   };
 
+  // Change 3: skip transition — confirm hiding and immediately start seeking
   const handleConfirmHiding = () => {
     if (engine.confirmHiding()) {
+      engine.startSeeking();
+      setLastGuessCorrect(null);
       refresh();
     }
-  };
-
-  const handleStartSeeking = () => {
-    engine.startSeeking();
-    setLastGuessCorrect(null);
-    refresh();
   };
 
   const handleSubmitGuess = () => {
@@ -81,8 +78,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     refresh();
   };
 
+  // Change 1: hint
+  const handleUseHint = () => {
+    engine.useHint();
+    refresh();
+  };
+
   const renderGrid = () => {
-    const { status, hiddenGems, currentSelection, guesses } = gameState;
+    const { status, hiddenGems, currentSelection, guesses, hintPosition } = gameState;
     const lastGuess = guesses[guesses.length - 1];
 
     return (
@@ -101,6 +104,10 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             const isSelected = hasPos(currentSelection, pos);
             const wasInLastGuess = lastGuess ? hasPos(lastGuess.positions, pos) : false;
             const isRevealed = status === 'ended' && isHiddenGem;
+            const isHinted =
+              hintPosition !== null &&
+              hintPosition.row === row &&
+              hintPosition.col === col;
 
             let cellClass =
               'relative flex items-center justify-center rounded-full border-2 aspect-square transition-all cursor-pointer select-none ';
@@ -113,14 +120,11 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 cellClass +=
                   'border-foreground/20 bg-background hover:border-cherry-blossom/60 hover:bg-cherry-blossom/10';
               }
-            } else if (status === 'transition') {
-              if (isHiddenGem) {
-                cellClass += 'border-cherry-blossom bg-cherry-blossom/40';
-              } else {
-                cellClass += 'border-foreground/20 bg-background cursor-default';
-              }
             } else if (status === 'seeking') {
-              if (isSelected) {
+              if (isHinted && !isSelected) {
+                cellClass +=
+                  'border-cherry-blossom bg-cherry-blossom/20 hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
+              } else if (isSelected) {
                 cellClass +=
                   'border-dusty-mauve bg-dusty-mauve/40 scale-105 shadow-md';
               } else if (wasInLastGuess) {
@@ -152,11 +156,16 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 style={{ minWidth: '36px', minHeight: '36px' }}
                 onClick={onClick}
                 role="gridcell"
-                aria-label={`Cell ${row + 1},${col + 1}${isHiddenGem && (status === 'hiding' || status === 'transition' || status === 'ended') ? ' - gem' : ''}${isSelected ? ' - selected' : ''}`}
+                aria-label={`Cell ${row + 1},${col + 1}${isHiddenGem && (status === 'hiding' || status === 'ended') ? ' - gem' : ''}${isSelected ? ' - selected' : ''}${isHinted ? ' - hint' : ''}`}
               >
-                {(status === 'hiding' || status === 'transition') && isHiddenGem && (
+                {status === 'hiding' && isHiddenGem && (
                   <span className="text-sm md:text-base" aria-hidden="true">
                     {GEM_EMOJI}
+                  </span>
+                )}
+                {status === 'seeking' && isHinted && !isSelected && (
+                  <span className="text-sm md:text-base" aria-hidden="true" title="Hint from Abbee!">
+                    🐝
                   </span>
                 )}
                 {status === 'seeking' && isSelected && (
@@ -214,19 +223,6 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
         </div>
       )}
 
-      {gameState.status === 'transition' && (
-        <div className="text-center">
-          <p className="text-lg font-semibold text-cherry-blossom">
-            Gems hidden! ✅
-          </p>
-          <p className="text-sm text-foreground/60">
-            Pass the device to{' '}
-            <span className="font-semibold">{seekerName}</span>, then tap
-            &quot;Start Seeking&quot;.
-          </p>
-        </div>
-      )}
-
       {gameState.status === 'seeking' && (
         <div className="text-center">
           <p className="text-lg font-semibold">
@@ -272,23 +268,33 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           </button>
         )}
 
-        {gameState.status === 'transition' && (
-          <button
-            onClick={handleStartSeeking}
-            className="w-full rounded-lg bg-foreground px-6 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
-          >
-            Start Seeking!
-          </button>
-        )}
-
         {gameState.status === 'seeking' && (
-          <button
-            onClick={handleSubmitGuess}
-            disabled={gameState.currentSelection.length !== GEMS_TO_HIDE}
-            className="w-full rounded-lg bg-foreground px-6 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
-          >
-            Reveal! 🔍
-          </button>
+          <div className="flex w-full gap-3">
+            <button
+              onClick={handleSubmitGuess}
+              disabled={gameState.currentSelection.length !== GEMS_TO_HIDE}
+              className="flex-1 rounded-lg bg-foreground px-6 py-3 font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+            >
+              Reveal! 🔍
+            </button>
+            {/* Change 1: Hint button */}
+            <button
+              onClick={handleUseHint}
+              disabled={gameState.hintUsed}
+              title={gameState.hintUsed ? 'Hint already used' : 'Ask Abbee for a hint!'}
+              className="rounded-lg border-2 border-cherry-blossom px-4 py-3 text-sm font-bold text-cherry-blossom transition-all hover:bg-cherry-blossom/10 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-cherry-blossom focus:ring-offset-2"
+            >
+              🐝 Hint
+            </button>
+            {/* Change 2: Restart button */}
+            <button
+              onClick={handleReset}
+              title="Restart the game"
+              className="rounded-lg border border-foreground/30 px-3 py-3 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
+            >
+              ↺
+            </button>
+          </div>
         )}
 
         {gameState.status === 'ended' && (

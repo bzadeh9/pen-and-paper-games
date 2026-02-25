@@ -20,6 +20,8 @@ export class HideAndSeekEngine {
       winner: null,
       hider,
       seeker: hider === 1 ? 2 : 1,
+      hintPosition: null,
+      hintUsed: false,
     };
   }
 
@@ -32,7 +34,28 @@ export class HideAndSeekEngine {
         ...g,
         positions: g.positions.map((p) => ({ ...p })),
       })),
+      hintPosition: this.state.hintPosition ? { ...this.state.hintPosition } : null,
     };
+  }
+
+  /**
+   * Reveal one random hidden gem as a hint to the seeker.
+   * Can only be used once per game and only during the seeking phase.
+   * Returns the revealed position, or null if unavailable.
+   */
+  useHint(): Position | null {
+    if (this.state.status !== 'seeking') return null;
+    if (this.state.hintUsed) return null;
+
+    // Pick a random hidden gem that wasn't already found
+    const candidates = this.state.hiddenGems.filter(() => true);
+    if (candidates.length === 0) return null;
+
+    const idx = Math.floor(Math.random() * candidates.length);
+    const hint = { ...candidates[idx] };
+    this.state.hintPosition = hint;
+    this.state.hintUsed = true;
+    return hint;
   }
 
   /**

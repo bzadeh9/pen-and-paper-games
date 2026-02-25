@@ -277,4 +277,71 @@ describe('HideAndSeekEngine', () => {
       expect(engine.getState().hiddenGems[0].row).toBe(0);
     });
   });
+
+  describe('hint', () => {
+    const hideAndSeek = () => {
+      for (let i = 0; i < GEMS_TO_HIDE; i++) {
+        engine.toggleHidingGem({ row: 0, col: i });
+      }
+      engine.confirmHiding();
+      engine.startSeeking();
+    };
+
+    it('should start with hintUsed false and no hintPosition', () => {
+      const state = engine.getState();
+      expect(state.hintUsed).toBe(false);
+      expect(state.hintPosition).toBeNull();
+    });
+
+    it('should return a hidden gem position when used', () => {
+      hideAndSeek();
+      const pos = engine.useHint();
+      expect(pos).not.toBeNull();
+      const hiddenGems = engine.getState().hiddenGems;
+      const isHiddenGem = hiddenGems.some((g) => g.row === pos!.row && g.col === pos!.col);
+      expect(isHiddenGem).toBe(true);
+    });
+
+    it('should set hintUsed after use', () => {
+      hideAndSeek();
+      engine.useHint();
+      expect(engine.getState().hintUsed).toBe(true);
+    });
+
+    it('should set hintPosition after use', () => {
+      hideAndSeek();
+      engine.useHint();
+      expect(engine.getState().hintPosition).not.toBeNull();
+    });
+
+    it('should not allow hint to be used twice', () => {
+      hideAndSeek();
+      engine.useHint();
+      const secondResult = engine.useHint();
+      expect(secondResult).toBeNull();
+    });
+
+    it('should not allow hint outside seeking phase', () => {
+      const result = engine.useHint();
+      expect(result).toBeNull();
+    });
+
+    it('should reset hint on reset()', () => {
+      hideAndSeek();
+      engine.useHint();
+      engine.reset();
+      const state = engine.getState();
+      expect(state.hintUsed).toBe(false);
+      expect(state.hintPosition).toBeNull();
+    });
+
+    it('should return defensive copy of hintPosition', () => {
+      hideAndSeek();
+      engine.useHint();
+      const state = engine.getState();
+      const originalRow = state.hintPosition!.row;
+      state.hintPosition!.row = 99;
+      expect(engine.getState().hintPosition!.row).toBe(originalRow);
+    });
+  });
 });
