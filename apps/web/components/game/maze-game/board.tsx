@@ -301,22 +301,10 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     if (isStart) return '🏠';
     // Gate rooms are obvious — show a lock
     if (isRoomA || isRoomB) return '🔒';
-    // Real keys — discreet, no number, small dot indicator
-    if (isKeyA || isKeyB) {
-      return (
-        <span style={{ opacity: 0.45, fontSize: CELL_SIZE >= 48 ? 10 : 8 }}>
-          ●
-        </span>
-      );
-    }
+    // Real keys — show key emoji, no number (players must figure out which gate)
+    if (isKeyA || isKeyB) return '🔑';
     // Decoy keys — same appearance as real keys
-    if (isDecoy) {
-      return (
-        <span style={{ opacity: 0.45, fontSize: CELL_SIZE >= 48 ? 10 : 8 }}>
-          ●
-        </span>
-      );
-    }
+    if (isDecoy) return '🔑';
     return '';
   };
 
@@ -477,7 +465,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
         <span>👧 Girl (↑↓←→)</span>
         <span>🐝🐝 Find the bees!</span>
         <span>🔒 Locked gate</span>
-        <span style={{ opacity: 0.7 }}>● Key (some are decoys!)</span>
+        <span>🔑 Key (some are decoys!)</span>
       </div>
 
       {/* D-pads for touch / mouse */}

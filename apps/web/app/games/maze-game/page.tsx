@@ -112,7 +112,7 @@ export default function MazeGamePage() {
                   on the matching <strong>key</strong> somewhere in the maze:
                   <ul className="mt-1 ml-4 space-y-1 text-foreground/70">
                     <li>
-                      — Keys are hidden as small dots — explore to find them!
+                      — Keys 🔑 are scattered around the maze — explore to find them!
                     </li>
                     <li>
                       — Some keys are <em>decoys</em> that don&apos;t open
