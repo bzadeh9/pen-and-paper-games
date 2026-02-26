@@ -67,15 +67,16 @@ export default function MazeGamePage() {
             The Story of Abbee &amp; Dot
           </h2>
           <p className="text-sm leading-relaxed text-foreground/80">
-            Abbee and Dot are on their way to the Ayyam-i-Ha celebration, but
-            the garden path has turned into a tricky maze! The little bees are
-            separated somewhere in the paths, but they can hear the flowers
-            calling at the other end. To reach the beautiful blossoms, they
-            must work <em>together</em> — especially when they come across the
-            old rope bridges. One bee must hold the lever to lower the bridge
-            so the other can cross, then the other bee holds the far lever so
-            the first bee can follow. Can you guide both Abbee and Dot to the
-            flowers?
+            During the Ayyam-i-Ha celebration, a young boy and girl discover
+            that the garden has transformed into a winding maze! They can
+            hear the excited buzzing of Abbee and Dot — the two little bees —
+            somewhere at the other end. To reach their bee friends, the
+            children must work <em>together</em>. Along the way they encounter
+            old rope bridges with levers on either side: one child holds a
+            lever to lower the bridge while the other crosses, and then they
+            switch — holding the far lever so their partner can follow. Only
+            by helping each other can they make it through and reunite with
+            the bees in time for the celebration!
           </p>
         </div>
 
@@ -93,36 +94,40 @@ export default function MazeGamePage() {
             <div className="px-6 pb-6">
               <ul className="space-y-2 text-foreground/80">
                 <li>
-                  • Both bees (<strong>Abbee 🐝</strong> and{' '}
-                  <strong>Dot 🐝</strong>) start at the <strong>Home 🏠</strong>{' '}
-                  tile and must both reach the{' '}
-                  <strong>flowers 🌸</strong> to win!
+                  • Both players move <strong>simultaneously</strong> — no waiting
+                  for turns! 👦 uses <kbd className="rounded border border-foreground/30 px-1 text-xs">WASD</kbd> and
+                  👧 uses <kbd className="rounded border border-foreground/30 px-1 text-xs">↑↓←→</kbd>{' '}
+                  (or the on-screen d-pads).
                 </li>
                 <li>
-                  • Players take turns — click a <em>highlighted</em> (pink)
-                  tile to move the current bee one step through the maze.
+                  • Both players start at <strong>Home 🏠</strong> and must both
+                  reach the <strong>bees 🐝🐝</strong> to win!
                 </li>
                 <li>
-                  • The maze is fully visible — plan your route carefully!
+                  • The maze is fully visible — plan your routes carefully!
                 </li>
                 <li>
-                  • Watch out for the <strong>bridge 🌉</strong> (striped
-                  passage). You can only cross it when the other bee is
-                  standing on the matching <strong>lever 🔧</strong>:
+                  • There are <strong>bridge gates 🌉</strong> (2-3 per maze) that
+                  are <em>locked</em>. To cross a bridge, your partner must stand
+                  on the matching <strong>key 🔑</strong> on the correct side:
                   <ul className="mt-1 ml-4 space-y-1 text-foreground/70">
                     <li>
-                      — Stand on <em>Lever A</em> (🔧, side A) so the other
-                      bee can cross from side A to side B.
+                      — Keys and gates are numbered (🔑1, 🌉1, etc.) — numbers
+                      must match!
                     </li>
                     <li>
-                      — Then the other bee stands on <em>Lever B</em> (🔧,
-                      side B) so you can follow.
+                      — Key A opens the bridge from side A; Key B opens it from
+                      side B.
+                    </li>
+                    <li>
+                      — Keys can be far from their gate — you may need to split up
+                      to find them.
                     </li>
                   </ul>
                 </li>
                 <li>
-                  • Once <em>one</em> bee reaches the flowers, it waits there
-                  while the other finds its way!
+                  • Once <em>one</em> player reaches the bees, they wait there
+                  while the other navigates to join them!
                 </li>
               </ul>
             </div>

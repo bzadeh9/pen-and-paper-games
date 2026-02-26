@@ -21,6 +21,16 @@ const DIR_DELTA: Record<Direction, { dr: number; dc: number }> = {
   west: { dr: 0, dc: -1 },
 };
 
+const ALL_DIRS: Direction[] = ['north', 'south', 'east', 'west'];
+
+function pKey(p: Position): string {
+  return `${p.row},${p.col}`;
+}
+
+function posEq(a: Position, b: Position): boolean {
+  return a.row === b.row && a.col === b.col;
+}
+
 export class MazeGameEngine {
   private state: MazeGameState;
   private rng: () => number;
@@ -32,7 +42,7 @@ export class MazeGameEngine {
 
   private createInitialState(rows: number, cols: number): MazeGameState {
     const passages = this.generateMaze(rows, cols);
-    const bridges = this.placeBridge(rows, cols, passages);
+    const bridges = this.placeBridges(rows, cols, passages);
 
     const startPos: Position = { row: 0, col: 0 };
     const endPos: Position = { row: rows - 1, col: cols - 1 };
@@ -48,7 +58,6 @@ export class MazeGameEngine {
         1: { ...startPos },
         2: { ...startPos },
       },
-      currentPlayer: 1,
       status: 'playing',
       reachedEnd: [],
       moveHistory: [],
@@ -73,7 +82,7 @@ export class MazeGameEngine {
 
     const dfs = (r: number, c: number) => {
       visited[r][c] = true;
-      const dirs: Direction[] = this.shuffleArray(['north', 'south', 'east', 'west']);
+      const dirs = this.shuffleArray([...ALL_DIRS]);
 
       for (const dir of dirs) {
         const { dr, dc } = DIR_DELTA[dir];
@@ -81,7 +90,6 @@ export class MazeGameEngine {
         const nc = c + dc;
 
         if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !visited[nr][nc]) {
-          // Remove wall between (r,c) and (nr,nc)
           passages[r][c][dir] = true;
           passages[nr][nc][OPPOSITE[dir]] = true;
           dfs(nr, nc);
@@ -96,78 +104,138 @@ export class MazeGameEngine {
   // ─── Bridge placement ─────────────────────────────────────────────────────
 
   /**
-   * Find the path from start to end using BFS, then place a bridge on an
-   * edge roughly in the middle of that path.  The bridge edge is removed
-   * from the normal passages so that cooperation is required to cross it.
+   * Place up to 3 bridges along the critical path.
+   * Each bridge has levers placed at distance ≥ 2 from the bridge room,
+   * so players must travel some distance to find the matching lever.
    */
-  private placeBridge(
+  private placeBridges(
     rows: number,
     cols: number,
     passages: RoomPassages[][]
   ): Bridge[] {
+    const bridges: Bridge[] = [];
     const start: Position = { row: 0, col: 0 };
     const end: Position = { row: rows - 1, col: cols - 1 };
+    const numBridges = 3;
 
-    // BFS to find path from start to end
-    const path = this.bfsPath(rows, cols, passages, start, end);
-    if (path.length < 4) return []; // maze too small for a bridge
+    for (let i = 0; i < numBridges; i++) {
+      // BFS treating already-placed bridges as traversable, so we always
+      // find the full critical path regardless of previously removed passages.
+      const path = this.bfsPathWithBridges(rows, cols, passages, bridges, start, end);
+      if (path.length < 5) break;
 
-    // Pick an edge roughly in the middle of the path, but avoid being
-    // at the very start or end (need at least 1 room on each side for levers).
-    const midIdx = Math.floor(path.length / 2);
-    const clampedIdx = Math.max(1, Math.min(midIdx, path.length - 3));
+      // Target position along the path (evenly spaced: 1/4, 1/2, 3/4)
+      const frac = (i + 1) / (numBridges + 1);
+      const targetIdx = Math.floor(path.length * frac);
 
-    const roomA = path[clampedIdx];
-    const roomB = path[clampedIdx + 1];
+      // Search outward from target: try offset=0 (exact), then ±1, ±2, …
+      // to find the nearest normal-passage edge in either direction.
+      let placed = false;
+      for (let offset = 0; offset < path.length && !placed; offset++) {
+        // Probe at: targetIdx, targetIdx-offset, targetIdx+offset
+        for (const sign of [0, -1, 1]) {
+          const idx = targetIdx + sign * offset;
+          if (idx < 1 || idx >= path.length - 1) continue;
 
-    // Determine which direction the bridge edge goes (A → B)
-    const bridgeDir = this.getDirection(roomA, roomB);
-    if (!bridgeDir) return [];
+          const roomA = path[idx];
+          const roomB = path[idx + 1];
+          const dir = this.getDirection(roomA, roomB);
+          if (!dir) continue;
 
-    // Remove the normal passage for this edge
-    passages[roomA.row][roomA.col][bridgeDir] = false;
-    passages[roomB.row][roomB.col][OPPOSITE[bridgeDir]] = false;
+          // Must be a normal (non-bridge) passage
+          if (!passages[roomA.row][roomA.col][dir]) continue;
 
-    // Find lever positions: a room adjacent to roomA (reachable from roomA,
-    // not through the bridge) and similarly for roomB.
-    const leverA = this.findLeverRoom(rows, cols, passages, roomA, roomB);
-    const leverB = this.findLeverRoom(rows, cols, passages, roomB, roomA);
+          // Remove the passage to create the bridge gap
+          passages[roomA.row][roomA.col][dir] = false;
+          passages[roomB.row][roomB.col][OPPOSITE[dir]] = false;
 
-    if (!leverA || !leverB) {
-      // Could not place levers — restore the passage and skip the bridge
-      passages[roomA.row][roomA.col][bridgeDir] = true;
-      passages[roomB.row][roomB.col][OPPOSITE[bridgeDir]] = true;
-      return [];
+          // Positions already taken by start, end, and previous bridges
+          const taken = new Set<string>([
+            pKey(start),
+            pKey(end),
+            pKey(roomA),
+            pKey(roomB),
+            ...bridges.flatMap((b) => [
+              pKey(b.leverA),
+              pKey(b.leverB),
+              pKey(b.roomA),
+              pKey(b.roomB),
+            ]),
+          ]);
+
+          const leverA = this.findFarLeverRoom(rows, cols, passages, roomA, taken);
+          const leverB = this.findFarLeverRoom(rows, cols, passages, roomB, taken);
+
+          if (!leverA || !leverB) {
+            // Restore and try the next edge
+            passages[roomA.row][roomA.col][dir] = true;
+            passages[roomB.row][roomB.col][OPPOSITE[dir]] = true;
+            continue;
+          }
+
+          bridges.push({
+            id: i,
+            roomA: { ...roomA },
+            roomB: { ...roomB },
+            leverA: { ...leverA },
+            leverB: { ...leverB },
+          });
+          placed = true;
+          break;
+        }
+      }
     }
 
-    const bridge: Bridge = {
-      id: 0,
-      roomA: { ...roomA },
-      roomB: { ...roomB },
-      leverA: { ...leverA },
-      leverB: { ...leverB },
-    };
-
-    return [bridge];
+    return bridges;
   }
 
-  /** Find a room adjacent to `from` in the current passage graph, excluding `exclude`. */
-  private findLeverRoom(
+  /**
+   * Find a lever room reachable from `from` via normal passages, at
+   * distance ≥ 2 (preferring 2–5 hops), avoiding `taken` positions.
+   * Falls back to distance-1 if no farther room is available.
+   */
+  private findFarLeverRoom(
     rows: number,
     cols: number,
     passages: RoomPassages[][],
     from: Position,
-    exclude: Position
+    taken: Set<string>
   ): Position | null {
-    const dirs: Direction[] = ['north', 'south', 'east', 'west'];
-    for (const dir of dirs) {
-      if (!passages[from.row][from.col][dir]) continue;
-      const { dr, dc } = DIR_DELTA[dir];
-      const nr = from.row + dr;
-      const nc = from.col + dc;
-      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
-      if (nr === exclude.row && nc === exclude.col) continue;
-      return { row: nr, col: nc };
+    const visited = new Set<string>([pKey(from)]);
+    const queue: Array<{ pos: Position; dist: number }> = [
+      { pos: from, dist: 0 },
+    ];
+    const farCandidates: Position[] = [];
+    const nearCandidates: Position[] = [];
+
+    while (queue.length > 0) {
+      const { pos, dist } = queue.shift()!;
+      if (dist >= 5) continue;
+
+      for (const dir of ALL_DIRS) {
+        if (!passages[pos.row][pos.col][dir]) continue;
+        const { dr, dc } = DIR_DELTA[dir];
+        const next: Position = { row: pos.row + dr, col: pos.col + dc };
+        if (next.row < 0 || next.row >= rows || next.col < 0 || next.col >= cols)
+          continue;
+        const nk = pKey(next);
+        if (visited.has(nk)) continue;
+        visited.add(nk);
+
+        const nextDist = dist + 1;
+        if (!taken.has(nk)) {
+          if (nextDist >= 2) farCandidates.push({ ...next });
+          else nearCandidates.push({ ...next });
+        }
+        queue.push({ pos: next, dist: nextDist });
+      }
+    }
+
+    if (farCandidates.length > 0) {
+      return farCandidates[Math.floor(this.rng() * farCandidates.length)];
+    }
+    if (nearCandidates.length > 0) {
+      return nearCandidates[0];
     }
     return null;
   }
@@ -182,7 +250,7 @@ export class MazeGameEngine {
     return null;
   }
 
-  /** BFS; returns the path as an array of positions, or [] if unreachable. */
+  /** BFS through normal passages only; returns path or []. */
   private bfsPath(
     rows: number,
     cols: number,
@@ -191,25 +259,22 @@ export class MazeGameEngine {
     end: Position
   ): Position[] {
     const queue: Position[] = [start];
-    const prev: Map<string, Position | null> = new Map();
-    const key = (p: Position) => `${p.row},${p.col}`;
-    prev.set(key(start), null);
+    const prev = new Map<string, Position | null>();
+    prev.set(pKey(start), null);
 
     while (queue.length > 0) {
       const cur = queue.shift()!;
       if (cur.row === end.row && cur.col === end.col) {
-        // Reconstruct path
         const path: Position[] = [];
         let node: Position | null = cur;
         while (node !== null) {
           path.unshift(node);
-          node = prev.get(key(node)) ?? null;
+          node = prev.get(pKey(node)) ?? null;
         }
         return path;
       }
 
-      const dirs: Direction[] = ['north', 'south', 'east', 'west'];
-      for (const dir of dirs) {
+      for (const dir of ALL_DIRS) {
         if (!passages[cur.row][cur.col][dir]) continue;
         const { dr, dc } = DIR_DELTA[dir];
         const nr = cur.row + dr;
@@ -219,6 +284,67 @@ export class MazeGameEngine {
         if (!prev.has(nk)) {
           prev.set(nk, cur);
           queue.push({ row: nr, col: nc });
+        }
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * BFS treating existing bridge crossings as free passages (no lever needed).
+   * Used during bridge placement to find the critical path through already-
+   * placed bridges so we can position subsequent bridges on it.
+   */
+  private bfsPathWithBridges(
+    rows: number,
+    cols: number,
+    passages: RoomPassages[][],
+    bridges: Bridge[],
+    start: Position,
+    end: Position
+  ): Position[] {
+    const queue: Position[] = [{ ...start }];
+    const prev = new Map<string, Position | null>();
+    prev.set(pKey(start), null);
+
+    while (queue.length > 0) {
+      const cur = queue.shift()!;
+      if (cur.row === end.row && cur.col === end.col) {
+        const path: Position[] = [];
+        let node: Position | null = cur;
+        while (node !== null) {
+          path.unshift(node);
+          node = prev.get(pKey(node)) ?? null;
+        }
+        return path;
+      }
+
+      // Normal passages
+      for (const dir of ALL_DIRS) {
+        if (!passages[cur.row][cur.col][dir]) continue;
+        const { dr, dc } = DIR_DELTA[dir];
+        const next: Position = { row: cur.row + dr, col: cur.col + dc };
+        if (next.row < 0 || next.row >= rows || next.col < 0 || next.col >= cols)
+          continue;
+        const nk = pKey(next);
+        if (!prev.has(nk)) {
+          prev.set(nk, cur);
+          queue.push(next);
+        }
+      }
+
+      // Bridge crossings (treated as always passable during placement)
+      for (const bridge of bridges) {
+        let next: Position | null = null;
+        if (posEq(cur, bridge.roomA)) next = bridge.roomB;
+        else if (posEq(cur, bridge.roomB)) next = bridge.roomA;
+        if (next) {
+          const nk = pKey(next);
+          if (!prev.has(nk)) {
+            prev.set(nk, cur);
+            queue.push({ ...next });
+          }
         }
       }
     }
@@ -255,80 +381,106 @@ export class MazeGameEngine {
   }
 
   /**
-   * Returns all valid destination rooms the current player can move to.
-   * Includes normal adjacent rooms and bridge destinations (if lever conditions met).
+   * Returns the directions a given player can move right now.
+   * Includes normal passage directions and bridge crossings (when the other
+   * player is on the matching lever).
    */
-  getValidMoves(): Position[] {
+  getValidDirectionsForPlayer(player: Player): Direction[] {
     if (this.state.status !== 'playing') return [];
 
-    const cur = this.state.players[this.state.currentPlayer];
-    const opponent: Player = this.state.currentPlayer === 1 ? 2 : 1;
+    const cur = this.state.players[player];
+    const opponent: Player = player === 1 ? 2 : 1;
+    const oppPos = this.state.players[opponent];
+    const dirs: Direction[] = [];
+
+    for (const dir of ALL_DIRS) {
+      if (this.canMoveInDirection(cur, dir, oppPos)) dirs.push(dir);
+    }
+
+    return dirs;
+  }
+
+  private canMoveInDirection(
+    cur: Position,
+    dir: Direction,
+    oppPos: Position
+  ): boolean {
+    const { dr, dc } = DIR_DELTA[dir];
+    const target: Position = { row: cur.row + dr, col: cur.col + dc };
+
+    if (
+      target.row < 0 ||
+      target.row >= this.state.rows ||
+      target.col < 0 ||
+      target.col >= this.state.cols
+    )
+      return false;
+
+    // Normal passage
+    if (this.state.passages[cur.row][cur.col][dir]) return true;
+
+    // Bridge crossing
+    for (const bridge of this.state.bridges) {
+      if (posEq(cur, bridge.roomA) && posEq(target, bridge.roomB)) {
+        return posEq(oppPos, bridge.leverA);
+      }
+      if (posEq(cur, bridge.roomB) && posEq(target, bridge.roomA)) {
+        return posEq(oppPos, bridge.leverB);
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Move a specific player one step in `direction`.
+   * Both players can move simultaneously (no turn order).
+   * Returns true if the move was valid and executed.
+   */
+  movePlayer(player: Player, direction: Direction): boolean {
+    if (this.state.status !== 'playing') return false;
+
+    const cur = this.state.players[player];
+    const opponent: Player = player === 1 ? 2 : 1;
     const oppPos = this.state.players[opponent];
 
-    const moves: Position[] = [];
+    if (!this.canMoveInDirection(cur, direction, oppPos)) return false;
 
-    // Normal moves through passages
-    const dirs: Direction[] = ['north', 'south', 'east', 'west'];
-    for (const dir of dirs) {
-      if (!this.state.passages[cur.row][cur.col][dir]) continue;
-      const { dr, dc } = DIR_DELTA[dir];
-      moves.push({ row: cur.row + dr, col: cur.col + dc });
-    }
+    const { dr, dc } = DIR_DELTA[direction];
+    const target: Position = { row: cur.row + dr, col: cur.col + dc };
 
-    // Bridge moves
-    for (const bridge of this.state.bridges) {
-      const { roomA, roomB, leverA, leverB } = bridge;
+    this.state.moveHistory.push({
+      player,
+      from: { ...cur },
+      to: { ...target },
+    });
+    this.state.players[player] = { ...target };
 
-      const onRoomA = cur.row === roomA.row && cur.col === roomA.col;
-      const onRoomB = cur.row === roomB.row && cur.col === roomB.col;
-      const oppOnLeverA = oppPos.row === leverA.row && oppPos.col === leverA.col;
-      const oppOnLeverB = oppPos.row === leverB.row && oppPos.col === leverB.col;
-
-      if (onRoomA && oppOnLeverA) {
-        moves.push({ ...roomB });
-      }
-      if (onRoomB && oppOnLeverB) {
-        moves.push({ ...roomA });
-      }
-    }
-
-    return moves;
-  }
-
-  isValidMove(pos: Position): boolean {
-    return this.getValidMoves().some((m) => m.row === pos.row && m.col === pos.col);
-  }
-
-  makeMove(pos: Position): boolean {
-    if (!this.isValidMove(pos)) return false;
-
-    const currentPlayer = this.state.currentPlayer;
-    const from = { ...this.state.players[currentPlayer] };
-
-    this.state.moveHistory.push({ player: currentPlayer, from, to: { ...pos } });
-    this.state.players[currentPlayer] = { ...pos };
-
-    // Check if player reached the end
+    // Check win condition
     const { endPos } = this.state;
-    if (pos.row === endPos.row && pos.col === endPos.col) {
-      if (!this.state.reachedEnd.includes(currentPlayer)) {
-        this.state.reachedEnd.push(currentPlayer);
-      }
-      // Win when both players have reached the end
-      if (this.state.reachedEnd.length === 2) {
-        this.state.status = 'ended';
-      }
+    if (posEq(target, endPos) && !this.state.reachedEnd.includes(player)) {
+      this.state.reachedEnd.push(player);
     }
-
-    // Switch turns
-    const opponent: Player = currentPlayer === 1 ? 2 : 1;
-    this.state.currentPlayer = opponent;
+    if (this.state.reachedEnd.length === 2) {
+      this.state.status = 'ended';
+    }
 
     return true;
   }
 
   reset(): void {
     this.state = this.createInitialState(this.state.rows, this.state.cols);
+  }
+
+  // Keep bfsPath accessible for tests
+  _bfsPath(
+    rows: number,
+    cols: number,
+    passages: RoomPassages[][],
+    start: Position,
+    end: Position
+  ): Position[] {
+    return this.bfsPath(rows, cols, passages, start, end);
   }
 
   private shuffleArray<T>(arr: T[]): T[] {
@@ -340,3 +492,4 @@ export class MazeGameEngine {
     return a;
   }
 }
+

@@ -52,8 +52,8 @@ export interface MazeGameState {
   bridges: Bridge[];
   startPos: Position;
   endPos: Position;
+  /** Both players move simultaneously — no turn order. */
   players: Record<Player, Position>;
-  currentPlayer: Player;
   status: GameStatus;
   /** Which players have reached the end tile. Win when both are listed. */
   reachedEnd: Player[];
