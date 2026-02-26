@@ -20,6 +20,8 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'black-hole': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'order-and-chaos': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
   scribbl: { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
+  'bee-game': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
+  'hide-and-seek': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
 };
 
 const iconPaths: Record<string, React.ReactNode> = {
@@ -207,6 +209,58 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeLinecap="round"
         strokeWidth={2}
       />
+   * Abbee & Dot – a stylized bee with body, wings, and stinger, themed for
+   * the Ayyam-i-ha bee chase game.
+   */
+  'bee-game': (
+    <>
+      {/* Body */}
+      <ellipse cx="12" cy="13" rx="5" ry="4" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={1.5} />
+      {/* Stripes */}
+      <line x1="10" y1="11.5" x2="14" y2="11.5" strokeWidth={1} strokeLinecap="round" />
+      <line x1="9.5" y1="13.5" x2="14.5" y2="13.5" strokeWidth={1} strokeLinecap="round" />
+      {/* Wings */}
+      <ellipse cx="9" cy="9" rx="2.5" ry="1.8" fill="none" strokeWidth={1.2} transform="rotate(-20 9 9)" />
+      <ellipse cx="15" cy="9" rx="2.5" ry="1.8" fill="none" strokeWidth={1.2} transform="rotate(20 15 9)" />
+      {/* Head */}
+      <circle cx="12" cy="7.5" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={1.2} />
+      {/* Antennae */}
+      <line x1="11" y1="6" x2="9.5" y2="3.5" strokeWidth={1} strokeLinecap="round" />
+      <line x1="13" y1="6" x2="14.5" y2="3.5" strokeWidth={1} strokeLinecap="round" />
+      <circle cx="9.5" cy="3.2" r="0.6" fill="currentColor" stroke="none" />
+      <circle cx="14.5" cy="3.2" r="0.6" fill="currentColor" stroke="none" />
+      {/* Stinger */}
+      <line x1="12" y1="17" x2="12" y2="19.5" strokeWidth={1.2} strokeLinecap="round" />
+    </>
+  ),
+
+  /**
+   * Ayyam-i-Ha Hide & Seek – a gem shape with a small magnifying glass,
+   * representing the gem-hiding and seeking mechanic.
+   */
+  'hide-and-seek': (
+    <>
+      {/* Gem body */}
+      <polygon
+        points="12,3 20,8 17,18 7,18 4,8"
+        fill="currentColor"
+        opacity={0.25}
+        stroke="currentColor"
+        strokeWidth={1.5}
+        strokeLinejoin="round"
+      />
+      {/* Gem top facets */}
+      <polyline
+        points="4,8 12,3 20,8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1}
+        strokeLinejoin="round"
+      />
+      <line x1="12" y1="3" x2="12" y2="18" strokeWidth={0.8} strokeLinecap="round" opacity={0.5} />
+      {/* Magnifying glass */}
+      <circle cx="18" cy="18" r="3" fill="none" stroke="currentColor" strokeWidth={1.5} />
+      <line x1="20.1" y1="20.1" x2="22.5" y2="22.5" strokeWidth={1.5} strokeLinecap="round" />
     </>
   ),
 };

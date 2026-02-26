@@ -1,5 +1,5 @@
 export type GameCategory = 'Strategy' | 'Puzzle' | 'Party' | 'Abstract';
-export type GameTag = '2-Player' | 'Quick' | 'Complex' | 'Chess-like' | 'Area Control' | 'Abstract';
+export type GameTag = '2-Player' | 'Quick' | 'Complex' | 'Chess-like' | 'Area Control' | 'Abstract' | 'Family';
 
 export interface GameMetadata {
   id: string;
@@ -66,5 +66,19 @@ export const games: GameMetadata[] = [
     href: '/games/scribbl',
     category: 'Party',
     tags: ['2-Player', 'Quick'],
+    id: 'bee-game',
+    name: 'Abbee & Dot',
+    description: 'A Baha\'i Ayyam-i-ha bee chase game for families!',
+    href: '/games/bee-game',
+    category: 'Party',
+    tags: ['2-Player', 'Family'],
+  },
+  {
+    id: 'hide-and-seek',
+    name: 'Ayyam-i-Ha Hide & Seek',
+    description: 'Hide gems in the garden — can Dot find them all?',
+    href: '/games/hide-and-seek',
+    category: 'Party',
+    tags: ['2-Player', 'Family'],
   },
 ];
