@@ -68,6 +68,34 @@ describe('MazeGameEngine', () => {
         startPassages.west;
       expect(hasAnyPassage).toBe(true);
     });
+
+    it('should support configurable maze sizes', () => {
+      const small = new MazeGameEngine(5, 5, createSeededRng(1));
+      expect(small.getState().rows).toBe(5);
+      expect(small.getState().cols).toBe(5);
+
+      const large = new MazeGameEngine(9, 9, createSeededRng(1));
+      expect(large.getState().rows).toBe(9);
+      expect(large.getState().cols).toBe(9);
+    });
+  });
+
+  describe('multiple paths', () => {
+    it('should have extra passages beyond a perfect maze (multiple paths)', () => {
+      const state = engine.getState();
+      // Count total open passages (each bidirectional passage counted once)
+      let passageCount = 0;
+      for (let r = 0; r < state.rows; r++) {
+        for (let c = 0; c < state.cols; c++) {
+          if (state.passages[r][c].east) passageCount++;
+          if (state.passages[r][c].south) passageCount++;
+        }
+      }
+      // A perfect maze on rows*cols cells has exactly rows*cols-1 passages
+      // With extra passages, we should have more
+      const perfectCount = state.rows * state.cols - 1;
+      expect(passageCount).toBeGreaterThan(perfectCount);
+    });
   });
 
   describe('getValidDirectionsForPlayer', () => {
@@ -146,88 +174,120 @@ describe('MazeGameEngine', () => {
     });
   });
 
-  describe('bridge mechanics', () => {
-    it('should place multiple bridges in a 7x7 maze', () => {
+  describe('gate mechanics', () => {
+    it('should place multiple gates in a 7x7 maze', () => {
       const state = engine.getState();
-      expect(state.bridges.length).toBeGreaterThanOrEqual(1);
+      expect(state.gates.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('bridge rooms A and B should be adjacent (1 step apart)', () => {
+    it('gate rooms A and B should be adjacent (1 step apart)', () => {
       const state = engine.getState();
-      for (const bridge of state.bridges) {
-        const dr = Math.abs(bridge.roomA.row - bridge.roomB.row);
-        const dc = Math.abs(bridge.roomA.col - bridge.roomB.col);
+      for (const gate of state.gates) {
+        const dr = Math.abs(gate.roomA.row - gate.roomB.row);
+        const dc = Math.abs(gate.roomA.col - gate.roomB.col);
         expect(dr + dc).toBe(1);
       }
     });
 
-    it('bridge levers should be within maze bounds', () => {
+    it('gate keys should be within maze bounds', () => {
       const state = engine.getState();
-      for (const bridge of state.bridges) {
-        expect(bridge.leverA.row).toBeGreaterThanOrEqual(0);
-        expect(bridge.leverA.row).toBeLessThan(7);
-        expect(bridge.leverA.col).toBeGreaterThanOrEqual(0);
-        expect(bridge.leverA.col).toBeLessThan(7);
-        expect(bridge.leverB.row).toBeGreaterThanOrEqual(0);
-        expect(bridge.leverB.row).toBeLessThan(7);
+      for (const gate of state.gates) {
+        expect(gate.keyA.row).toBeGreaterThanOrEqual(0);
+        expect(gate.keyA.row).toBeLessThan(7);
+        expect(gate.keyA.col).toBeGreaterThanOrEqual(0);
+        expect(gate.keyA.col).toBeLessThan(7);
+        expect(gate.keyB.row).toBeGreaterThanOrEqual(0);
+        expect(gate.keyB.row).toBeLessThan(7);
       }
     });
 
-    it('bridge levers should not be at the bridge rooms themselves', () => {
+    it('gate keys should not be at the gate rooms themselves', () => {
       const state = engine.getState();
-      for (const bridge of state.bridges) {
-        const aKey = `${bridge.roomA.row},${bridge.roomA.col}`;
-        const bKey = `${bridge.roomB.row},${bridge.roomB.col}`;
-        expect(`${bridge.leverA.row},${bridge.leverA.col}`).not.toBe(aKey);
-        expect(`${bridge.leverA.row},${bridge.leverA.col}`).not.toBe(bKey);
-        expect(`${bridge.leverB.row},${bridge.leverB.col}`).not.toBe(aKey);
-        expect(`${bridge.leverB.row},${bridge.leverB.col}`).not.toBe(bKey);
+      for (const gate of state.gates) {
+        const aKey = `${gate.roomA.row},${gate.roomA.col}`;
+        const bKey = `${gate.roomB.row},${gate.roomB.col}`;
+        expect(`${gate.keyA.row},${gate.keyA.col}`).not.toBe(aKey);
+        expect(`${gate.keyA.row},${gate.keyA.col}`).not.toBe(bKey);
+        expect(`${gate.keyB.row},${gate.keyB.col}`).not.toBe(aKey);
+        expect(`${gate.keyB.row},${gate.keyB.col}`).not.toBe(bKey);
       }
     });
 
-    it('should allow bridge crossing only when opponent is on a lever', () => {
+    it('should allow gate crossing only when opponent is on a key', () => {
       const engineSmall = new MazeGameEngine(7, 7, createSeededRng(42));
       const s = engineSmall.getState();
-      if (s.bridges.length === 0) return;
+      if (s.gates.length === 0) return;
 
-      // The bridge passage should be removed from normal passages
-      const bridge0 = s.bridges[0];
+      // The gate passage should be removed from normal passages
+      const gate0 = s.gates[0];
       const dir =
-        bridge0.roomB.row > bridge0.roomA.row ? 'south' :
-        bridge0.roomB.row < bridge0.roomA.row ? 'north' :
-        bridge0.roomB.col > bridge0.roomA.col ? 'east' : 'west';
-      expect(s.passages[bridge0.roomA.row][bridge0.roomA.col][dir]).toBe(false);
+        gate0.roomB.row > gate0.roomA.row ? 'south' :
+        gate0.roomB.row < gate0.roomA.row ? 'north' :
+        gate0.roomB.col > gate0.roomA.col ? 'east' : 'west';
+      expect(s.passages[gate0.roomA.row][gate0.roomA.col][dir]).toBe(false);
     });
 
-    it('leverB should also allow the other player to cross A→B (bidirectional)', () => {
-      // This covers the bug: after P2 crosses A→B and stands on leverB,
-      // P1 (still on side A) must also be able to cross A→B.
+    it('keyB should also allow the other player to cross A→B (bidirectional)', () => {
       const engineSmall = new MazeGameEngine(7, 7, createSeededRng(42));
       const s = engineSmall.getState();
-      if (s.bridges.length === 0) return;
-      const bridge0 = s.bridges[0];
+      if (s.gates.length === 0) return;
+      const gate0 = s.gates[0];
 
-      // Teleport P1 to roomA and P2 to leverB
-      engineSmall._setPlayerPosition(1, bridge0.roomA);
-      engineSmall._setPlayerPosition(2, bridge0.leverB);
+      // Teleport P1 to roomA and P2 to keyB
+      engineSmall._setPlayerPosition(1, gate0.roomA);
+      engineSmall._setPlayerPosition(2, gate0.keyB);
 
-      // P1 should now be able to move toward roomB (opponent on leverB)
+      // P1 should now be able to move toward roomB (opponent on keyB)
       const dirs = engineSmall.getValidDirectionsForPlayer(1);
       const dir =
-        bridge0.roomB.row > bridge0.roomA.row ? 'south' :
-        bridge0.roomB.row < bridge0.roomA.row ? 'north' :
-        bridge0.roomB.col > bridge0.roomA.col ? 'east' : 'west';
+        gate0.roomB.row > gate0.roomA.row ? 'south' :
+        gate0.roomB.row < gate0.roomA.row ? 'north' :
+        gate0.roomB.col > gate0.roomA.col ? 'east' : 'west';
       expect(dirs).toContain(dir);
 
-      // Sanity-check the reverse: P2 at roomB, P1 at leverA → P2 can cross B→A
-      engineSmall._setPlayerPosition(2, bridge0.roomB);
-      engineSmall._setPlayerPosition(1, bridge0.leverA);
+      // Sanity-check the reverse: P2 at roomB, P1 at keyA → P2 can cross B→A
+      engineSmall._setPlayerPosition(2, gate0.roomB);
+      engineSmall._setPlayerPosition(1, gate0.keyA);
       const dirs2 = engineSmall.getValidDirectionsForPlayer(2);
       const reverseDir =
         dir === 'south' ? 'north' :
         dir === 'north' ? 'south' :
         dir === 'east' ? 'west' : 'east';
       expect(dirs2).toContain(reverseDir);
+    });
+  });
+
+  describe('decoy keys', () => {
+    it('should place decoy keys in the maze', () => {
+      const state = engine.getState();
+      expect(state.decoyKeys.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('decoy keys should not overlap with gates, keys, start, or end', () => {
+      const state = engine.getState();
+      const taken = new Set<string>([
+        `${state.startPos.row},${state.startPos.col}`,
+        `${state.endPos.row},${state.endPos.col}`,
+        ...state.gates.flatMap((g) => [
+          `${g.roomA.row},${g.roomA.col}`,
+          `${g.roomB.row},${g.roomB.col}`,
+          `${g.keyA.row},${g.keyA.col}`,
+          `${g.keyB.row},${g.keyB.col}`,
+        ]),
+      ]);
+      for (const dk of state.decoyKeys) {
+        expect(taken.has(`${dk.row},${dk.col}`)).toBe(false);
+      }
+    });
+
+    it('decoy keys should be within maze bounds', () => {
+      const state = engine.getState();
+      for (const dk of state.decoyKeys) {
+        expect(dk.row).toBeGreaterThanOrEqual(0);
+        expect(dk.row).toBeLessThan(state.rows);
+        expect(dk.col).toBeGreaterThanOrEqual(0);
+        expect(dk.col).toBeLessThan(state.cols);
+      }
     });
   });
 
@@ -269,4 +329,3 @@ describe('MazeGameEngine', () => {
     });
   });
 });
-

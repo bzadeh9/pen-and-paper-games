@@ -2,21 +2,27 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { MazeGameEngine } from '@/lib/games/maze-game/engine';
-import type { MazeGameState, Position, Bridge, Direction, Player } from '@/lib/games/maze-game/types';
+import type { MazeGameState, Position, Gate, Direction, Player } from '@/lib/games/maze-game/types';
 
 interface GameBoardProps {
   onGameEnd?: (totalMoves: number) => void;
 }
 
-const CELL_SIZE = 48;
 const WALL_SIZE = 8;
 
-// Per-bridge colour scheme: [room bg, lever bg, passage gradient]
-const BRIDGE_COLORS = [
-  { room: '#e0d4f5', lever: '#fde68a', stripe: '#c9a0dc,#e0d4f5' },
-  { room: '#d4f5f0', lever: '#fed7aa', stripe: '#5eead4,#d4f5f0' },
-  { room: '#fcd4e0', lever: '#bbf7d0', stripe: '#f9a8d4,#fcd4e0' },
+// Per-gate colour scheme
+const GATE_COLORS = [
+  { room: '#d9b3ff', passage: '#b366ff,#d9b3ff' },
+  { room: '#80e5d0', passage: '#33ccaa,#80e5d0' },
+  { room: '#ffb3c6', passage: '#ff6699,#ffb3c6' },
 ];
+
+type MazeSize = 'small' | 'medium' | 'large';
+const MAZE_SIZES: Record<MazeSize, { rows: number; cols: number; cell: number }> = {
+  small: { rows: 5, cols: 5, cell: 56 },
+  medium: { rows: 7, cols: 7, cell: 48 },
+  large: { rows: 9, cols: 9, cell: 40 },
+};
 
 function posKey(pos: Position): string {
   return `${pos.row},${pos.col}`;
@@ -100,8 +106,22 @@ function DPad({ label, playerColor, validDirs, onMove, disabled }: DPadProps) {
 }
 
 export function GameBoard({ onGameEnd }: GameBoardProps) {
-  const engine = useMemo(() => new MazeGameEngine(7, 7), []);
+  const [mazeSize, setMazeSize] = useState<MazeSize>('medium');
+  const sizeConfig = MAZE_SIZES[mazeSize];
+  const CELL_SIZE = sizeConfig.cell;
+
+  const [engineKey, setEngineKey] = useState(0);
+  const engine = useMemo(
+    () => new MazeGameEngine(sizeConfig.rows, sizeConfig.cols),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [engineKey, mazeSize]
+  );
   const [gameState, setGameState] = useState<MazeGameState>(() => engine.getState());
+
+  // Sync state when engine changes
+  useEffect(() => {
+    setGameState(engine.getState());
+  }, [engine]);
 
   const p1ValidDirs = useMemo(
     () => (gameState.status === 'playing' ? engine.getValidDirectionsForPlayer(1) : []),
@@ -168,31 +188,36 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
   }, [engine, onGameEnd]);
 
   const handleReset = useCallback(() => {
-    engine.reset();
-    setGameState(engine.getState());
-  }, [engine]);
+    setEngineKey((k) => k + 1);
+  }, []);
 
-  const { rows, cols, passages, bridges, players, status, startPos, endPos, reachedEnd } =
+  const handleSizeChange = useCallback((size: MazeSize) => {
+    setMazeSize(size);
+    setEngineKey((k) => k + 1);
+  }, []);
+
+  const { rows, cols, passages, gates, decoyKeys, players, status, startPos, endPos, reachedEnd } =
     gameState;
 
   const p1Pos = players[1];
   const p2Pos = players[2];
 
-  // Build lookup maps for all bridge elements
-  const bridgeRoomAKeys = useMemo(() => new Set(bridges.map((b) => posKey(b.roomA))), [bridges]);
-  const bridgeRoomBKeys = useMemo(() => new Set(bridges.map((b) => posKey(b.roomB))), [bridges]);
-  const leverAKeys = useMemo(() => new Set(bridges.map((b) => posKey(b.leverA))), [bridges]);
-  const leverBKeys = useMemo(() => new Set(bridges.map((b) => posKey(b.leverB))), [bridges]);
-  const bridgeByKey = useMemo(() => {
-    const m = new Map<string, Bridge>();
-    for (const b of bridges) {
-      m.set(posKey(b.roomA), b);
-      m.set(posKey(b.roomB), b);
-      m.set(posKey(b.leverA), b);
-      m.set(posKey(b.leverB), b);
+  // Build lookup maps for gate elements
+  const gateRoomAKeys = useMemo(() => new Set(gates.map((g) => posKey(g.roomA))), [gates]);
+  const gateRoomBKeys = useMemo(() => new Set(gates.map((g) => posKey(g.roomB))), [gates]);
+  const keyAKeys = useMemo(() => new Set(gates.map((g) => posKey(g.keyA))), [gates]);
+  const keyBKeys = useMemo(() => new Set(gates.map((g) => posKey(g.keyB))), [gates]);
+  const decoyKeySet = useMemo(() => new Set(decoyKeys.map((k) => posKey(k))), [decoyKeys]);
+  const gateByKey = useMemo(() => {
+    const m = new Map<string, Gate>();
+    for (const g of gates) {
+      m.set(posKey(g.roomA), g);
+      m.set(posKey(g.roomB), g);
+      m.set(posKey(g.keyA), g);
+      m.set(posKey(g.keyB), g);
     }
     return m;
-  }, [bridges]);
+  }, [gates]);
 
   const boardWidth = cols * CELL_SIZE + (cols - 1) * WALL_SIZE;
   const boardHeight = rows * CELL_SIZE + (rows - 1) * WALL_SIZE;
@@ -203,20 +228,18 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     const isP2 = posEq(p2Pos, { row, col });
     const isStart = posEq(startPos, { row, col });
     const isEnd = posEq(endPos, { row, col });
-    const isRoomA = bridgeRoomAKeys.has(key);
-    const isRoomB = bridgeRoomBKeys.has(key);
-    const isLeverA = leverAKeys.has(key);
-    const isLeverB = leverBKeys.has(key);
+    const isRoomA = gateRoomAKeys.has(key);
+    const isRoomB = gateRoomBKeys.has(key);
     const isP1Valid = p1ValidKeys.has(key);
     const isP2Valid = p2ValidKeys.has(key);
-    const bridge = bridgeByKey.get(key);
-    const bc = bridge ? BRIDGE_COLORS[bridge.id % BRIDGE_COLORS.length] : null;
+    const gate = gateByKey.get(key);
+    const gc = gate ? GATE_COLORS[gate.id % GATE_COLORS.length] : null;
 
     let bg = '#f8e5e5';
     if (isStart) bg = '#d1fae5';
     if (isEnd) bg = '#fef3c7';
-    if ((isRoomA || isRoomB) && bc) bg = bc.room;
-    if ((isLeverA || isLeverB) && bc) bg = bc.lever;
+    // Gate rooms are very obvious - prominent color
+    if ((isRoomA || isRoomB) && gc) bg = gc.room;
     // Valid-move highlights (overlaid on top of cell type)
     if (isP1Valid && !isP2Valid) bg = '#ffd6e0';
     if (!isP1Valid && isP2Valid) bg = '#e8d8f8';
@@ -226,14 +249,18 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     if (!isP1 && isP2) bg = '#c9a0dc';
     if (isP1 && isP2) bg = '#e0a0cc';
 
-    const borderColor =
-      isP1Valid && isP2Valid
-        ? '#d090d0'
-        : isP1Valid
-        ? '#ffb3c1'
-        : isP2Valid
-        ? '#c9a0dc'
-        : 'transparent';
+    // Gate rooms get a thick prominent border
+    const isGateRoom = isRoomA || isRoomB;
+    const borderWidth = isGateRoom ? 3 : 2;
+    const borderColor = isGateRoom && gc
+      ? gc.room
+      : isP1Valid && isP2Valid
+      ? '#d090d0'
+      : isP1Valid
+      ? '#ffb3c1'
+      : isP2Valid
+      ? '#c9a0dc'
+      : 'transparent';
 
     return {
       position: 'absolute',
@@ -243,11 +270,11 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       height: CELL_SIZE,
       borderRadius: 8,
       backgroundColor: bg,
-      border: `2px solid ${borderColor}`,
+      border: `${borderWidth}px solid ${borderColor}`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: 18,
+      fontSize: CELL_SIZE >= 48 ? 18 : 14,
       transition: 'background-color 0.12s',
       boxSizing: 'border-box',
       zIndex: 1,
@@ -255,31 +282,64 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     };
   };
 
-  const getCellContent = (row: number, col: number): string => {
+  const getCellContent = (row: number, col: number): React.ReactNode => {
     const key = posKey({ row, col });
     const isP1 = posEq(p1Pos, { row, col });
     const isP2 = posEq(p2Pos, { row, col });
     const isEnd = posEq(endPos, { row, col });
     const isStart = posEq(startPos, { row, col });
-    const isLeverA = leverAKeys.has(key);
-    const isLeverB = leverBKeys.has(key);
-    const isRoomA = bridgeRoomAKeys.has(key);
-    const isRoomB = bridgeRoomBKeys.has(key);
-    const bridge = bridgeByKey.get(key);
-    const bridgeNum = bridge ? bridge.id + 1 : '';
+    const isKeyA = keyAKeys.has(key);
+    const isKeyB = keyBKeys.has(key);
+    const isRoomA = gateRoomAKeys.has(key);
+    const isRoomB = gateRoomBKeys.has(key);
+    const isDecoy = decoyKeySet.has(key);
 
     if (isP1 && isP2) return '👦👧';
     if (isP1) return '👦';
     if (isP2) return '👧';
     if (isEnd) return '🐝🐝';
     if (isStart) return '🏠';
-    if (isLeverA || isLeverB) return `🔑${bridgeNum}`;
-    if (isRoomA || isRoomB) return `🌉${bridgeNum}`;
+    // Gate rooms are obvious — show a lock
+    if (isRoomA || isRoomB) return '🔒';
+    // Real keys — discreet, no number, small dot indicator
+    if (isKeyA || isKeyB) {
+      return (
+        <span style={{ opacity: 0.45, fontSize: CELL_SIZE >= 48 ? 10 : 8 }}>
+          ●
+        </span>
+      );
+    }
+    // Decoy keys — same appearance as real keys
+    if (isDecoy) {
+      return (
+        <span style={{ opacity: 0.45, fontSize: CELL_SIZE >= 48 ? 10 : 8 }}>
+          ●
+        </span>
+      );
+    }
     return '';
   };
 
   return (
     <div className="flex flex-col items-center gap-4">
+      {/* Size selector */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-foreground/60">Size:</span>
+        {(['small', 'medium', 'large'] as MazeSize[]).map((size) => (
+          <button
+            key={size}
+            onClick={() => handleSizeChange(size)}
+            className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+              mazeSize === size
+                ? 'border border-dusty-mauve bg-dusty-mauve/20 text-dusty-mauve'
+                : 'border border-foreground/20 bg-foreground/5 text-foreground/60 hover:bg-foreground/10'
+            }`}
+          >
+            {size === 'small' ? '5×5' : size === 'medium' ? '7×7' : '9×9'}
+          </button>
+        ))}
+      </div>
+
       {/* Status bar */}
       <div className="rounded-lg border border-foreground/20 bg-background px-4 py-2 text-center text-sm font-medium">
         {status === 'ended' ? (
@@ -312,7 +372,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             <div
               key={`${row},${col}`}
               style={getCellStyle(row, col)}
-              title={getCellTitle(posKey({ row, col }), bridgeByKey, posKey(startPos), posKey(endPos))}
+              title={getCellTitle(posKey({ row, col }), gateByKey, decoyKeySet, posKey(startPos), posKey(endPos))}
             >
               {getCellContent(row, col)}
             </div>
@@ -363,21 +423,21 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           })
         )}
 
-        {/* Bridge passage overlays (one striped gap per bridge) */}
-        {bridges.map((bridge) => {
-          const { roomA, roomB } = bridge;
+        {/* Gate passage overlays (one striped gap per gate) */}
+        {gates.map((gate) => {
+          const { roomA, roomB } = gate;
           const dr = roomB.row - roomA.row;
           const dc = roomB.col - roomA.col;
           if (Math.abs(dr) + Math.abs(dc) !== 1) return null;
-          const colors = BRIDGE_COLORS[bridge.id % BRIDGE_COLORS.length];
-          const [colorA, colorB] = colors.stripe.split(',');
+          const colors = GATE_COLORS[gate.id % GATE_COLORS.length];
+          const [colorA, colorB] = colors.passage.split(',');
           const gradient = `repeating-linear-gradient(45deg, ${colorA}, ${colorA} 3px, ${colorB} 3px, ${colorB} 6px)`;
 
           if (dc !== 0) {
             const leftRoom = dc > 0 ? roomA : roomB;
             return (
               <div
-                key={`bridge-gap-${bridge.id}`}
+                key={`gate-gap-${gate.id}`}
                 style={{
                   position: 'absolute',
                   left: leftRoom.col * (CELL_SIZE + WALL_SIZE) + CELL_SIZE,
@@ -394,7 +454,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             const topRoom = dr > 0 ? roomA : roomB;
             return (
               <div
-                key={`bridge-gap-${bridge.id}`}
+                key={`gate-gap-${gate.id}`}
                 style={{
                   position: 'absolute',
                   left: topRoom.col * (CELL_SIZE + WALL_SIZE) + 2,
@@ -416,8 +476,8 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
         <span>👦 Boy (WASD)</span>
         <span>👧 Girl (↑↓←→)</span>
         <span>🐝🐝 Find the bees!</span>
-        <span>🌉 Bridge gate</span>
-        <span>🔑 Key/Lever</span>
+        <span>🔒 Locked gate</span>
+        <span style={{ opacity: 0.7 }}>● Key (some are decoys!)</span>
       </div>
 
       {/* D-pads for touch / mouse */}
@@ -460,21 +520,19 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
 
 function getCellTitle(
   key: string,
-  bridgeByKey: Map<string, Bridge>,
+  gateByKey: Map<string, Gate>,
+  decoyKeySet: Set<string>,
   startKey: string,
   endKey: string
 ): string {
   if (key === startKey) return 'Start';
   if (key === endKey) return 'Find the bees here!';
-  const bridge = bridgeByKey.get(key);
-  if (!bridge) return '';
-  const n = bridge.id + 1;
-  if (key === posKey(bridge.roomA) || key === posKey(bridge.roomB))
-    return `Bridge gate ${n} — needs lever ${n} held to cross`;
-  if (key === posKey(bridge.leverA))
-    return `Key ${n}A — stand here so your partner can cross bridge ${n} →`;
-  if (key === posKey(bridge.leverB))
-    return `Key ${n}B — stand here so your partner can cross bridge ${n} ←`;
+  if (decoyKeySet.has(key)) return 'A key — but does it open anything?';
+  const gate = gateByKey.get(key);
+  if (!gate) return '';
+  if (key === posKey(gate.roomA) || key === posKey(gate.roomB))
+    return 'Locked gate — find the right key!';
+  if (key === posKey(gate.keyA) || key === posKey(gate.keyB))
+    return 'A key — stand here so your partner can cross a gate';
   return '';
 }
-
