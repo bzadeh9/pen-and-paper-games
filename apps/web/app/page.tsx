@@ -21,7 +21,7 @@ export default function Home() {
 
         {/* Game cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {games.map((game) => {
+          {games.filter((g) => g.showOnHome !== false).map((game) => {
             const colors = gameColors[game.id] ?? {
               bg: 'bg-foreground/10',
               text: 'text-foreground/60',

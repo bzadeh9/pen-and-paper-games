@@ -22,6 +22,8 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   scribbl: { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'bee-game': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'hide-and-seek': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
+  'abbee-and-dot': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
+  'maze-game': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
 };
 
 const iconPaths: Record<string, React.ReactNode> = {
@@ -235,6 +237,53 @@ const iconPaths: Record<string, React.ReactNode> = {
       <circle cx="14.5" cy="3.2" r="0.6" fill="currentColor" stroke="none" />
       {/* Stinger */}
       <line x1="12" y1="17" x2="12" y2="19.5" strokeWidth={1.2} strokeLinecap="round" />
+    </>
+  ),
+
+  /**
+   * Abbee & Dot category – same bee icon as bee-game, representing the
+   * Ayyam-i-Ha series category tile on the home page.
+   */
+  'abbee-and-dot': (
+    <>
+      {/* Body */}
+      <ellipse cx="12" cy="13" rx="5" ry="4" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={1.5} />
+      {/* Stripes */}
+      <line x1="10" y1="11.5" x2="14" y2="11.5" strokeWidth={1} strokeLinecap="round" />
+      <line x1="9.5" y1="13.5" x2="14.5" y2="13.5" strokeWidth={1} strokeLinecap="round" />
+      {/* Wings */}
+      <ellipse cx="9" cy="9" rx="2.5" ry="1.8" fill="none" strokeWidth={1.2} transform="rotate(-20 9 9)" />
+      <ellipse cx="15" cy="9" rx="2.5" ry="1.8" fill="none" strokeWidth={1.2} transform="rotate(20 15 9)" />
+      {/* Head */}
+      <circle cx="12" cy="7.5" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={1.2} />
+      {/* Antennae */}
+      <line x1="11" y1="6" x2="9.5" y2="3.5" strokeWidth={1} strokeLinecap="round" />
+      <line x1="13" y1="6" x2="14.5" y2="3.5" strokeWidth={1} strokeLinecap="round" />
+      <circle cx="9.5" cy="3.2" r="0.6" fill="currentColor" stroke="none" />
+      <circle cx="14.5" cy="3.2" r="0.6" fill="currentColor" stroke="none" />
+      {/* Stinger */}
+      <line x1="12" y1="17" x2="12" y2="19.5" strokeWidth={1.2} strokeLinecap="round" />
+    </>
+  ),
+
+  /**
+   * Ayyam-i-Ha Maze – a simple maze grid with a path arrow, representing
+   * the maze navigation game.
+   */
+  'maze-game': (
+    <>
+      {/* Outer border */}
+      <rect x="3" y="3" width="18" height="18" rx="1" fill="none" strokeWidth={1.5} />
+      {/* Maze walls */}
+      <line x1="3" y1="9" x2="9" y2="9" strokeWidth={1.5} strokeLinecap="round" />
+      <line x1="12" y1="9" x2="21" y2="9" strokeWidth={1.5} strokeLinecap="round" />
+      <line x1="9" y1="9" x2="9" y2="15" strokeWidth={1.5} strokeLinecap="round" />
+      <line x1="15" y1="3" x2="15" y2="9" strokeWidth={1.5} strokeLinecap="round" />
+      <line x1="9" y1="15" x2="15" y2="15" strokeWidth={1.5} strokeLinecap="round" />
+      <line x1="15" y1="15" x2="15" y2="21" strokeWidth={1.5} strokeLinecap="round" />
+      {/* Path arrow (small bee indicator moving through maze) */}
+      <circle cx="6" cy="6" r="1.2" fill="currentColor" opacity={0.7} stroke="none" />
+      <circle cx="18" cy="18" r="1.2" fill="currentColor" opacity={0.7} stroke="none" />
     </>
   ),
 
