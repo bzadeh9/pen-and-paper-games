@@ -51,7 +51,7 @@ export default function BeeGamePage() {
             </div>
           </div>
           <h1 className="mb-2 text-4xl font-bold tracking-tight">
-            Abbee &amp; Dot
+            Ayyam-i-Ha Virtue Chase
           </h1>
           <p className="text-lg text-foreground/60">
             A Baha&apos;i Ayyam-i-ha bee chase game for families!

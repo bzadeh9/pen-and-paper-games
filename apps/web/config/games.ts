@@ -1,5 +1,5 @@
-export type GameCategory = 'Strategy' | 'Puzzle' | 'Party' | 'Abstract';
-export type GameTag = '2-Player' | 'Quick' | 'Complex' | 'Chess-like' | 'Area Control' | 'Abstract' | 'Family';
+export type GameCategory = 'Strategy' | 'Puzzle' | 'Party' | 'Abstract' | 'Ayyam-i-Ha';
+export type GameTag = '2-Player' | 'Quick' | 'Complex' | 'Chess-like' | 'Area Control' | 'Abstract' | 'Family' | 'Cooperative';
 
 export interface GameMetadata {
   id: string;
@@ -8,6 +8,8 @@ export interface GameMetadata {
   href: string;
   category: GameCategory;
   tags: GameTag[];
+  /** When false, the game is not shown directly on the home page (e.g. it lives inside a category). Defaults to true. */
+  showOnHome?: boolean;
 }
 
 export const games: GameMetadata[] = [
@@ -68,19 +70,38 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Quick'],
   },
   {
-    id: 'bee-game',
+    id: 'abbee-and-dot',
     name: 'Abbee & Dot',
+    description: 'Baha\'i Ayyam-i-Ha games with Abbee and Dot the bees!',
+    href: '/games/abbee-and-dot',
+    category: 'Ayyam-i-Ha',
+    tags: ['Family'],
+  },
+  {
+    id: 'bee-game',
+    name: 'Ayyam-i-Ha Virtue Chase',
     description: 'A Baha\'i Ayyam-i-ha bee chase game for families!',
     href: '/games/bee-game',
-    category: 'Party',
+    category: 'Ayyam-i-Ha',
     tags: ['2-Player', 'Family'],
+    showOnHome: false,
   },
   {
     id: 'hide-and-seek',
     name: 'Ayyam-i-Ha Hide & Seek',
     description: 'Hide gems in the garden — can Dot find them all?',
     href: '/games/hide-and-seek',
-    category: 'Party',
+    category: 'Ayyam-i-Ha',
     tags: ['2-Player', 'Family'],
+    showOnHome: false,
+  },
+  {
+    id: 'maze-game',
+    name: 'Ayyam-i-Ha Maze',
+    description: 'Navigate a maze together — help each other cross the bridges!',
+    href: '/games/maze-game',
+    category: 'Ayyam-i-Ha',
+    tags: ['2-Player', 'Family', 'Cooperative'],
+    showOnHome: false,
   },
 ];
