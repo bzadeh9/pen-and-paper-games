@@ -421,11 +421,14 @@ export class MazeGameEngine {
 
     // Bridge crossing
     for (const bridge of this.state.bridges) {
-      if (posEq(cur, bridge.roomA) && posEq(target, bridge.roomB)) {
-        return posEq(oppPos, bridge.leverA);
-      }
-      if (posEq(cur, bridge.roomB) && posEq(target, bridge.roomA)) {
-        return posEq(oppPos, bridge.leverB);
+      const isCrossing =
+        (posEq(cur, bridge.roomA) && posEq(target, bridge.roomB)) ||
+        (posEq(cur, bridge.roomB) && posEq(target, bridge.roomA));
+      if (isCrossing) {
+        // Either lever unlocks the gate in both directions:
+        // leverA (side A) held → anyone can cross in either direction
+        // leverB (side B) held → anyone can cross in either direction
+        return posEq(oppPos, bridge.leverA) || posEq(oppPos, bridge.leverB);
       }
     }
 
@@ -481,6 +484,11 @@ export class MazeGameEngine {
     end: Position
   ): Position[] {
     return this.bfsPath(rows, cols, passages, start, end);
+  }
+
+  /** FOR TESTS ONLY — directly set a player's position. */
+  _setPlayerPosition(player: Player, pos: Position): void {
+    this.state.players[player] = { ...pos };
   }
 
   private shuffleArray<T>(arr: T[]): T[] {

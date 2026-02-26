@@ -185,28 +185,49 @@ describe('MazeGameEngine', () => {
       }
     });
 
-    it('should allow bridge crossing only when opponent is on correct lever', () => {
-      const state = engine.getState();
-      if (state.bridges.length === 0) return;
-      const bridge = state.bridges[0];
-
-      // Manually position P1 at roomA and P2 at leverA using a tiny engine
-      // and verify getValidDirectionsForPlayer reflects the lever condition.
-      // We test this indirectly: if P2 is NOT on leverA, the bridge direction
-      // for P1 should not be in valid directions.
+    it('should allow bridge crossing only when opponent is on a lever', () => {
       const engineSmall = new MazeGameEngine(7, 7, createSeededRng(42));
       const s = engineSmall.getState();
       if (s.bridges.length === 0) return;
 
-      // Default: both players at start, not on any lever → bridge cross not valid
+      // The bridge passage should be removed from normal passages
       const bridge0 = s.bridges[0];
-      // Only verify that the bridge passage is not in the normal passages
-      expect(s.passages[bridge0.roomA.row][bridge0.roomA.col]).toBeDefined();
-      const dir = bridge0.roomB.row > bridge0.roomA.row ? 'south' :
+      const dir =
+        bridge0.roomB.row > bridge0.roomA.row ? 'south' :
         bridge0.roomB.row < bridge0.roomA.row ? 'north' :
         bridge0.roomB.col > bridge0.roomA.col ? 'east' : 'west';
-      // The bridge passage should be removed from normal passages
       expect(s.passages[bridge0.roomA.row][bridge0.roomA.col][dir]).toBe(false);
+    });
+
+    it('leverB should also allow the other player to cross A→B (bidirectional)', () => {
+      // This covers the bug: after P2 crosses A→B and stands on leverB,
+      // P1 (still on side A) must also be able to cross A→B.
+      const engineSmall = new MazeGameEngine(7, 7, createSeededRng(42));
+      const s = engineSmall.getState();
+      if (s.bridges.length === 0) return;
+      const bridge0 = s.bridges[0];
+
+      // Teleport P1 to roomA and P2 to leverB
+      engineSmall._setPlayerPosition(1, bridge0.roomA);
+      engineSmall._setPlayerPosition(2, bridge0.leverB);
+
+      // P1 should now be able to move toward roomB (opponent on leverB)
+      const dirs = engineSmall.getValidDirectionsForPlayer(1);
+      const dir =
+        bridge0.roomB.row > bridge0.roomA.row ? 'south' :
+        bridge0.roomB.row < bridge0.roomA.row ? 'north' :
+        bridge0.roomB.col > bridge0.roomA.col ? 'east' : 'west';
+      expect(dirs).toContain(dir);
+
+      // Sanity-check the reverse: P2 at roomB, P1 at leverA → P2 can cross B→A
+      engineSmall._setPlayerPosition(2, bridge0.roomB);
+      engineSmall._setPlayerPosition(1, bridge0.leverA);
+      const dirs2 = engineSmall.getValidDirectionsForPlayer(2);
+      const reverseDir =
+        dir === 'south' ? 'north' :
+        dir === 'north' ? 'south' :
+        dir === 'east' ? 'west' : 'east';
+      expect(dirs2).toContain(reverseDir);
     });
   });
 

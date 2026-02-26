@@ -446,6 +446,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           Play Again
         </button>
       )}
+      {status === 'playing' && (
+        <button
+          onClick={handleReset}
+          className="rounded-lg border border-foreground/20 bg-foreground/5 px-4 py-1.5 text-xs font-medium text-foreground/60 transition-colors hover:bg-foreground/10"
+        >
+          ↺ Restart
+        </button>
+      )}
     </div>
   );
 }
