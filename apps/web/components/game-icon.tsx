@@ -209,6 +209,10 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeLinecap="round"
         strokeWidth={2}
       />
+    </>
+  ),
+
+  /**
    * Abbee & Dot – a stylized bee with body, wings, and stinger, themed for
    * the Ayyam-i-ha bee chase game.
    */
