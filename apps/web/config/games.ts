@@ -60,6 +60,14 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Abstract'],
   },
   {
+    id: 'scribbl',
+    name: 'Scribble',
+    description: 'Complete a scribble into a drawing!',
+    href: '/games/scribbl',
+    category: 'Party',
+    tags: ['2-Player', 'Quick'],
+  },
+  {
     id: 'bee-game',
     name: 'Abbee & Dot',
     description: 'A Baha\'i Ayyam-i-ha bee chase game for families!',
