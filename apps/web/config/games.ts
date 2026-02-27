@@ -104,4 +104,13 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Family', 'Cooperative'],
     showOnHome: false,
   },
+  {
+    id: 'virtue-memory',
+    name: 'Ayyam-i-Ha Virtue Memory',
+    description: 'Match pairs of Ayyam-i-Ha virtues with Abbee & Dot!',
+    href: '/games/virtue-memory',
+    category: 'Ayyam-i-Ha',
+    tags: ['2-Player', 'Family'],
+    showOnHome: false,
+  },
 ];
