@@ -227,6 +227,58 @@ describe('MazeGameEngine', () => {
       expect(s.passages[gate0.roomA.row][gate0.roomA.col][dir]).toBe(false);
     });
 
+    it('gate keys should be reachable from their gate rooms via normal passages (no soft locks)', () => {
+      const state = engine.getState();
+      for (const gate of state.gates) {
+        // keyA must be reachable from roomA using only normal passages
+        // (i.e., with all gate gaps already removed from passages)
+        const pathToKeyA = engine._bfsPath(
+          state.rows,
+          state.cols,
+          state.passages,
+          gate.roomA,
+          gate.keyA
+        );
+        expect(pathToKeyA.length).toBeGreaterThan(0);
+
+        // keyB must be reachable from roomB using only normal passages
+        const pathToKeyB = engine._bfsPath(
+          state.rows,
+          state.cols,
+          state.passages,
+          gate.roomB,
+          gate.keyB
+        );
+        expect(pathToKeyB.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('keys are never locked behind another gate across many random seeds', () => {
+      for (let seed = 1; seed <= 50; seed++) {
+        const e = new MazeGameEngine(7, 7, createSeededRng(seed));
+        const state = e.getState();
+        for (const gate of state.gates) {
+          const pathToKeyA = e._bfsPath(
+            state.rows,
+            state.cols,
+            state.passages,
+            gate.roomA,
+            gate.keyA
+          );
+          expect(pathToKeyA.length).toBeGreaterThan(0);
+
+          const pathToKeyB = e._bfsPath(
+            state.rows,
+            state.cols,
+            state.passages,
+            gate.roomB,
+            gate.keyB
+          );
+          expect(pathToKeyB.length).toBeGreaterThan(0);
+        }
+      }
+    });
+
     it('keyB should also allow the other player to cross A→B (bidirectional)', () => {
       const engineSmall = new MazeGameEngine(7, 7, createSeededRng(42));
       const s = engineSmall.getState();
