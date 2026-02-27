@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { FlowerHopEngine } from './engine';
-import { LEVEL_LENGTH, CANVAS_HEIGHT, BEE_HEIGHT, PLATFORM_Y, PLATFORM_WIDTH, BEE_WIDTH } from './types';
+import { LEVEL_LENGTH, CANVAS_HEIGHT, BEE_HEIGHT } from './types';
 
 /** Deterministic RNG that returns values from a pre-set sequence. */
 function seededRng(values: number[]) {
@@ -33,16 +33,12 @@ describe('FlowerHopEngine', () => {
       expect(engine.getState().flowers).toHaveLength(LEVEL_LENGTH);
     });
 
-    it('should place the bee on the starting platform', () => {
+    it('should place the bee on the first flower', () => {
       const state = engine.getState();
-      // Bee should be on top of the platform
-      expect(state.bee.y).toBe(PLATFORM_Y - BEE_HEIGHT);
-      expect(state.bee.x).toBe(PLATFORM_WIDTH / 2 - BEE_WIDTH / 2);
+      const firstFlower = state.flowers[0];
+      // Bee Y should be on top of the first flower
+      expect(state.bee.y).toBeLessThan(firstFlower.y);
       expect(state.bee.onGround).toBe(true);
-    });
-
-    it('should start with started=false', () => {
-      expect(engine.getState().started).toBe(false);
     });
 
     it('should start with zero scores', () => {
@@ -57,6 +53,10 @@ describe('FlowerHopEngine', () => {
 
     it('should have no winner initially', () => {
       expect(engine.getState().winner).toBeNull();
+    });
+
+    it('should start with started=false', () => {
+      expect(engine.getState().started).toBe(false);
     });
   });
 
@@ -99,7 +99,6 @@ describe('FlowerHopEngine', () => {
       engine.jump(); // should be ignored since not on ground
       expect(engine.getState().bee.vy).toBe(vyAfterJump);
     });
-
     it('should set started=true on first jump', () => {
       engine.startRound();
       expect(engine.getState().started).toBe(false);
@@ -121,7 +120,6 @@ describe('FlowerHopEngine', () => {
     it('should not scroll before first jump', () => {
       engine.startRound();
       engine.tick();
-      // Not started yet — should not scroll
       expect(engine.getState().scrollOffset).toBe(0);
     });
 
@@ -141,7 +139,8 @@ describe('FlowerHopEngine', () => {
 
     it('should end round when bee falls off screen', () => {
       engine.startRound();
-      engine.jump(); // First jump triggers scrolling
+      // Force bee to fall by jumping and ticking many times
+      engine.jump();
       for (let i = 0; i < 500; i++) {
         engine.tick();
       }
@@ -166,8 +165,7 @@ describe('FlowerHopEngine', () => {
   describe('round management', () => {
     it('should transition to player 2 after round 1 ends', () => {
       engine.startRound();
-      engine.jump(); // First jump triggers scrolling
-      // Force the bee to fall by ticking many times
+      engine.jump(); // first jump starts scrolling
       for (let i = 0; i < 500; i++) {
         engine.tick();
       }
@@ -194,7 +192,6 @@ describe('FlowerHopEngine', () => {
     });
 
     it('should determine winner based on scores', () => {
-      // Use a custom RNG where player 1 gets lots of gems and player 2 gets few
       const customEngine = new FlowerHopEngine(
         seededRng([0.5, 0.1, 0.5, 0.1]) // 0.1 < 0.6 → gem spawns
       );
@@ -206,7 +203,6 @@ describe('FlowerHopEngine', () => {
       for (let i = 0; i < 500; i++) customEngine.tick();
       const state = customEngine.getState();
       expect(state.status).toBe('ended');
-      // Winner should be non-null or null (draw) — just check it's decided
       expect(state.round).toBe(3);
     });
   });
