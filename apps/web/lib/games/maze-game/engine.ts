@@ -2,7 +2,7 @@ import type {
   Position,
   Player,
   MazeGameState,
-  Bridge,
+  Gate,
   RoomPassages,
   Direction,
 } from './types';
@@ -42,16 +42,31 @@ export class MazeGameEngine {
 
   private createInitialState(rows: number, cols: number): MazeGameState {
     const passages = this.generateMaze(rows, cols);
-    const bridges = this.placeBridges(rows, cols, passages);
+    this.addExtraPassages(rows, cols, passages);
+    const gates = this.placeGates(rows, cols, passages);
 
     const startPos: Position = { row: 0, col: 0 };
     const endPos: Position = { row: rows - 1, col: cols - 1 };
+
+    // Collect all taken positions for decoy key placement
+    const taken = new Set<string>([
+      pKey(startPos),
+      pKey(endPos),
+      ...gates.flatMap((g) => [
+        pKey(g.roomA),
+        pKey(g.roomB),
+        pKey(g.keyA),
+        pKey(g.keyB),
+      ]),
+    ]);
+    const decoyKeys = this.placeDecoyKeys(rows, cols, taken);
 
     return {
       rows,
       cols,
       passages,
-      bridges,
+      gates,
+      decoyKeys,
       startPos,
       endPos,
       players: {
@@ -101,31 +116,67 @@ export class MazeGameEngine {
     return passages;
   }
 
-  // ─── Bridge placement ─────────────────────────────────────────────────────
+  // ─── Extra passages (multiple paths) ──────────────────────────────────────
 
   /**
-   * Place up to 3 bridges along the critical path.
-   * Each bridge has levers placed at distance ≥ 2 from the bridge room,
-   * so players must travel some distance to find the matching lever.
+   * Open additional walls to create multiple paths through the maze.
+   * Removes roughly 15% of remaining walls.
    */
-  private placeBridges(
+  private addExtraPassages(
     rows: number,
     cols: number,
     passages: RoomPassages[][]
-  ): Bridge[] {
-    const bridges: Bridge[] = [];
+  ): void {
+    const walls: { r: number; c: number; dir: Direction }[] = [];
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (c < cols - 1 && !passages[r][c].east) {
+          walls.push({ r, c, dir: 'east' });
+        }
+        if (r < rows - 1 && !passages[r][c].south) {
+          walls.push({ r, c, dir: 'south' });
+        }
+      }
+    }
+
+    // Shuffle and open ~15% of remaining walls
+    const shuffled = this.shuffleArray(walls);
+    const toOpen = Math.floor(shuffled.length * 0.15);
+
+    for (let i = 0; i < toOpen; i++) {
+      const { r, c, dir } = shuffled[i];
+      const { dr, dc } = DIR_DELTA[dir];
+      passages[r][c][dir] = true;
+      passages[r + dr][c + dc][OPPOSITE[dir]] = true;
+    }
+  }
+
+  // ─── Gate placement ───────────────────────────────────────────────────────
+
+  /**
+   * Place up to 3 gates along the critical path.
+   * Each gate has keys placed at distance ≥ 2 from the gate room,
+   * so players must travel some distance to find the matching key.
+   */
+  private placeGates(
+    rows: number,
+    cols: number,
+    passages: RoomPassages[][]
+  ): Gate[] {
+    const gates: Gate[] = [];
     const start: Position = { row: 0, col: 0 };
     const end: Position = { row: rows - 1, col: cols - 1 };
-    const numBridges = 3;
+    const numGates = 3;
 
-    for (let i = 0; i < numBridges; i++) {
-      // BFS treating already-placed bridges as traversable, so we always
+    for (let i = 0; i < numGates; i++) {
+      // BFS treating already-placed gates as traversable, so we always
       // find the full critical path regardless of previously removed passages.
-      const path = this.bfsPathWithBridges(rows, cols, passages, bridges, start, end);
+      const path = this.bfsPathWithGates(rows, cols, passages, gates, start, end);
       if (path.length < 5) break;
 
       // Target position along the path (evenly spaced: 1/4, 1/2, 3/4)
-      const frac = (i + 1) / (numBridges + 1);
+      const frac = (i + 1) / (numGates + 1);
       const targetIdx = Math.floor(path.length * frac);
 
       // Search outward from target: try offset=0 (exact), then ±1, ±2, …
@@ -142,43 +193,43 @@ export class MazeGameEngine {
           const dir = this.getDirection(roomA, roomB);
           if (!dir) continue;
 
-          // Must be a normal (non-bridge) passage
+          // Must be a normal (non-gate) passage
           if (!passages[roomA.row][roomA.col][dir]) continue;
 
-          // Remove the passage to create the bridge gap
+          // Remove the passage to create the gate gap
           passages[roomA.row][roomA.col][dir] = false;
           passages[roomB.row][roomB.col][OPPOSITE[dir]] = false;
 
-          // Positions already taken by start, end, and previous bridges
+          // Positions already taken by start, end, and previous gates
           const taken = new Set<string>([
             pKey(start),
             pKey(end),
             pKey(roomA),
             pKey(roomB),
-            ...bridges.flatMap((b) => [
-              pKey(b.leverA),
-              pKey(b.leverB),
-              pKey(b.roomA),
-              pKey(b.roomB),
+            ...gates.flatMap((g) => [
+              pKey(g.keyA),
+              pKey(g.keyB),
+              pKey(g.roomA),
+              pKey(g.roomB),
             ]),
           ]);
 
-          const leverA = this.findFarLeverRoom(rows, cols, passages, roomA, taken);
-          const leverB = this.findFarLeverRoom(rows, cols, passages, roomB, taken);
+          const keyA = this.findFarKeyRoom(rows, cols, passages, roomA, taken);
+          const keyB = this.findFarKeyRoom(rows, cols, passages, roomB, taken);
 
-          if (!leverA || !leverB) {
+          if (!keyA || !keyB) {
             // Restore and try the next edge
             passages[roomA.row][roomA.col][dir] = true;
             passages[roomB.row][roomB.col][OPPOSITE[dir]] = true;
             continue;
           }
 
-          bridges.push({
+          gates.push({
             id: i,
             roomA: { ...roomA },
             roomB: { ...roomB },
-            leverA: { ...leverA },
-            leverB: { ...leverB },
+            keyA: { ...keyA },
+            keyB: { ...keyB },
           });
           placed = true;
           break;
@@ -186,15 +237,15 @@ export class MazeGameEngine {
       }
     }
 
-    return bridges;
+    return gates;
   }
 
   /**
-   * Find a lever room reachable from `from` via normal passages, at
+   * Find a key room reachable from `from` via normal passages, at
    * distance ≥ 2 (preferring 2–5 hops), avoiding `taken` positions.
    * Falls back to distance-1 if no farther room is available.
    */
-  private findFarLeverRoom(
+  private findFarKeyRoom(
     rows: number,
     cols: number,
     passages: RoomPassages[][],
@@ -238,6 +289,34 @@ export class MazeGameEngine {
       return nearCandidates[0];
     }
     return null;
+  }
+
+  // ─── Decoy key placement ─────────────────────────────────────────────────
+
+  /**
+   * Place 2–4 decoy keys in random cells that are not already taken.
+   */
+  private placeDecoyKeys(
+    rows: number,
+    cols: number,
+    taken: Set<string>
+  ): Position[] {
+    const candidates: Position[] = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const k = pKey({ row: r, col: c });
+        if (!taken.has(k)) {
+          candidates.push({ row: r, col: c });
+        }
+      }
+    }
+
+    const shuffled = this.shuffleArray(candidates);
+    const count = Math.min(
+      shuffled.length,
+      2 + Math.floor(this.rng() * 3) // 2–4 decoy keys
+    );
+    return shuffled.slice(0, count);
   }
 
   private getDirection(from: Position, to: Position): Direction | null {
@@ -292,15 +371,15 @@ export class MazeGameEngine {
   }
 
   /**
-   * BFS treating existing bridge crossings as free passages (no lever needed).
-   * Used during bridge placement to find the critical path through already-
-   * placed bridges so we can position subsequent bridges on it.
+   * BFS treating existing gate crossings as free passages (no key needed).
+   * Used during gate placement to find the critical path through already-
+   * placed gates so we can position subsequent gates on it.
    */
-  private bfsPathWithBridges(
+  private bfsPathWithGates(
     rows: number,
     cols: number,
     passages: RoomPassages[][],
-    bridges: Bridge[],
+    gates: Gate[],
     start: Position,
     end: Position
   ): Position[] {
@@ -334,11 +413,11 @@ export class MazeGameEngine {
         }
       }
 
-      // Bridge crossings (treated as always passable during placement)
-      for (const bridge of bridges) {
+      // Gate crossings (treated as always passable during placement)
+      for (const gate of gates) {
         let next: Position | null = null;
-        if (posEq(cur, bridge.roomA)) next = bridge.roomB;
-        else if (posEq(cur, bridge.roomB)) next = bridge.roomA;
+        if (posEq(cur, gate.roomA)) next = gate.roomB;
+        else if (posEq(cur, gate.roomB)) next = gate.roomA;
         if (next) {
           const nk = pKey(next);
           if (!prev.has(nk)) {
@@ -360,13 +439,14 @@ export class MazeGameEngine {
       passages: this.state.passages.map((row) =>
         row.map((cell) => ({ ...cell }))
       ),
-      bridges: this.state.bridges.map((b) => ({
-        ...b,
-        roomA: { ...b.roomA },
-        roomB: { ...b.roomB },
-        leverA: { ...b.leverA },
-        leverB: { ...b.leverB },
+      gates: this.state.gates.map((g) => ({
+        ...g,
+        roomA: { ...g.roomA },
+        roomB: { ...g.roomB },
+        keyA: { ...g.keyA },
+        keyB: { ...g.keyB },
       })),
+      decoyKeys: this.state.decoyKeys.map((k) => ({ ...k })),
       players: {
         1: { ...this.state.players[1] },
         2: { ...this.state.players[2] },
@@ -382,8 +462,8 @@ export class MazeGameEngine {
 
   /**
    * Returns the directions a given player can move right now.
-   * Includes normal passage directions and bridge crossings (when the other
-   * player is on the matching lever).
+   * Includes normal passage directions and gate crossings (when the other
+   * player is on the matching key).
    */
   getValidDirectionsForPlayer(player: Player): Direction[] {
     if (this.state.status !== 'playing') return [];
@@ -419,16 +499,14 @@ export class MazeGameEngine {
     // Normal passage
     if (this.state.passages[cur.row][cur.col][dir]) return true;
 
-    // Bridge crossing
-    for (const bridge of this.state.bridges) {
+    // Gate crossing
+    for (const gate of this.state.gates) {
       const isCrossing =
-        (posEq(cur, bridge.roomA) && posEq(target, bridge.roomB)) ||
-        (posEq(cur, bridge.roomB) && posEq(target, bridge.roomA));
+        (posEq(cur, gate.roomA) && posEq(target, gate.roomB)) ||
+        (posEq(cur, gate.roomB) && posEq(target, gate.roomA));
       if (isCrossing) {
-        // Either lever unlocks the gate in both directions:
-        // leverA (side A) held → anyone can cross in either direction
-        // leverB (side B) held → anyone can cross in either direction
-        return posEq(oppPos, bridge.leverA) || posEq(oppPos, bridge.leverB);
+        // Either key unlocks the gate in both directions
+        return posEq(oppPos, gate.keyA) || posEq(oppPos, gate.keyB);
       }
     }
 
@@ -500,4 +578,3 @@ export class MazeGameEngine {
     return a;
   }
 }
-

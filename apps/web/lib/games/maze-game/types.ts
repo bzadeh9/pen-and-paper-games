@@ -7,24 +7,24 @@ export type GameStatus = 'playing' | 'ended';
 export type Direction = 'north' | 'south' | 'east' | 'west';
 
 /**
- * A bridge is a special passage between two rooms that requires
+ * A gate is a locked passage between two adjacent rooms that requires
  * cooperation to cross.
  *
- * - LeverA is a room on side A of the bridge. When a player stands on
- *   leverA, the other player can cross the bridge from side A to side B.
- * - LeverB is a room on side B of the bridge. When a player stands on
- *   leverB, the other player can cross the bridge from side B to side A.
+ * - keyA is a room on side A. When a player stands on keyA, the other
+ *   player can cross the gate in either direction.
+ * - keyB is a room on side B. When a player stands on keyB, the other
+ *   player can cross the gate in either direction.
  */
-export interface Bridge {
+export interface Gate {
   id: number;
-  /** Room on side A of the bridge passage (the cell you step from when crossing A→B). */
+  /** Room on side A of the gate (the cell you step from when crossing A→B). */
   roomA: Position;
-  /** Room on side B of the bridge passage (the cell you step from when crossing B→A). */
+  /** Room on side B of the gate (the cell you step from when crossing B→A). */
   roomB: Position;
-  /** Lever cell on side A. When occupied, the other player can cross A→B. */
-  leverA: Position;
-  /** Lever cell on side B. When occupied, the other player can cross B→A. */
-  leverB: Position;
+  /** Key cell on side A. When occupied, the other player can cross. */
+  keyA: Position;
+  /** Key cell on side B. When occupied, the other player can cross. */
+  keyB: Position;
 }
 
 /**
@@ -48,8 +48,10 @@ export interface MazeGameState {
    * These represent normal (unlocked) maze connections.
    */
   passages: RoomPassages[][];
-  /** Cooperative bridges in the maze. */
-  bridges: Bridge[];
+  /** Cooperative gates in the maze. */
+  gates: Gate[];
+  /** Decoy keys that look like real keys but don't open any gate. */
+  decoyKeys: Position[];
   startPos: Position;
   endPos: Position;
   /** Both players move simultaneously — no turn order. */

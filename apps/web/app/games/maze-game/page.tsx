@@ -57,7 +57,7 @@ export default function MazeGamePage() {
             Ayyam-i-Ha Maze
           </h1>
           <p className="text-lg text-foreground/60">
-            Navigate the maze together — help each other cross the bridges!
+            Navigate the maze together — help each other unlock the gates!
           </p>
         </div>
 
@@ -72,11 +72,11 @@ export default function MazeGamePage() {
             hear the excited buzzing of Abbee and Dot — the two little bees —
             somewhere at the other end. To reach their bee friends, the
             children must work <em>together</em>. Along the way they encounter
-            old rope bridges with levers on either side: one child holds a
-            lever to lower the bridge while the other crosses, and then they
-            switch — holding the far lever so their partner can follow. Only
-            by helping each other can they make it through and reunite with
-            the bees in time for the celebration!
+            locked gates. Somewhere in the maze, hidden keys can unlock these
+            gates — but beware, some keys are decoys! One child stands on a
+            key to open the gate while the other crosses, then they
+            switch. Only by helping each other can they make it through and
+            reunite with the bees in time for the celebration!
           </p>
         </div>
 
@@ -107,17 +107,16 @@ export default function MazeGamePage() {
                   • The maze is fully visible — plan your routes carefully!
                 </li>
                 <li>
-                  • There are <strong>bridge gates 🌉</strong> (2-3 per maze) that
-                  are <em>locked</em>. To cross a bridge, your partner must stand
-                  on the matching <strong>key 🔑</strong> on the correct side:
+                  • There are <strong>locked gates 🔒</strong> (2-3 per maze) that
+                  block the path. To cross a gate, your partner must stand
+                  on the matching <strong>key</strong> somewhere in the maze:
                   <ul className="mt-1 ml-4 space-y-1 text-foreground/70">
                     <li>
-                      — Keys and gates are numbered (🔑1, 🌉1, etc.) — numbers
-                      must match!
+                      — Keys 🔑 are scattered around the maze — explore to find them!
                     </li>
                     <li>
-                      — Key A opens the bridge from side A; Key B opens it from
-                      side B.
+                      — Some keys are <em>decoys</em> that don&apos;t open
+                      anything — you&apos;ll have to figure out which ones work.
                     </li>
                     <li>
                       — Keys can be far from their gate — you may need to split up
