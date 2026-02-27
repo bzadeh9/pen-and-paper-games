@@ -23,18 +23,24 @@ const PHASE_LABEL: Record<GamePhase, string> = {
   done: '🎨 Artwork Complete!',
 };
 
-const PHASE_DESCRIPTION: Record<GamePhase, { normal: string; expert: string }> = {
+const PHASE_DESCRIPTION: Record<GamePhase, Record<GameMode, string>> = {
   scribble: {
-    normal: 'Draw a random scribble on the canvas. Keep it abstract!',
-    expert: '🔄 Expert mode: the canvas is flipped! Draw knowing it will be revealed right-side-up.',
+    regular: 'Draw a random scribble on the canvas. Keep it abstract!',
+    'upside-down': '🙃 Upside-Down mode: the canvas is flipped! Draw knowing it will be revealed right-side-up.',
+    flip: '🔄 Flip mode: the canvas flips every 5 seconds — keep drawing!',
+    themed: 'Draw a random scribble on the canvas — Player 2 will receive a theme to complete it!',
   },
   complete: {
-    normal: 'Turn the scribble into a drawing. Be as creative as you like!',
-    expert: '🔄 Expert mode: canvas is still flipped — complete the drawing!',
+    regular: 'Turn the scribble into a drawing. Be as creative as you like!',
+    'upside-down': '🙃 Canvas is still upside-down — complete the drawing!',
+    flip: '🔄 The canvas is still flipping — complete the drawing!',
+    themed: 'Complete the drawing to match your theme below!',
   },
   done: {
-    normal: 'Wonderful! Look at the finished collaboration.',
-    expert: 'Canvas flipped back — look at the finished collaboration!',
+    regular: 'Wonderful! Look at the finished collaboration.',
+    'upside-down': 'Canvas flipped back — look at the finished collaboration!',
+    flip: 'Canvas is right-side-up — look at the finished collaboration!',
+    themed: 'Wonderful! How well did Player 2 capture the theme?',
   },
 };
 
@@ -44,9 +50,18 @@ const PHASE_BUTTON: Record<GamePhase, string> = {
   done: 'Play Again',
 };
 
+const MODE_LABELS: Record<GameMode, string> = {
+  regular: '✏️ Regular',
+  'upside-down': '🙃 Upside-Down',
+  flip: '🔄 Flip',
+  themed: '🎯 Themed',
+};
+
+const ALL_MODES: GameMode[] = ['regular', 'upside-down', 'flip', 'themed'];
+
 export default function ScribblPage() {
   const [phase, setPhase] = useState<GamePhase>('scribble');
-  const [mode, setMode] = useState<GameMode>('normal');
+  const [mode, setMode] = useState<GameMode>('regular');
   const [player1Color, setPlayer1Color] = useState(DRAW_COLORS[0].value);
   const [player2Color, setPlayer2Color] = useState(DRAW_COLORS[2].value);
   const [erasing, setErasing] = useState(false);
@@ -63,10 +78,11 @@ export default function ScribblPage() {
 
   const isDrawingPhase = phase === 'scribble' || phase === 'complete';
 
-  // Auto-flip timer: toggles the canvas every FLIP_INTERVAL_MS while drawing.
-  // Disabled when the user prefers reduced motion.
+  // Auto-flip timer: only active in 'flip' mode while drawing and when
+  // the user has not requested reduced motion.
   useEffect(() => {
-    if (!isDrawingPhase || reducedMotion) {
+    const drawing = phase === 'scribble' || phase === 'complete';
+    if (mode !== 'flip' || !drawing || reducedMotion) {
       setAutoFlipped(false);
       return;
     }
@@ -74,10 +90,9 @@ export default function ScribblPage() {
     const id = setInterval(() => {
       setAutoFlipped((v) => !v);
     }, FLIP_INTERVAL_MS);
+    // `phase` drives restart so the flip resets when Player 2 takes over.
     return () => clearInterval(id);
-  // `phase` is used instead of the derived `isDrawingPhase` so the timer
-  // restarts (and the flip resets to false) each time the phase changes.
-  }, [phase, reducedMotion]);
+  }, [phase, mode, reducedMotion]);
 
   const handleUndo = useCallback(() => {
     canvasRef.current?.undo();
@@ -86,19 +101,21 @@ export default function ScribblPage() {
   const handleAction = useCallback(() => {
     setErasing(false);
     if (phase === 'scribble') {
-      setConcept(getRandomConcept());
+      if (mode === 'themed') {
+        setConcept(getRandomConcept());
+      }
       setPhase('complete');
     } else if (phase === 'complete') {
       setPhase('done');
     } else {
       canvasRef.current?.reset();
       setPhase('scribble');
-      setMode('normal');
+      setMode('regular');
       setPlayer1Color(DRAW_COLORS[0].value);
       setPlayer2Color(DRAW_COLORS[2].value);
       setConcept(null);
     }
-  }, [phase]);
+  }, [phase, mode]);
 
   const handleColorSelect = useCallback(
     (c: string) => {
@@ -108,9 +125,13 @@ export default function ScribblPage() {
     [setCurrentColor]
   );
 
-  // XOR: the auto-flip toggles the current base orientation every 5 seconds.
-  const baseFlipped = mode === 'expert' && isDrawingPhase;
-  const canvasFlipped = baseFlipped !== autoFlipped;
+  // Canvas orientation logic per mode:
+  //  regular     → never flipped
+  //  upside-down → statically flipped during both drawing phases, normal at reveal
+  //  flip        → follows the auto-flip timer during drawing phases, normal at reveal
+  //  themed      → never flipped
+  const staticFlipped = mode === 'upside-down' && isDrawingPhase;
+  const canvasFlipped = mode === 'flip' ? autoFlipped : staticFlipped;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background p-4 md:p-8">
@@ -169,35 +190,52 @@ export default function ScribblPage() {
               <p>
                 • Use <strong>Undo</strong> to undo the last stroke.
               </p>
-              <p className="pt-2 font-semibold">Expert Mode:</p>
+              <p className="pt-2 font-semibold">Game Modes:</p>
               <p>
-                • In <strong>Expert mode</strong>, the canvas is flipped 180°
-                during drawing. Both players must draw on the flipped canvas —
-                once complete, the canvas is re-flipped to reveal the artwork!
+                • <strong>✏️ Regular</strong> — classic scribble and pass. No
+                tricks!
+              </p>
+              <p>
+                • <strong>🙃 Upside-Down</strong> — the canvas is flipped 180°
+                for both players. It is revealed right-side-up at the end!
+              </p>
+              <p>
+                • <strong>🔄 Flip</strong> — the canvas automatically flips
+                every 5 seconds while both players draw. It is shown
+                right-side-up when complete.
+              </p>
+              <p>
+                • <strong>🎯 Themed</strong> — once Player 1 finishes, Player 2
+                is given a random concept (e.g. &quot;house&quot;,
+                &quot;rocket ship&quot;) to incorporate into the drawing.
               </p>
             </div>
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Mode selector – available only in the scribble phase */}
-        <div className="mb-4 flex items-center justify-center gap-3">
-          <span className="text-sm font-medium text-foreground/60">Mode:</span>
-          {(['normal', 'expert'] as GameMode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              disabled={phase !== 'scribble'}
-              className={cn(
-                'rounded-full px-4 py-1.5 text-sm font-medium transition-all',
-                mode === m
-                  ? 'bg-foreground text-background shadow'
-                  : 'bg-foreground/10 text-foreground/70 hover:bg-foreground/20',
-                phase !== 'scribble' && 'cursor-not-allowed opacity-50'
-              )}
-            >
-              {m === 'normal' ? 'Normal' : '🔄 Expert'}
-            </button>
-          ))}
+        {/* Mode selector – locked once drawing has started */}
+        <div className="mb-4">
+          <p className="mb-2 text-center text-sm font-medium text-foreground/60">
+            Choose a mode:
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {ALL_MODES.map((m) => (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                disabled={phase !== 'scribble'}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-sm font-medium transition-all',
+                  mode === m
+                    ? 'bg-foreground text-background shadow'
+                    : 'bg-foreground/10 text-foreground/70 hover:bg-foreground/20',
+                  phase !== 'scribble' && 'cursor-not-allowed opacity-50'
+                )}
+              >
+                {MODE_LABELS[m]}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Phase indicator */}
@@ -206,15 +244,15 @@ export default function ScribblPage() {
           <p className="mt-1 text-sm text-foreground/60">
             {PHASE_DESCRIPTION[phase][mode]}
           </p>
-          {isDrawingPhase && reducedMotion && (
+          {mode === 'flip' && isDrawingPhase && reducedMotion && (
             <p className="mt-1 text-xs text-foreground/50" aria-live="polite">
               Auto-flip disabled (reduced-motion preference detected).
             </p>
           )}
         </div>
 
-        {/* Concept prompt for Player 2 */}
-        {phase === 'complete' && concept && (
+        {/* Concept prompt for Player 2 — Themed mode only */}
+        {phase === 'complete' && mode === 'themed' && concept && (
           <div
             role="status"
             aria-live="polite"
