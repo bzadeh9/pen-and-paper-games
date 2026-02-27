@@ -13,6 +13,8 @@ import {
   GRAVITY,
   JUMP_FORCE,
   LEVEL_LENGTH,
+  PLATFORM_WIDTH,
+  PLATFORM_Y,
   SCROLL_SPEED,
 } from './types';
 
@@ -67,13 +69,12 @@ export class FlowerHopEngine {
 
   private createInitialState(): GameState {
     const { flowers, gems } = this.generateLevel();
-    const startFlower = flowers[0];
     return {
       status: 'idle',
       currentPlayer: 1,
       bee: {
-        x: startFlower.x + startFlower.width / 2 - BEE_WIDTH / 2,
-        y: startFlower.y - BEE_HEIGHT,
+        x: PLATFORM_WIDTH / 2 - BEE_WIDTH / 2,
+        y: PLATFORM_Y - BEE_HEIGHT,
         vy: 0,
         onGround: true,
       },
@@ -83,6 +84,7 @@ export class FlowerHopEngine {
       scrollOffset: 0,
       winner: null,
       round: 1,
+      started: false,
     };
   }
 
@@ -100,6 +102,9 @@ export class FlowerHopEngine {
     if (!this.state.bee.onGround) return;
     this.state.bee.vy = JUMP_FORCE;
     this.state.bee.onGround = false;
+    if (!this.state.started) {
+      this.state.started = true;
+    }
   }
 
   /**
@@ -110,6 +115,14 @@ export class FlowerHopEngine {
     if (this.state.status !== 'running') return;
 
     const bee = this.state.bee;
+
+    // Before the first jump the bee sits on the starting platform
+    if (!this.state.started) {
+      // Keep the bee grounded on the platform — no gravity, no scroll
+      bee.onGround = true;
+      bee.vy = 0;
+      return;
+    }
 
     // Apply gravity
     bee.vy += GRAVITY;
@@ -194,17 +207,17 @@ export class FlowerHopEngine {
       this.state.round = 2;
       this.state.currentPlayer = 2;
       const { flowers, gems } = this.generateLevel();
-      const startFlower = flowers[0];
       this.state.flowers = flowers;
       this.state.gems = gems;
       this.state.bee = {
-        x: startFlower.x + startFlower.width / 2 - BEE_WIDTH / 2,
-        y: startFlower.y - BEE_HEIGHT,
+        x: PLATFORM_WIDTH / 2 - BEE_WIDTH / 2,
+        y: PLATFORM_Y - BEE_HEIGHT,
         vy: 0,
         onGround: true,
       };
       this.state.scrollOffset = 0;
       this.state.status = 'idle';
+      this.state.started = false;
     } else {
       // Both rounds done
       this.state.round = 3;

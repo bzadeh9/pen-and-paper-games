@@ -11,6 +11,8 @@ import {
   FLOWER_PETAL_HEIGHT,
   FLOWER_STEM_HEIGHT,
   GEM_SIZE,
+  PLATFORM_WIDTH,
+  PLATFORM_Y,
 } from '@/lib/games/flower-hop/types';
 
 interface GameBoardProps {
@@ -85,7 +87,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
   const playerBg = (p: Player) =>
     p === 1 ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
 
-  const { bee, flowers, gems, scores, scrollOffset, status, currentPlayer, round, winner } =
+  const { bee, flowers, gems, scores, scrollOffset, status, currentPlayer, round, winner, started } =
     gameState;
 
   return (
@@ -120,7 +122,16 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
         </div>
       )}
 
-      {status === 'running' && (
+      {status === 'running' && !started && (
+        <p className="text-sm text-foreground/60">
+          <span className={`font-semibold ${playerColor(currentPlayer)}`}>
+            {playerName(currentPlayer)}
+          </span>{' '}
+          is on the platform — jump to begin! 🐝
+        </p>
+      )}
+
+      {status === 'running' && started && (
         <p className="text-sm text-foreground/60">
           <span className={`font-semibold ${playerColor(currentPlayer)}`}>
             {playerName(currentPlayer)}
@@ -171,6 +182,19 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           className="absolute bottom-0 left-0 right-0 bg-green-300/40 dark:bg-green-800/40"
           style={{ height: 30 }}
         />
+
+        {/* Starting platform */}
+        {status === 'running' && !started && (
+          <div
+            className="absolute rounded-lg bg-green-400/60 dark:bg-green-700/60 border border-green-500/50"
+            style={{
+              left: 0,
+              top: PLATFORM_Y,
+              width: PLATFORM_WIDTH,
+              height: FLOWER_PETAL_HEIGHT + 4,
+            }}
+          />
+        )}
 
         {/* Flowers */}
         {flowers.map((flower, i) => {
@@ -252,9 +276,25 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 {playerName(currentPlayer)}&apos;s Turn
               </p>
               <p className="text-sm text-foreground/60">
-                Tap or press Space to start!
+                Tap or press Space to get ready!
               </p>
             </div>
+          </div>
+        )}
+
+        {/* On-platform prompt */}
+        {status === 'running' && !started && (
+          <div
+            className="absolute text-center"
+            style={{
+              left: PLATFORM_WIDTH / 2 - 60,
+              top: PLATFORM_Y - BEE_HEIGHT - 40,
+              width: 120,
+            }}
+          >
+            <p className="animate-bounce text-xs font-semibold text-foreground/70">
+              ⬆️ Jump to start!
+            </p>
           </div>
         )}
       </div>

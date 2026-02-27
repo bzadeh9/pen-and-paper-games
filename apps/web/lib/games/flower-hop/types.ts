@@ -17,6 +17,10 @@ export const FLOWER_WIDTH = 60;
 export const FLOWER_PETAL_HEIGHT = 14;
 export const FLOWER_STEM_HEIGHT = 40;
 
+/** Wide safe platform the bee starts on before the first jump. */
+export const PLATFORM_WIDTH = 120;
+export const PLATFORM_Y = 260;
+
 export const GEM_SIZE = 18;
 
 /** Number of flowers generated for one round. */
@@ -64,4 +68,6 @@ export interface GameState {
   winner: Player | null;
   /** Which round: 1 = player 1's turn, 2 = player 2's turn, 3 = both done */
   round: number;
+  /** False until the player makes their first jump; scrolling begins after. */
+  started: boolean;
 }

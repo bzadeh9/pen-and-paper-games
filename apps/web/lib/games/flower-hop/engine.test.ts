@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { FlowerHopEngine } from './engine';
-import { LEVEL_LENGTH, CANVAS_HEIGHT, BEE_HEIGHT } from './types';
+import { LEVEL_LENGTH, CANVAS_HEIGHT, BEE_HEIGHT, PLATFORM_Y, PLATFORM_WIDTH, BEE_WIDTH } from './types';
 
 /** Deterministic RNG that returns values from a pre-set sequence. */
 function seededRng(values: number[]) {
@@ -33,12 +33,16 @@ describe('FlowerHopEngine', () => {
       expect(engine.getState().flowers).toHaveLength(LEVEL_LENGTH);
     });
 
-    it('should place the bee on the first flower', () => {
+    it('should place the bee on the starting platform', () => {
       const state = engine.getState();
-      const firstFlower = state.flowers[0];
-      // Bee Y should be on top of the first flower
-      expect(state.bee.y).toBeLessThan(firstFlower.y);
+      // Bee should be on top of the platform
+      expect(state.bee.y).toBe(PLATFORM_Y - BEE_HEIGHT);
+      expect(state.bee.x).toBe(PLATFORM_WIDTH / 2 - BEE_WIDTH / 2);
       expect(state.bee.onGround).toBe(true);
+    });
+
+    it('should start with started=false', () => {
+      expect(engine.getState().started).toBe(false);
     });
 
     it('should start with zero scores', () => {
@@ -95,10 +99,17 @@ describe('FlowerHopEngine', () => {
       engine.jump(); // should be ignored since not on ground
       expect(engine.getState().bee.vy).toBe(vyAfterJump);
     });
+
+    it('should set started=true on first jump', () => {
+      engine.startRound();
+      expect(engine.getState().started).toBe(false);
+      engine.jump();
+      expect(engine.getState().started).toBe(true);
+    });
   });
 
   describe('tick', () => {
-    it('should apply gravity each tick', () => {
+    it('should apply gravity each tick after first jump', () => {
       engine.startRound();
       engine.jump();
       const vyBefore = engine.getState().bee.vy;
@@ -107,8 +118,16 @@ describe('FlowerHopEngine', () => {
       expect(engine.getState().bee.vy).toBeGreaterThan(vyBefore);
     });
 
-    it('should advance scroll offset', () => {
+    it('should not scroll before first jump', () => {
       engine.startRound();
+      engine.tick();
+      // Not started yet — should not scroll
+      expect(engine.getState().scrollOffset).toBe(0);
+    });
+
+    it('should advance scroll offset after first jump', () => {
+      engine.startRound();
+      engine.jump();
       engine.tick();
       expect(engine.getState().scrollOffset).toBeGreaterThan(0);
     });
@@ -122,8 +141,7 @@ describe('FlowerHopEngine', () => {
 
     it('should end round when bee falls off screen', () => {
       engine.startRound();
-      // Force bee to fall by jumping and ticking many times
-      engine.jump();
+      engine.jump(); // First jump triggers scrolling
       for (let i = 0; i < 500; i++) {
         engine.tick();
       }
@@ -148,10 +166,8 @@ describe('FlowerHopEngine', () => {
   describe('round management', () => {
     it('should transition to player 2 after round 1 ends', () => {
       engine.startRound();
-      // Force the bee to fall
-      const state = engine.getState();
-      // Move bee way below screen
-      // We'll tick many times with a jump to eventually fall
+      engine.jump(); // First jump triggers scrolling
+      // Force the bee to fall by ticking many times
       for (let i = 0; i < 500; i++) {
         engine.tick();
       }
@@ -164,10 +180,12 @@ describe('FlowerHopEngine', () => {
     it('should end the game after both rounds', () => {
       // Play round 1
       engine.startRound();
+      engine.jump();
       for (let i = 0; i < 500; i++) engine.tick();
 
       // Play round 2
       engine.startRound();
+      engine.jump();
       for (let i = 0; i < 500; i++) engine.tick();
 
       const final = engine.getState();
@@ -181,8 +199,10 @@ describe('FlowerHopEngine', () => {
         seededRng([0.5, 0.1, 0.5, 0.1]) // 0.1 < 0.6 → gem spawns
       );
       customEngine.startRound();
+      customEngine.jump();
       for (let i = 0; i < 500; i++) customEngine.tick();
       customEngine.startRound();
+      customEngine.jump();
       for (let i = 0; i < 500; i++) customEngine.tick();
       const state = customEngine.getState();
       expect(state.status).toBe('ended');
