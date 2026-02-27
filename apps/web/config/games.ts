@@ -113,4 +113,13 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Family'],
     showOnHome: false,
   },
+  {
+    id: 'flower-hop',
+    name: 'Ayyam-i-Ha Flower Hop',
+    description: 'Hop across flowers and collect gems with Abbee & Dot!',
+    href: '/games/flower-hop',
+    category: 'Ayyam-i-Ha',
+    tags: ['2-Player', 'Family'],
+    showOnHome: false,
+  },
 ];
