@@ -135,7 +135,7 @@ export default function ScribblPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background p-4 md:p-8">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mb-4 flex justify-center">
@@ -213,7 +213,7 @@ export default function ScribblPage() {
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Mode selector – locked once drawing has started */}
+        {/* Mode selector — full width, locked once drawing has started */}
         <div className="mb-4">
           <p className="mb-2 text-center text-sm font-medium text-foreground/60">
             Choose a mode:
@@ -238,70 +238,47 @@ export default function ScribblPage() {
           </div>
         </div>
 
-        {/* Phase indicator */}
-        <div className="mb-4 rounded-lg border border-foreground/20 bg-background p-4 text-center">
-          <p className="text-lg font-semibold">{PHASE_LABEL[phase]}</p>
-          <p className="mt-1 text-sm text-foreground/60">
-            {PHASE_DESCRIPTION[phase][mode]}
-          </p>
-          {mode === 'flip' && isDrawingPhase && reducedMotion && (
-            <p className="mt-1 text-xs text-foreground/50" aria-live="polite">
-              Auto-flip disabled (reduced-motion preference detected).
-            </p>
-          )}
-        </div>
+        {/*
+         * 3-column gameplay area (lg+) / stacked (smaller screens)
+         *
+         * CSS order on mobile (flex-col):
+         *   1 → center (canvas area) — first thing players see
+         *   2 → right panel (action button) — right below the canvas
+         *   3 → left panel (colour tools) — scroll down to change colours
+         *
+         * CSS order on desktop (lg:flex-row):
+         *   lg:order-1 → left panel (colours)
+         *   lg:order-2 → center (canvas)
+         *   lg:order-3 → right panel (action)
+         */}
+        <div className="flex flex-col lg:flex-row gap-4">
 
-        {/* Concept prompt for Player 2 — Themed mode only */}
-        {phase === 'complete' && mode === 'themed' && concept && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="mb-4 rounded-lg border-2 border-foreground/30 bg-foreground/5 p-4 text-center"
+          {/* ── LEFT PANEL: colour picker + drawing tools ── */}
+          {/* Mobile: order-3 (below canvas + action). Desktop: lg:order-1 (leftmost) */}
+          <aside
+            className={cn(
+              'order-3 lg:order-1',
+              'lg:w-40 lg:shrink-0',
+              'rounded-lg border border-foreground/20 bg-background p-3',
+              'flex flex-col gap-3',
+              // On mobile, hide when done — tools are no longer needed
+              phase === 'done' && 'hidden lg:flex'
+            )}
           >
-            <p className="text-sm font-medium text-foreground/60">
-              <span aria-hidden="true">🎯</span> Player 2&apos;s concept:
+            <p className="text-center text-xs font-semibold uppercase tracking-wide text-foreground/50">
+              Colors
             </p>
-            <p className="mt-1 text-2xl font-bold tracking-wide">{concept}</p>
-            <p className="mt-1 text-sm text-foreground/50">
-              Complete the drawing to represent this concept!
-            </p>
-          </div>
-        )}
-
-        {/* Canvas */}
-        <div className="mb-4 overflow-hidden rounded-xl border-4 border-foreground/10 shadow-lg">
-          <DrawingCanvas
-            ref={canvasRef}
-            color={currentColor}
-            lineWidth={3}
-            disabled={phase === 'done'}
-            erasing={erasing}
-            flipped={canvasFlipped}
-            reducedMotion={reducedMotion}
-          />
-        </div>
-
-        {/* Toolbar (hidden when done) */}
-        {phase !== 'done' && (
-          <div className="mb-6 space-y-3 rounded-lg border border-foreground/20 bg-background p-4">
-            {/* Color picker row */}
-            <div>
-              <p className="mb-2 text-center text-sm text-foreground/60">
-                Choose a color:
-              </p>
-              <ColorPicker
-                colors={DRAW_COLORS}
-                selected={erasing ? '' : currentColor}
-                onSelect={handleColorSelect}
-              />
-            </div>
-
-            {/* Erase + Undo row */}
-            <div className="flex items-center justify-center gap-3 pt-1">
+            <ColorPicker
+              colors={DRAW_COLORS}
+              selected={erasing ? '' : currentColor}
+              onSelect={handleColorSelect}
+            />
+            {/* Erase + Undo — stacked vertically on desktop, side-by-side on mobile */}
+            <div className="flex gap-2 lg:flex-col">
               <button
                 onClick={() => setErasing((v) => !v)}
                 className={cn(
-                  'flex items-center gap-1.5 rounded-lg border px-4 py-1.5 text-sm font-medium transition-all',
+                  'flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all',
                   erasing
                     ? 'border-foreground bg-foreground text-background'
                     : 'border-foreground/30 text-foreground/70 hover:border-foreground/60 hover:bg-foreground/5'
@@ -312,22 +289,78 @@ export default function ScribblPage() {
               </button>
               <button
                 onClick={handleUndo}
-                className="flex items-center gap-1.5 rounded-lg border border-foreground/30 px-4 py-1.5 text-sm font-medium text-foreground/70 transition-all hover:border-foreground/60 hover:bg-foreground/5"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-foreground/30 px-3 py-1.5 text-sm font-medium text-foreground/70 transition-all hover:border-foreground/60 hover:bg-foreground/5"
               >
                 <span>↩</span> Undo
               </button>
             </div>
-          </div>
-        )}
+          </aside>
 
-        {/* Action button */}
-        <div className="flex justify-center">
-          <button
-            onClick={handleAction}
-            className="rounded-lg bg-foreground px-8 py-3 text-sm font-semibold text-background transition-all hover:bg-foreground/90 hover:shadow-md active:scale-95"
+          {/* ── CENTER: phase indicator + concept prompt + canvas ── */}
+          {/* Mobile: order-1 (first). Desktop: lg:order-2 (center) */}
+          <div className="order-1 lg:order-2 flex-1 min-w-0 flex flex-col gap-4">
+            {/* Phase indicator */}
+            <div className="rounded-lg border border-foreground/20 bg-background p-4 text-center">
+              <p className="text-lg font-semibold">{PHASE_LABEL[phase]}</p>
+              <p className="mt-1 text-sm text-foreground/60">
+                {PHASE_DESCRIPTION[phase][mode]}
+              </p>
+              {mode === 'flip' && isDrawingPhase && reducedMotion && (
+                <p className="mt-1 text-xs text-foreground/50" aria-live="polite">
+                  Auto-flip disabled (reduced-motion preference detected).
+                </p>
+              )}
+            </div>
+
+            {/* Concept prompt for Player 2 — Themed mode only */}
+            {phase === 'complete' && mode === 'themed' && concept && (
+              <div
+                role="status"
+                aria-live="polite"
+                className="rounded-lg border-2 border-foreground/30 bg-foreground/5 p-4 text-center"
+              >
+                <p className="text-sm font-medium text-foreground/60">
+                  <span aria-hidden="true">🎯</span> Player 2&apos;s concept:
+                </p>
+                <p className="mt-1 text-2xl font-bold tracking-wide">{concept}</p>
+                <p className="mt-1 text-sm text-foreground/50">
+                  Complete the drawing to represent this concept!
+                </p>
+              </div>
+            )}
+
+            {/* Canvas */}
+            <div className="overflow-hidden rounded-xl border-4 border-foreground/10 shadow-lg">
+              <DrawingCanvas
+                ref={canvasRef}
+                color={currentColor}
+                lineWidth={3}
+                disabled={phase === 'done'}
+                erasing={erasing}
+                flipped={canvasFlipped}
+                reducedMotion={reducedMotion}
+              />
+            </div>
+          </div>
+
+          {/* ── RIGHT PANEL: action button ── */}
+          {/* Mobile: order-2 (right below canvas). Desktop: lg:order-3 (rightmost, button pinned to bottom) */}
+          <aside
+            className={cn(
+              'order-2 lg:order-3',
+              'lg:w-40 lg:shrink-0',
+              'rounded-lg border border-foreground/20 bg-background p-3',
+              'flex flex-col lg:justify-end'
+            )}
           >
-            {PHASE_BUTTON[phase]}
-          </button>
+            <button
+              onClick={handleAction}
+              className="w-full rounded-lg bg-foreground px-4 py-3 text-sm font-semibold text-background transition-all hover:bg-foreground/90 hover:shadow-md active:scale-95"
+            >
+              {PHASE_BUTTON[phase]}
+            </button>
+          </aside>
+
         </div>
       </div>
     </div>
