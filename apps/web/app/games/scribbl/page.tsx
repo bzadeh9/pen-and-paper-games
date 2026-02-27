@@ -213,43 +213,18 @@ export default function ScribblPage() {
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Mode selector — full width, locked once drawing has started */}
-        <div className="mb-4">
-          <p className="mb-2 text-center text-sm font-medium text-foreground/60">
-            Choose a mode:
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {ALL_MODES.map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                disabled={phase !== 'scribble'}
-                className={cn(
-                  'rounded-full px-4 py-1.5 text-sm font-medium transition-all',
-                  mode === m
-                    ? 'bg-foreground text-background shadow'
-                    : 'bg-foreground/10 text-foreground/70 hover:bg-foreground/20',
-                  phase !== 'scribble' && 'cursor-not-allowed opacity-50'
-                )}
-              >
-                {MODE_LABELS[m]}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/*
          * 3-column gameplay area (lg+) / stacked (smaller screens)
          *
          * CSS order on mobile (flex-col):
          *   1 → center (canvas area) — first thing players see
-         *   2 → right panel (action button) — right below the canvas
+         *   2 → right panel (mode + action) — right below the canvas
          *   3 → left panel (colour tools) — scroll down to change colours
          *
          * CSS order on desktop (lg:flex-row):
          *   lg:order-1 → left panel (colours)
          *   lg:order-2 → center (canvas)
-         *   lg:order-3 → right panel (action)
+         *   lg:order-3 → right panel (mode + action)
          */}
         <div className="flex flex-col lg:flex-row gap-4">
 
@@ -343,16 +318,39 @@ export default function ScribblPage() {
             </div>
           </div>
 
-          {/* ── RIGHT PANEL: action button ── */}
-          {/* Mobile: order-2 (right below canvas). Desktop: lg:order-3 (rightmost, button pinned to bottom) */}
+          {/* ── RIGHT PANEL: mode selector + action button ── */}
+          {/* Mobile: order-2 (right below canvas). Desktop: lg:order-3 (rightmost) */}
           <aside
             className={cn(
               'order-2 lg:order-3',
               'lg:w-40 lg:shrink-0',
               'rounded-lg border border-foreground/20 bg-background p-3',
-              'flex flex-col lg:justify-end'
+              'flex flex-col gap-3'
             )}
           >
+            <div>
+              <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-foreground/50">
+                Mode
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {ALL_MODES.map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMode(m)}
+                    disabled={phase !== 'scribble'}
+                    className={cn(
+                      'rounded-full px-3 py-1 text-xs font-medium transition-all',
+                      mode === m
+                        ? 'bg-foreground text-background shadow'
+                        : 'bg-foreground/10 text-foreground/70 hover:bg-foreground/20',
+                      phase !== 'scribble' && 'cursor-not-allowed opacity-50'
+                    )}
+                  >
+                    {MODE_LABELS[m]}
+                  </button>
+                ))}
+              </div>
+            </div>
             <button
               onClick={handleAction}
               className="w-full rounded-lg bg-foreground px-4 py-3 text-sm font-semibold text-background transition-all hover:bg-foreground/90 hover:shadow-md active:scale-95"
