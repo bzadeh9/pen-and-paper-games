@@ -158,32 +158,46 @@ export class MazeGameEngine {
    * Place up to 3 gates along the critical path.
    * Each gate has keys placed at distance ≥ 2 from the gate room,
    * so players must travel some distance to find the matching key.
+   *
+   * Uses a two-phase approach to prevent soft locks:
+   *   Phase 1 – Find and commit all gate edge positions, removing every gate
+   *             passage from `passages` before any keys are assigned.
+   *   Phase 2 – Assign keys to each gate using BFS over the fully-reduced
+   *             `passages` graph, guaranteeing that no key is placed in a
+   *             region that becomes unreachable once a later gate is added.
    */
   private placeGates(
     rows: number,
     cols: number,
     passages: RoomPassages[][]
   ): Gate[] {
-    const gates: Gate[] = [];
     const start: Position = { row: 0, col: 0 };
     const end: Position = { row: rows - 1, col: cols - 1 };
     const numGates = 3;
 
+    // ── Phase 1: find all gate edge positions ────────────────────────────────
+    // Collect (roomA, roomB) pairs without keys yet. We pass gateEdges directly
+    // to bfsPathWithGates (which only needs roomA/roomB) so we can find the
+    // full critical path through already-placed gate gaps.
+    type GateEdge = { id: number; roomA: Position; roomB: Position };
+    const gateEdges: GateEdge[] = [];
+
     for (let i = 0; i < numGates; i++) {
-      // BFS treating already-placed gates as traversable, so we always
-      // find the full critical path regardless of previously removed passages.
-      const path = this.bfsPathWithGates(rows, cols, passages, gates, start, end);
+      const path = this.bfsPathWithGates(
+        rows,
+        cols,
+        passages,
+        gateEdges,
+        start,
+        end
+      );
       if (path.length < 5) break;
 
-      // Target position along the path (evenly spaced: 1/4, 1/2, 3/4)
       const frac = (i + 1) / (numGates + 1);
       const targetIdx = Math.floor(path.length * frac);
 
-      // Search outward from target: try offset=0 (exact), then ±1, ±2, …
-      // to find the nearest normal-passage edge in either direction.
       let placed = false;
       for (let offset = 0; offset < path.length && !placed; offset++) {
-        // Probe at: targetIdx, targetIdx-offset, targetIdx+offset
         for (const sign of [0, -1, 1]) {
           const idx = targetIdx + sign * offset;
           if (idx < 1 || idx >= path.length - 1) continue;
@@ -193,48 +207,45 @@ export class MazeGameEngine {
           const dir = this.getDirection(roomA, roomB);
           if (!dir) continue;
 
-          // Must be a normal (non-gate) passage
           if (!passages[roomA.row][roomA.col][dir]) continue;
 
-          // Remove the passage to create the gate gap
+          // Remove passage to create the gate gap
           passages[roomA.row][roomA.col][dir] = false;
           passages[roomB.row][roomB.col][OPPOSITE[dir]] = false;
 
-          // Positions already taken by start, end, and previous gates
-          const taken = new Set<string>([
-            pKey(start),
-            pKey(end),
-            pKey(roomA),
-            pKey(roomB),
-            ...gates.flatMap((g) => [
-              pKey(g.keyA),
-              pKey(g.keyB),
-              pKey(g.roomA),
-              pKey(g.roomB),
-            ]),
-          ]);
+          gateEdges.push({ id: i, roomA: { ...roomA }, roomB: { ...roomB } });
 
-          const keyA = this.findFarKeyRoom(rows, cols, passages, roomA, taken);
-          const keyB = this.findFarKeyRoom(rows, cols, passages, roomB, taken);
-
-          if (!keyA || !keyB) {
-            // Restore and try the next edge
-            passages[roomA.row][roomA.col][dir] = true;
-            passages[roomB.row][roomB.col][OPPOSITE[dir]] = true;
-            continue;
-          }
-
-          gates.push({
-            id: i,
-            roomA: { ...roomA },
-            roomB: { ...roomB },
-            keyA: { ...keyA },
-            keyB: { ...keyB },
-          });
           placed = true;
           break;
         }
       }
+    }
+
+    // ── Phase 2: assign keys now that ALL gate passages are removed ──────────
+    // Because every gate gap is already absent from `passages`, the BFS in
+    // findFarKeyRoom cannot cross into a region locked by a later gate, so
+    // keys are always placed in their correct reachable segment.
+    const gates: Gate[] = [];
+    for (const { id, roomA, roomB } of gateEdges) {
+      const taken = new Set<string>([
+        pKey(start),
+        pKey(end),
+        ...gateEdges.flatMap((ge) => [pKey(ge.roomA), pKey(ge.roomB)]),
+        ...gates.flatMap((g) => [pKey(g.keyA), pKey(g.keyB)]),
+      ]);
+
+      const keyA = this.findFarKeyRoom(rows, cols, passages, roomA, taken);
+      const keyB = this.findFarKeyRoom(rows, cols, passages, roomB, taken);
+
+      if (!keyA || !keyB) continue; // skip gate if no valid key room found
+
+      gates.push({
+        id,
+        roomA: { ...roomA },
+        roomB: { ...roomB },
+        keyA: { ...keyA },
+        keyB: { ...keyB },
+      });
     }
 
     return gates;
@@ -374,12 +385,14 @@ export class MazeGameEngine {
    * BFS treating existing gate crossings as free passages (no key needed).
    * Used during gate placement to find the critical path through already-
    * placed gates so we can position subsequent gates on it.
+   * Accepts any objects with `roomA` and `roomB` fields so callers don't
+   * need to construct full Gate objects with placeholder key values.
    */
   private bfsPathWithGates(
     rows: number,
     cols: number,
     passages: RoomPassages[][],
-    gates: Gate[],
+    gates: Pick<Gate, 'roomA' | 'roomB'>[],
     start: Position,
     end: Position
   ): Position[] {
