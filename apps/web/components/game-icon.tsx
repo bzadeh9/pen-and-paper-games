@@ -24,6 +24,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'hide-and-seek': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'abbee-and-dot': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'maze-game': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
+  'virtue-memory': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
 };
 
 const iconPaths: Record<string, React.ReactNode> = {
@@ -314,6 +315,25 @@ const iconPaths: Record<string, React.ReactNode> = {
       {/* Magnifying glass */}
       <circle cx="18" cy="18" r="3" fill="none" stroke="currentColor" strokeWidth={1.5} />
       <line x1="20.1" y1="20.1" x2="22.5" y2="22.5" strokeWidth={1.5} strokeLinecap="round" />
+    </>
+  ),
+  /**
+   * Ayyam-i-Ha Virtue Memory – two overlapping cards with a star/sparkle,
+   * representing the memory card-matching game.
+   */
+  'virtue-memory': (
+    <>
+      {/* Back card */}
+      <rect x="3" y="6" width="12" height="15" rx="1.5" fill="none" strokeWidth={1.5} />
+      {/* Front card */}
+      <rect x="9" y="3" width="12" height="15" rx="1.5" fill="currentColor" opacity={0.15} strokeWidth={1.5} />
+      {/* Star on front card */}
+      <path
+        d="M15 6.5l.8 2.4h2.5l-2 1.5.8 2.4L15 11.4l-2.1 1.4.8-2.4-2-1.5h2.5z"
+        fill="currentColor"
+        stroke="none"
+        opacity={0.9}
+      />
     </>
   ),
 };
