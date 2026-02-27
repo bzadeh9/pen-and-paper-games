@@ -34,6 +34,8 @@ interface DrawingCanvasProps {
   disabled?: boolean;
   erasing?: boolean;
   flipped?: boolean;
+  /** When true, the flip CSS transition is removed to respect reduced-motion preferences. */
+  reducedMotion?: boolean;
 }
 
 const wrapperStyle: React.CSSProperties = { position: 'relative', lineHeight: 0 };
@@ -46,7 +48,7 @@ const touchOverlayStyle: React.CSSProperties = {
 
 export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
   function DrawingCanvas(
-    { color, lineWidth = 3, disabled = false, erasing = false, flipped = false },
+    { color, lineWidth = 3, disabled = false, erasing = false, flipped = false, reducedMotion = false },
     ref
   ) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -221,7 +223,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
             cursor: activeCursor,
             display: 'block',
             transform: flipped ? 'rotate(180deg)' : undefined,
-            transition: 'transform 0.4s ease',
+            transition: reducedMotion ? undefined : 'transform 0.4s ease',
           }}
           aria-label="Drawing canvas"
         />

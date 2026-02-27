@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { GameIcon, gameColors } from '@/components/game-icon';
 import {
   DrawingCanvas,
@@ -8,6 +8,7 @@ import {
 } from '@/components/game/scribbl/drawing-canvas';
 import { ColorPicker } from '@/components/game/scribbl/color-picker';
 import { DRAW_COLORS, type GamePhase, type GameMode } from '@/lib/games/scribbl/types';
+import { getRandomConcept, FLIP_INTERVAL_MS } from '@/lib/games/scribbl/engine';
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -49,13 +50,34 @@ export default function ScribblPage() {
   const [player1Color, setPlayer1Color] = useState(DRAW_COLORS[0].value);
   const [player2Color, setPlayer2Color] = useState(DRAW_COLORS[2].value);
   const [erasing, setErasing] = useState(false);
+  const [autoFlipped, setAutoFlipped] = useState(false);
+  const [concept, setConcept] = useState<string | null>(null);
   const canvasRef = useRef<DrawingCanvasHandle>(null);
 
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   const currentColor = phase === 'scribble' ? player1Color : player2Color;
   const setCurrentColor =
     phase === 'scribble' ? setPlayer1Color : setPlayer2Color;
+
+  const isDrawingPhase = phase === 'scribble' || phase === 'complete';
+
+  // Auto-flip timer: toggles the canvas every FLIP_INTERVAL_MS while drawing.
+  // Disabled when the user prefers reduced motion.
+  useEffect(() => {
+    if (!isDrawingPhase || reducedMotion) {
+      setAutoFlipped(false);
+      return;
+    }
+    setAutoFlipped(false);
+    const id = setInterval(() => {
+      setAutoFlipped((v) => !v);
+    }, FLIP_INTERVAL_MS);
+    return () => clearInterval(id);
+  // `phase` is used instead of the derived `isDrawingPhase` so the timer
+  // restarts (and the flip resets to false) each time the phase changes.
+  }, [phase, reducedMotion]);
 
   const handleUndo = useCallback(() => {
     canvasRef.current?.undo();
@@ -64,6 +86,7 @@ export default function ScribblPage() {
   const handleAction = useCallback(() => {
     setErasing(false);
     if (phase === 'scribble') {
+      setConcept(getRandomConcept());
       setPhase('complete');
     } else if (phase === 'complete') {
       setPhase('done');
@@ -73,6 +96,7 @@ export default function ScribblPage() {
       setMode('normal');
       setPlayer1Color(DRAW_COLORS[0].value);
       setPlayer2Color(DRAW_COLORS[2].value);
+      setConcept(null);
     }
   }, [phase]);
 
@@ -84,8 +108,9 @@ export default function ScribblPage() {
     [setCurrentColor]
   );
 
-  const isDrawingPhase = phase === 'scribble' || phase === 'complete';
-  const canvasFlipped = mode === 'expert' && isDrawingPhase;
+  // XOR: the auto-flip toggles the current base orientation every 5 seconds.
+  const baseFlipped = mode === 'expert' && isDrawingPhase;
+  const canvasFlipped = baseFlipped !== autoFlipped;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background p-4 md:p-8">
@@ -181,7 +206,29 @@ export default function ScribblPage() {
           <p className="mt-1 text-sm text-foreground/60">
             {PHASE_DESCRIPTION[phase][mode]}
           </p>
+          {isDrawingPhase && reducedMotion && (
+            <p className="mt-1 text-xs text-foreground/50" aria-live="polite">
+              Auto-flip disabled (reduced-motion preference detected).
+            </p>
+          )}
         </div>
+
+        {/* Concept prompt for Player 2 */}
+        {phase === 'complete' && concept && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mb-4 rounded-lg border-2 border-foreground/30 bg-foreground/5 p-4 text-center"
+          >
+            <p className="text-sm font-medium text-foreground/60">
+              <span aria-hidden="true">🎯</span> Player 2&apos;s concept:
+            </p>
+            <p className="mt-1 text-2xl font-bold tracking-wide">{concept}</p>
+            <p className="mt-1 text-sm text-foreground/50">
+              Complete the drawing to represent this concept!
+            </p>
+          </div>
+        )}
 
         {/* Canvas */}
         <div className="mb-4 overflow-hidden rounded-xl border-4 border-foreground/10 shadow-lg">
@@ -192,6 +239,7 @@ export default function ScribblPage() {
             disabled={phase === 'done'}
             erasing={erasing}
             flipped={canvasFlipped}
+            reducedMotion={reducedMotion}
           />
         </div>
 
