@@ -12,10 +12,10 @@ describe('Scribbl engine', () => {
       expect(CONCEPTS.length).toBeGreaterThanOrEqual(10);
     });
 
-    it('should contain the required example concepts', () => {
-      expect(CONCEPTS).toContain('house');
-      expect(CONCEPTS).toContain('flower');
-      expect(CONCEPTS).toContain('rocket ship');
+    it('should contain the required example themes', () => {
+      expect(CONCEPTS).toContain('A girl walking in a garden');
+      expect(CONCEPTS).toContain('A boy playing soccer');
+      expect(CONCEPTS).toContain('A rocket flying to the moon');
     });
 
     it('should only contain non-empty strings', () => {

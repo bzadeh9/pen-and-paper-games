@@ -206,8 +206,9 @@ export default function ScribblPage() {
               </p>
               <p>
                 • <strong>🎯 Themed</strong> — once Player 1 finishes, Player 2
-                is given a random concept (e.g. &quot;house&quot;,
-                &quot;rocket ship&quot;) to incorporate into the drawing.
+                is given a random scene theme (e.g. &quot;A girl walking in a
+                garden&quot;, &quot;A boy playing soccer&quot;) to incorporate
+                into the drawing.
               </p>
             </div>
           </CollapsibleContent>
@@ -233,7 +234,7 @@ export default function ScribblPage() {
           <aside
             className={cn(
               'order-3 lg:order-1',
-              'lg:w-40 lg:shrink-0',
+              'lg:w-40 lg:shrink-0 lg:self-start',
               'rounded-lg border border-foreground/20 bg-background p-3',
               'flex flex-col gap-3',
               // On mobile, hide when done — tools are no longer needed
@@ -295,11 +296,11 @@ export default function ScribblPage() {
                 className="rounded-lg border-2 border-foreground/30 bg-foreground/5 p-4 text-center"
               >
                 <p className="text-sm font-medium text-foreground/60">
-                  <span aria-hidden="true">🎯</span> Player 2&apos;s concept:
+                  <span aria-hidden="true">🎯</span> Player 2&apos;s theme:
                 </p>
                 <p className="mt-1 text-2xl font-bold tracking-wide">{concept}</p>
                 <p className="mt-1 text-sm text-foreground/50">
-                  Complete the drawing to represent this concept!
+                  Complete the drawing based on this theme!
                 </p>
               </div>
             )}
@@ -323,7 +324,7 @@ export default function ScribblPage() {
           <aside
             className={cn(
               'order-2 lg:order-3',
-              'lg:w-40 lg:shrink-0',
+              'lg:w-40 lg:shrink-0 lg:self-start',
               'rounded-lg border border-foreground/20 bg-background p-3',
               'flex flex-col gap-3'
             )}

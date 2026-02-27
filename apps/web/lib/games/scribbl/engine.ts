@@ -1,28 +1,28 @@
 /** How often (ms) the canvas automatically flips while a game is in progress. */
 export const FLIP_INTERVAL_MS = 5000;
 
-/** Concepts Player 2 can be challenged to draw. */
+/** Themes Player 2 can be challenged to draw. */
 export const CONCEPTS: string[] = [
-  'house',
-  'flower',
-  'rocket ship',
-  'cat',
-  'dog',
-  'tree',
-  'car',
-  'boat',
-  'bicycle',
-  'fish',
-  'bird',
-  'sun',
-  'cloud',
-  'mountain',
-  'butterfly',
-  'umbrella',
-  'hat',
-  'cake',
-  'guitar',
-  'robot',
+  'A girl walking in a garden',
+  'A boy playing soccer',
+  'A dog chasing its tail',
+  'A cat napping in the sun',
+  'A family having a picnic',
+  'A rocket flying to the moon',
+  'A fish jumping out of the sea',
+  'A bird perched on a branch',
+  'A child flying a kite',
+  'A chef cooking in a kitchen',
+  'A knight riding a horse',
+  'A robot exploring a forest',
+  'A boat sailing on a lake',
+  'A dancer spinning on stage',
+  'Two friends sharing an umbrella',
+  'A mountain climber at the summit',
+  'A musician playing guitar by a campfire',
+  'A butterfly landing on a flower',
+  'A snowman melting in the sun',
+  'A wizard casting a spell',
 ];
 
 /**
