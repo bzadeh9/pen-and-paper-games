@@ -25,6 +25,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'abbee-and-dot': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'maze-game': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'virtue-memory': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
+  'flower-hop': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
 };
 
 const iconPaths: Record<string, React.ReactNode> = {
@@ -334,6 +335,37 @@ const iconPaths: Record<string, React.ReactNode> = {
         stroke="none"
         opacity={0.9}
       />
+    </>
+  ),
+
+  /**
+   * Ayyam-i-Ha Flower Hop – a flower with a small gem above it and a tiny
+   * bee, representing the side-scrolling flower-hopping game.
+   */
+  'flower-hop': (
+    <>
+      {/* Flower stem */}
+      <line x1="12" y1="14" x2="12" y2="22" strokeWidth={2} strokeLinecap="round" stroke="currentColor" />
+      {/* Flower petals */}
+      <circle cx="9" cy="12" r="2.5" fill="currentColor" opacity={0.25} stroke="currentColor" strokeWidth={1} />
+      <circle cx="15" cy="12" r="2.5" fill="currentColor" opacity={0.25} stroke="currentColor" strokeWidth={1} />
+      <circle cx="12" cy="9.5" r="2.5" fill="currentColor" opacity={0.25} stroke="currentColor" strokeWidth={1} />
+      <circle cx="12" cy="14.5" r="2.5" fill="currentColor" opacity={0.25} stroke="currentColor" strokeWidth={1} />
+      {/* Flower centre */}
+      <circle cx="12" cy="12" r="1.8" fill="currentColor" opacity={0.6} stroke="none" />
+      {/* Gem above flower */}
+      <polygon
+        points="19,3 21,6 19,9 17,6"
+        fill="currentColor"
+        opacity={0.5}
+        stroke="currentColor"
+        strokeWidth={0.8}
+        strokeLinejoin="round"
+      />
+      {/* Tiny bee */}
+      <ellipse cx="5" cy="6" rx="2" ry="1.5" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
+      <line x1="4.5" y1="4.5" x2="4" y2="3" strokeWidth={0.7} strokeLinecap="round" />
+      <line x1="5.5" y1="4.5" x2="6" y2="3" strokeWidth={0.7} strokeLinecap="round" />
     </>
   ),
 };
