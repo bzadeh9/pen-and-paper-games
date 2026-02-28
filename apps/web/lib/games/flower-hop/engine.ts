@@ -1,4 +1,4 @@
-import type { Bee, Flower, GameState, Gem, Player } from './types';
+import type { Bee, Flower, GameState, Gem } from './types';
 import {
   BEE_HEIGHT,
   BEE_WIDTH,
@@ -11,6 +11,7 @@ import {
   FLOWER_WIDTH,
   GEM_SIZE,
   GRAVITY,
+  DOUBLE_JUMP_FORCE,
   JUMP_FORCE,
   LEVEL_LENGTH,
   SCROLL_SPEED,
@@ -47,8 +48,7 @@ export class FlowerHopEngine {
 
     for (let i = 0; i < LEVEL_LENGTH; i++) {
       const x = 80 + i * FLOWER_GAP_X;
-      const y =
-        FLOWER_MIN_Y + this.rng() * (FLOWER_MAX_Y - FLOWER_MIN_Y);
+      const y = FLOWER_MIN_Y + this.rng() * (FLOWER_MAX_Y - FLOWER_MIN_Y);
       flowers.push({ x, y, width: FLOWER_WIDTH });
 
       // ~60 % chance a gem spawns on this flower
@@ -76,6 +76,7 @@ export class FlowerHopEngine {
         y: startFlower.y - BEE_HEIGHT,
         vy: 0,
         onGround: true,
+        jumpsUsed: 0,
       },
       flowers,
       gems,
@@ -95,12 +96,14 @@ export class FlowerHopEngine {
     this.state.status = 'running';
   }
 
-  /** Make the bee jump (only if on the ground). */
+  /** Make the bee jump (supports double-jump). */
   jump(): void {
     if (this.state.status !== 'running') return;
-    if (!this.state.bee.onGround) return;
-    this.state.bee.vy = JUMP_FORCE;
+    if (this.state.bee.jumpsUsed >= 2) return;
+    this.state.bee.vy =
+      this.state.bee.jumpsUsed === 0 ? JUMP_FORCE : DOUBLE_JUMP_FORCE;
     this.state.bee.onGround = false;
+    this.state.bee.jumpsUsed += 1;
     if (!this.state.started) {
       this.state.started = true;
     }
@@ -130,11 +133,11 @@ export class FlowerHopEngine {
     // Collision with flower tops
     bee.onGround = false;
     for (const flower of this.state.flowers) {
-      const fx = flower.x - this.state.scrollOffset;
       if (this.collidesWithFlower(bee, flower, this.state.scrollOffset)) {
         bee.y = flower.y - BEE_HEIGHT;
         bee.vy = 0;
         bee.onGround = true;
+        bee.jumpsUsed = 0;
         break;
       }
     }
@@ -158,7 +161,8 @@ export class FlowerHopEngine {
     const lastFlower = this.state.flowers[this.state.flowers.length - 1];
     if (
       lastFlower &&
-      this.state.scrollOffset > lastFlower.x + lastFlower.width + CANVAS_WIDTH / 2
+      this.state.scrollOffset >
+        lastFlower.x + lastFlower.width + CANVAS_WIDTH / 2
     ) {
       this.endRound();
     }
@@ -169,7 +173,7 @@ export class FlowerHopEngine {
   private collidesWithFlower(
     bee: Bee,
     flower: Flower,
-    offset: number,
+    offset: number
   ): boolean {
     const fx = flower.x - offset;
     const beeBottom = bee.y + BEE_HEIGHT;
@@ -211,6 +215,7 @@ export class FlowerHopEngine {
         y: startFlower.y - BEE_HEIGHT,
         vy: 0,
         onGround: true,
+        jumpsUsed: 0,
       };
       this.state.scrollOffset = 0;
       this.state.status = 'idle';

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { FlowerHopEngine } from './engine';
-import { LEVEL_LENGTH, CANVAS_HEIGHT, BEE_HEIGHT } from './types';
+import { DOUBLE_JUMP_FORCE, JUMP_FORCE, LEVEL_LENGTH } from './types';
 
 /** Deterministic RNG that returns values from a pre-set sequence. */
 function seededRng(values: number[]) {
@@ -92,12 +92,21 @@ describe('FlowerHopEngine', () => {
       expect(engine.getState().bee.vy).toBe(vyBefore);
     });
 
-    it('should not allow double jump (when already in air)', () => {
+    it('should allow one mid-air double jump', () => {
       engine.startRound();
       engine.jump();
-      const vyAfterJump = engine.getState().bee.vy;
-      engine.jump(); // should be ignored since not on ground
-      expect(engine.getState().bee.vy).toBe(vyAfterJump);
+      expect(engine.getState().bee.vy).toBe(JUMP_FORCE);
+      engine.jump();
+      expect(engine.getState().bee.vy).toBe(DOUBLE_JUMP_FORCE);
+    });
+
+    it('should not allow a third jump while in air', () => {
+      engine.startRound();
+      engine.jump();
+      engine.jump();
+      const vyAfterDoubleJump = engine.getState().bee.vy;
+      engine.jump();
+      expect(engine.getState().bee.vy).toBe(vyAfterDoubleJump);
     });
     it('should set started=true on first jump', () => {
       engine.startRound();
@@ -135,6 +144,25 @@ describe('FlowerHopEngine', () => {
       engine.tick(); // idle — no-op
       const stateAfter = engine.getState();
       expect(stateAfter.scrollOffset).toBe(stateBefore.scrollOffset);
+    });
+
+    it('should reset jump counter when landing', () => {
+      engine.startRound();
+      engine.jump();
+      engine.jump();
+
+      let landed = false;
+      for (let i = 0; i < 200; i++) {
+        engine.tick();
+        const state = engine.getState();
+        if (state.started && state.bee.onGround) {
+          landed = true;
+          expect(state.bee.jumpsUsed).toBe(0);
+          break;
+        }
+      }
+
+      expect(landed).toBe(true);
     });
 
     it('should end round when bee falls off screen', () => {
@@ -225,7 +253,6 @@ describe('FlowerHopEngine', () => {
     });
 
     it('should generate new level on reset', () => {
-      const before = engine.getState().flowers.map((f) => f.y);
       engine.reset();
       // With deterministic RNG cycling, flowers regenerate (same pattern)
       const after = engine.getState().flowers.map((f) => f.y);
@@ -237,7 +264,9 @@ describe('FlowerHopEngine', () => {
     it('should not allow mutation of bee through getState', () => {
       const state = engine.getState();
       state.bee.y = -9999;
+      state.bee.jumpsUsed = 99;
       expect(engine.getState().bee.y).not.toBe(-9999);
+      expect(engine.getState().bee.jumpsUsed).toBe(0);
     });
 
     it('should not allow mutation of scores through getState', () => {
