@@ -211,7 +211,7 @@ export default function SplatterPage() {
           </div>
 
           {/* Center: Game board */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-start justify-center">
             <GameBoard
               player1Color={player1Color}
               player2Color={player2Color}

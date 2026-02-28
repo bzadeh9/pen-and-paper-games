@@ -24,7 +24,7 @@ export function Header() {
         </p>
       </div>
       <header className="sticky top-0 z-50 w-full border-b border-foreground/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="container relative mx-auto flex h-16 items-center justify-between px-4">
           {/* Logo */}
           <Link
             href="/"
@@ -47,7 +47,7 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden items-center space-x-6 md:absolute md:left-1/2 md:flex md:-translate-x-1/2">
             {navigation.map((item) => (
               <Link
                 key={item.name}

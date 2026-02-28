@@ -12,7 +12,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
     text: 'text-cherry-blossom',
   },
   splatter: { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
-  'knight-chase': { bg: 'bg-prussian-blue/20', text: 'text-prussian-blue' },
+  'knight-chase': { bg: 'bg-powder-petal/20', text: 'text-powder-petal' },
   'ultimate-tic-tac-toe': {
     bg: 'bg-powder-petal/20',
     text: 'text-powder-petal',
@@ -69,8 +69,8 @@ const iconPaths: Record<string, React.ReactNode> = {
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M6 20h12M9 20v-2l-1-2V13c0-3 2-5 5-5V6l1.5-3h1C17 3 18 4 18 5l-1.5 2H15v1.5c2 1 3 2.5 3 4.5v3l-1 2v2"
+      strokeWidth={1.75}
+      d="M7 20h10M9 20v-2.5l-1.5-2V12c0-2.2 1.8-4 4-4h1.5V6.5l1.5-2.5h2l1.5 2.5-2 2v1.5c1.8.9 2.5 2.3 2.5 4v1.5l-1 2V20"
     />
   ),
 
