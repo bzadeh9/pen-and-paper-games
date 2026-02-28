@@ -1,5 +1,5 @@
 export type GamePhase = 'scribble' | 'complete' | 'done';
-export type GameMode = 'normal' | 'expert';
+export type GameMode = 'regular' | 'upside-down' | 'flip' | 'themed';
 
 export interface DrawColor {
   name: string;
