@@ -8,6 +8,7 @@ export const CANVAS_HEIGHT = 360;
 
 export const GRAVITY = 0.6;
 export const JUMP_FORCE = -11;
+export const DOUBLE_JUMP_FORCE = -9.5;
 export const SCROLL_SPEED = 3;
 
 export const BEE_WIDTH = 30;
@@ -35,6 +36,7 @@ export interface Bee {
   y: number;
   vy: number;
   onGround: boolean;
+  jumpsUsed: number;
 }
 
 export interface Flower {

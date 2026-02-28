@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
 import { FlowerHopEngine } from '@/lib/games/flower-hop/engine';
 import type { Player } from '@/lib/games/flower-hop/types';
 import {
@@ -82,11 +88,19 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
   const playerName = (p: Player) => (p === 1 ? 'Abbee' : 'Dot');
   const playerColor = (p: Player) =>
     p === 1 ? 'text-cherry-blossom' : 'text-dusty-mauve';
-  const playerBg = (p: Player) =>
-    p === 1 ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
 
-  const { bee, flowers, gems, scores, scrollOffset, status, currentPlayer, round, winner, started } =
-    gameState;
+  const {
+    bee,
+    flowers,
+    gems,
+    scores,
+    scrollOffset,
+    status,
+    currentPlayer,
+    round,
+    winner,
+    started,
+  } = gameState;
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
@@ -115,7 +129,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             &apos;s turn
           </p>
           <p className="text-sm text-foreground/60">
-            Tap, click, or press Space to start &amp; jump!
+            Tap, click, or press Space to start &amp; jump (double-jump too)!
           </p>
         </div>
       )}
@@ -159,7 +173,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {/* Game canvas */}
       <div
         ref={containerRef}
-        className="relative overflow-hidden rounded-lg border-2 border-foreground/20 bg-gradient-to-b from-sky-100 to-green-50 dark:from-sky-950 dark:to-green-950 cursor-pointer select-none"
+        className="relative cursor-pointer select-none overflow-hidden rounded-lg border-2 border-foreground/20 bg-gradient-to-b from-pink-100 via-sky-100 to-lime-100 dark:from-fuchsia-950 dark:via-indigo-950 dark:to-emerald-950"
         style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
         onClick={handleJump}
         onTouchStart={(e) => {
@@ -171,13 +185,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
         tabIndex={0}
       >
         {/* Sky decorations */}
-        <div className="absolute top-3 left-8 text-2xl opacity-40">☁️</div>
-        <div className="absolute top-6 left-[55%] text-xl opacity-30">☁️</div>
-        <div className="absolute top-2 right-12 text-lg opacity-25">☁️</div>
+        <div className="absolute left-8 top-3 text-2xl opacity-45">☁️</div>
+        <div className="absolute left-[55%] top-6 text-xl opacity-35">☁️</div>
+        <div className="absolute right-12 top-2 text-lg opacity-30">☁️</div>
+        <div className="absolute right-8 top-8 text-sm opacity-70">✨</div>
 
         {/* Ground */}
         <div
-          className="absolute bottom-0 left-0 right-0 bg-green-300/40 dark:bg-green-800/40"
+          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-green-300/70 to-green-200/40 dark:from-green-800/60 dark:to-green-700/30"
           style={{ height: 30 }}
         />
 
@@ -187,10 +202,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           // Cull off-screen flowers
           if (fx + flower.width < -20 || fx > CANVAS_WIDTH + 20) return null;
           return (
-            <div key={i} className="absolute" style={{ left: fx, top: flower.y }}>
+            <div
+              key={i}
+              className="absolute"
+              style={{ left: fx, top: flower.y }}
+            >
               {/* Stem */}
               <div
-                className="absolute left-1/2 -translate-x-1/2 bg-green-500 dark:bg-green-600 rounded-b"
+                className="absolute left-1/2 -translate-x-1/2 rounded-b bg-gradient-to-b from-green-400 to-green-600 dark:from-green-500 dark:to-green-700"
                 style={{
                   width: 6,
                   height: FLOWER_STEM_HEIGHT,
@@ -198,8 +217,26 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 }}
               />
               {/* Petals */}
+              {[
+                { left: '50%', top: 0 },
+                { left: '25%', top: '25%' },
+                { left: '75%', top: '25%' },
+                { left: '35%', top: '55%' },
+                { left: '65%', top: '55%' },
+              ].map((petal, petalIndex) => (
+                <div
+                  key={petalIndex}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-pink-300/80 bg-gradient-to-b from-pink-200 to-fuchsia-300 dark:from-pink-400/60 dark:to-fuchsia-500/60"
+                  style={{
+                    left: petal.left,
+                    top: petal.top,
+                    width: flower.width * 0.35,
+                    height: FLOWER_PETAL_HEIGHT,
+                  }}
+                />
+              ))}
               <div
-                className="rounded-full bg-cherry-blossom/70 dark:bg-cherry-blossom/50 border border-cherry-blossom"
+                className="rounded-full border border-cherry-blossom bg-cherry-blossom/70 dark:bg-cherry-blossom/50"
                 style={{
                   width: flower.width,
                   height: FLOWER_PETAL_HEIGHT,
@@ -208,7 +245,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
               />
               {/* Centre dot */}
               <div
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bee-amber"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-300 bg-bee-amber"
                 style={{ width: 8, height: 8 }}
               />
             </div>
@@ -223,7 +260,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           return (
             <div
               key={`gem-${i}`}
-              className="absolute text-center leading-none"
+              className="absolute animate-pulse text-center leading-none"
               style={{
                 left: gx,
                 top: gem.y,
