@@ -63,7 +63,7 @@ export default function BeeGamePage() {
           <h2 className="mb-2 text-lg font-semibold">The Story of Abbee &amp; Dot</h2>
           <p className="text-sm leading-relaxed text-foreground/80">
             Every year during Ayyam-i-ha, two tiny bees named Abbee and Dot
-            wake up from their winter nap. Their hive has given them a special
+            wake up from their summer nap. Their hive has given them a special
             mission: fly across the garden, visit flowers that hold different
             virtues, and bring those virtues back Home before the celebration
             begins. But there&apos;s a twist — only one bee can be the

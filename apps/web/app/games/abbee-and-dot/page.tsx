@@ -33,7 +33,7 @@ export default function AbbeeAndDotPage() {
           <h2 className="mb-2 text-lg font-semibold">About Abbee &amp; Dot</h2>
           <p className="text-sm leading-relaxed text-foreground/80">
             Every year during Ayyam-i-Ha, two tiny bees named Abbee and Dot
-            wake up from their winter nap and go on adventures across the
+            wake up from their summer nap and go on adventures across the
             garden. These games follow their journeys — collecting virtues,
             finding hidden gems, and navigating mazes together. Perfect for
             families celebrating the Baha&apos;i Ayyam-i-Ha season!
