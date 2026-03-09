@@ -283,7 +283,7 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
             if (!owner) return null;
             const { x, y } = getDotPosition(row, col);
             const name = owner === 1 ? player1Name : player2Name;
-            const initials = name.trim().charAt(0).toUpperCase();
+            const initials = name.trim().charAt(0).toUpperCase() || (owner === 1 ? 'P' : 'P');
             return (
               <text
                 key={`label-${row}-${col}`}
