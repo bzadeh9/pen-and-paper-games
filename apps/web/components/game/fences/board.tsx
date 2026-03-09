@@ -6,9 +6,11 @@ import type { GameState } from '@/lib/games/fences/types';
 interface BoardProps {
   gameState: GameState;
   onLineClick: (row: number, col: number, orientation: 'h' | 'v') => void;
+  player1Name: string;
+  player2Name: string;
 }
 
-export function Board({ gameState, onLineClick }: BoardProps) {
+export function Board({ gameState, onLineClick, player1Name, player2Name }: BoardProps) {
   const [hoveredLine, setHoveredLine] = useState<{
     row: number;
     col: number;
@@ -120,7 +122,7 @@ export function Board({ gameState, onLineClick }: BoardProps) {
                 height={GRID_SPACING}
                 className={
                   owner === 1
-                    ? 'fill-dusty-mauve/30'
+                    ? 'fill-prussian-blue/30'
                     : 'fill-cherry-blossom/30'
                 }
               />
@@ -152,12 +154,12 @@ export function Board({ gameState, onLineClick }: BoardProps) {
                 className={
                   placed
                     ? owner === 1
-                      ? 'stroke-dusty-mauve'
+                      ? 'stroke-prussian-blue'
                       : 'stroke-cherry-blossom'
                     : clickable
                       ? hovered
                         ? gameState.currentPlayer === 1
-                          ? 'stroke-dusty-mauve/60 cursor-pointer'
+                          ? 'stroke-prussian-blue/60 cursor-pointer'
                           : 'stroke-cherry-blossom/60 cursor-pointer'
                         : 'stroke-foreground/10 cursor-pointer'
                       : 'stroke-foreground/10'
@@ -197,12 +199,12 @@ export function Board({ gameState, onLineClick }: BoardProps) {
                 className={
                   placed
                     ? owner === 1
-                      ? 'stroke-dusty-mauve'
+                      ? 'stroke-prussian-blue'
                       : 'stroke-cherry-blossom'
                     : clickable
                       ? hovered
                         ? gameState.currentPlayer === 1
-                          ? 'stroke-dusty-mauve/60 cursor-pointer'
+                          ? 'stroke-prussian-blue/60 cursor-pointer'
                           : 'stroke-cherry-blossom/60 cursor-pointer'
                         : 'stroke-foreground/10 cursor-pointer'
                       : 'stroke-foreground/10'
@@ -280,6 +282,8 @@ export function Board({ gameState, onLineClick }: BoardProps) {
             const owner = boxOwnerMap.get(`${row}-${col}`);
             if (!owner) return null;
             const { x, y } = getDotPosition(row, col);
+            const name = owner === 1 ? player1Name : player2Name;
+            const initials = name.trim().charAt(0).toUpperCase();
             return (
               <text
                 key={`label-${row}-${col}`}
@@ -289,12 +293,12 @@ export function Board({ gameState, onLineClick }: BoardProps) {
                 dominantBaseline="central"
                 className={
                   owner === 1
-                    ? 'fill-dusty-mauve font-bold text-sm'
+                    ? 'fill-prussian-blue font-bold text-sm'
                     : 'fill-cherry-blossom font-bold text-sm'
                 }
                 fontSize={GRID_SPACING * 0.3}
               >
-                P{owner}
+                {initials}
               </text>
             );
           })

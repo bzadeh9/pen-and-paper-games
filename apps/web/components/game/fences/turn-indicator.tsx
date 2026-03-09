@@ -10,6 +10,8 @@ interface TurnIndicatorProps {
   player1Score: number;
   player2Score: number;
   totalBoxes: number;
+  player1Name: string;
+  player2Name: string;
 }
 
 export function TurnIndicator({
@@ -19,6 +21,8 @@ export function TurnIndicator({
   player1Score,
   player2Score,
   totalBoxes,
+  player1Name,
+  player2Name,
 }: TurnIndicatorProps) {
   if (gameStatus === 'ended') {
     return (
@@ -26,14 +30,14 @@ export function TurnIndicator({
         <h2 className="mb-4 text-2xl font-bold">Game Over!</h2>
         <div className="mb-4 space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-dusty-mauve">
-              Player 1:
+            <span className="text-lg font-semibold text-prussian-blue">
+              {player1Name}:
             </span>
             <span className="text-2xl font-bold">{player1Score} boxes</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold text-cherry-blossom">
-              Player 2:
+              {player2Name}:
             </span>
             <span className="text-2xl font-bold">{player2Score} boxes</span>
           </div>
@@ -44,10 +48,10 @@ export function TurnIndicator({
           ) : (
             <span
               className={
-                winner === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'
+                winner === 1 ? 'text-prussian-blue' : 'text-cherry-blossom'
               }
             >
-              Player {winner} Wins! 🎉
+              {winner === 1 ? player1Name : player2Name} Wins! 🎉
             </span>
           )}
         </div>
@@ -64,20 +68,20 @@ export function TurnIndicator({
         <div className="mt-2 text-2xl font-bold">
           <span
             className={
-              currentPlayer === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'
+              currentPlayer === 1 ? 'text-prussian-blue' : 'text-cherry-blossom'
             }
           >
-            Player {currentPlayer}&apos;s Turn
+            {currentPlayer === 1 ? player1Name : player2Name}&apos;s Turn
           </span>
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-        <div className="rounded bg-dusty-mauve/10 dark:bg-dusty-mauve/20 p-2 text-center border border-dusty-mauve/30">
-          <div className="font-semibold text-dusty-mauve">Player 1</div>
+        <div className="rounded bg-prussian-blue/10 dark:bg-prussian-blue/20 p-2 text-center border border-prussian-blue/30">
+          <div className="font-semibold text-prussian-blue">{player1Name}</div>
           <div className="text-lg font-bold">{player1Score}</div>
         </div>
         <div className="rounded bg-cherry-blossom/10 dark:bg-cherry-blossom/20 p-2 text-center border border-cherry-blossom/30">
-          <div className="font-semibold text-cherry-blossom">Player 2</div>
+          <div className="font-semibold text-cherry-blossom">{player2Name}</div>
           <div className="text-lg font-bold">{player2Score}</div>
         </div>
       </div>

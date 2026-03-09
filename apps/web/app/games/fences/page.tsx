@@ -24,6 +24,8 @@ export default function FencesPage() {
   const engine = useMemo(() => new FencesEngine(gridSize), [gridSize]);
   const [gameState, setGameState] = useState(engine.getState());
   const [stats, setStats] = useState(() => getGameStatistics());
+  const [player1Name, setPlayer1Name] = useState('Player 1');
+  const [player2Name, setPlayer2Name] = useState('Player 2');
 
   const isMobile = useMediaQuery('(max-width: 767px)');
 
@@ -193,6 +195,8 @@ export default function FencesPage() {
             player1Score={gameState.player1Score}
             player2Score={gameState.player2Score}
             totalBoxes={gameState.totalBoxes}
+            player1Name={player1Name}
+            player2Name={player2Name}
           />
         </div>
 
@@ -205,6 +209,10 @@ export default function FencesPage() {
               onGridSizeChange={handleGridSizeChange}
               onReset={handleReset}
               gameStatus={gameState.status}
+              player1Name={player1Name}
+              player2Name={player2Name}
+              onPlayer1NameChange={setPlayer1Name}
+              onPlayer2NameChange={setPlayer2Name}
             />
           </div>
 
@@ -215,6 +223,8 @@ export default function FencesPage() {
                 <Board
                   gameState={gameState}
                   onLineClick={handleLineClick}
+                  player1Name={player1Name}
+                  player2Name={player2Name}
                 />
               </div>
             </div>
@@ -222,7 +232,12 @@ export default function FencesPage() {
 
           {/* Right panel: Stats */}
           <div>
-            <GameStats stats={stats} onReset={handleResetStats} />
+            <GameStats
+              stats={stats}
+              onReset={handleResetStats}
+              player1Name={player1Name}
+              player2Name={player2Name}
+            />
           </div>
         </div>
       </div>

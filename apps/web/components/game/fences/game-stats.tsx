@@ -11,9 +11,11 @@ interface GameStatsProps {
     gamesPlayed: number;
   };
   onReset: () => void;
+  player1Name: string;
+  player2Name: string;
 }
 
-export function GameStats({ stats, onReset }: GameStatsProps) {
+export function GameStats({ stats, onReset, player1Name, player2Name }: GameStatsProps) {
   return (
     <div className="rounded-lg border-2 border-foreground/20 bg-background p-4">
       <h2 className="mb-4 text-xl font-bold">Statistics</h2>
@@ -23,14 +25,14 @@ export function GameStats({ stats, onReset }: GameStatsProps) {
           <span className="font-semibold">{stats.gamesPlayed}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-dusty-mauve font-medium">Player 1 Wins:</span>
-          <span className="font-semibold text-dusty-mauve">
+          <span className="text-prussian-blue font-medium">{player1Name} Wins:</span>
+          <span className="font-semibold text-prussian-blue">
             {stats.player1Wins}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-cherry-blossom font-medium">
-            Player 2 Wins:
+            {player2Name} Wins:
           </span>
           <span className="font-semibold text-cherry-blossom">
             {stats.player2Wins}
