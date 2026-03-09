@@ -244,37 +244,27 @@ describe('FencesEngine', () => {
 
     it('should declare a draw when scores are equal', () => {
       const small = new FencesEngine(3);
-      // 4 boxes, need each player to get exactly 2
+      // 3×3 dot grid = 4 boxes. Draw requires each player getting exactly 2.
+      // Traced game: P2 gets (0,0), P1 gets (1,0), P2 gets (0,1), P1 gets (1,1)
 
-      // P1 completes box (0,0)
-      small.makeMove(0, 0, 'h'); // P1
-      small.makeMove(0, 1, 'h'); // P2
-      small.makeMove(0, 0, 'v'); // P1
-      small.makeMove(1, 0, 'h'); // P2
-      small.makeMove(0, 1, 'v'); // P1 completes box (0,0) -> P1:1, gets extra turn
+      small.makeMove(0, 0, 'h'); // P1: top of (0,0) → P2
+      small.makeMove(0, 0, 'v'); // P2: left of (0,0) → P1
+      small.makeMove(1, 0, 'h'); // P1: bottom of (0,0), top of (1,0) → P2
+      small.makeMove(0, 1, 'v'); // P2: right of (0,0) → completes (0,0)! P2:1, extra turn
+      small.makeMove(0, 1, 'h'); // P2: top of (0,1) → P1
+      small.makeMove(1, 0, 'v'); // P1: left of (1,0) → P2
+      small.makeMove(2, 0, 'h'); // P2: bottom of (1,0) → P1
+      small.makeMove(1, 1, 'v'); // P1: right of (1,0) → completes (1,0)! P1:1, extra turn
+      small.makeMove(1, 1, 'h'); // P1: bottom of (0,1), top of (1,1) → P2
+      small.makeMove(0, 2, 'v'); // P2: right of (0,1) → completes (0,1)! P2:2, extra turn
+      small.makeMove(1, 2, 'v'); // P2: right of (1,1) → P1
+      small.makeMove(2, 1, 'h'); // P1: bottom of (1,1) → completes (1,1)! P1:2
 
-      // P1 adds a line, not completing anything
-      small.makeMove(0, 2, 'v'); // P1
-      // P2's turn
-      small.makeMove(1, 1, 'h'); // P2 completes box (0,1) -> P2:1, gets extra turn
-
-      // P2 adds lines
-      small.makeMove(1, 0, 'v'); // P2
-      // P1's turn
-      small.makeMove(2, 0, 'h'); // P1 completes box (1,0) -> P1:2, gets extra turn
-
-      // P1 adds a line
-      small.makeMove(1, 1, 'v'); // P1
-
-      // P2's turn
-      small.makeMove(1, 2, 'v'); // P2
-      small.makeMove(2, 1, 'h'); // P1 completes box (1,1) -> P1:3
-
-      // Actually this doesn't give us a draw. Let me think differently...
-      // With 4 boxes, a draw means 2 each. Let me just verify the draw detection logic.
       const state = small.getState();
-      // The game ended, winner is determined by scores
       expect(state.status).toBe('ended');
+      expect(state.player1Score).toBe(2);
+      expect(state.player2Score).toBe(2);
+      expect(state.winner).toBe('draw');
     });
   });
 

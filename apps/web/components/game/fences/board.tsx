@@ -16,7 +16,16 @@ export function Board({ gameState, onLineClick }: BoardProps) {
   } | null>(null);
 
   const DOT_RADIUS = 5;
-  const GRID_SPACING = gameState.gridSize <= 5 ? 70 : gameState.gridSize <= 7 ? 55 : 45;
+  const HIT_TARGET_WIDTH = 16;
+  const GRID_SPACING_LARGE = 70;
+  const GRID_SPACING_MEDIUM = 55;
+  const GRID_SPACING_SMALL = 45;
+  const GRID_SPACING =
+    gameState.gridSize <= 5
+      ? GRID_SPACING_LARGE
+      : gameState.gridSize <= 7
+        ? GRID_SPACING_MEDIUM
+        : GRID_SPACING_SMALL;
   const PADDING = 30;
   const SVG_WIDTH = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
   const SVG_HEIGHT = GRID_SPACING * (gameState.gridSize - 1) + PADDING * 2;
@@ -224,7 +233,7 @@ export function Board({ gameState, onLineClick }: BoardProps) {
                 y1={start.y}
                 x2={end.x}
                 y2={end.y}
-                strokeWidth={16}
+                strokeWidth={HIT_TARGET_WIDTH}
                 stroke="transparent"
                 style={{ cursor: 'pointer' }}
                 onClick={() => onLineClick(row, col, 'h')}
@@ -252,7 +261,7 @@ export function Board({ gameState, onLineClick }: BoardProps) {
                 y1={start.y}
                 x2={end.x}
                 y2={end.y}
-                strokeWidth={16}
+                strokeWidth={HIT_TARGET_WIDTH}
                 stroke="transparent"
                 style={{ cursor: 'pointer' }}
                 onClick={() => onLineClick(row, col, 'v')}
