@@ -17,6 +17,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
     bg: 'bg-powder-petal/20',
     text: 'text-powder-petal',
   },
+  fences: { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
   'black-hole': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'order-and-chaos': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
   scribbl: { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
@@ -130,6 +131,33 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeLinecap="round"
         strokeWidth={2}
       />
+    </>
+  ),
+
+  /**
+   * Fences – a 2×2 grid of dots with partial box outlines, representing the
+   * dots-and-boxes game where players draw lines to complete squares.
+   */
+  fences: (
+    <>
+      {/* Dots (3×3 grid) */}
+      <circle cx="4" cy="4" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="4" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="20" cy="4" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="12" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="20" cy="12" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="20" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="20" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="20" cy="20" r="1.8" fill="currentColor" stroke="none" />
+      {/* Completed box outline (top-left) */}
+      <line x1="4" y1="4" x2="12" y2="4" strokeWidth={2} strokeLinecap="round" />
+      <line x1="4" y1="4" x2="4" y2="12" strokeWidth={2} strokeLinecap="round" />
+      <line x1="4" y1="12" x2="12" y2="12" strokeWidth={2} strokeLinecap="round" />
+      <line x1="12" y1="4" x2="12" y2="12" strokeWidth={2} strokeLinecap="round" />
+      {/* Partial lines on other boxes */}
+      <line x1="12" y1="4" x2="20" y2="4" strokeWidth={2} strokeLinecap="round" opacity={0.4} />
+      <line x1="4" y1="12" x2="4" y2="20" strokeWidth={2} strokeLinecap="round" opacity={0.4} />
     </>
   ),
 

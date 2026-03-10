@@ -54,6 +54,14 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Area Control'],
   },
   {
+    id: 'fences',
+    name: 'Fences',
+    description: 'Connect dots to claim boxes — get the most territory!',
+    href: '/games/fences',
+    category: 'Strategy',
+    tags: ['2-Player', 'Area Control'],
+  },
+  {
     id: 'black-hole',
     name: 'Black Hole',
     description: 'A game of reverse-area control',
