@@ -119,7 +119,7 @@ export function GameControls({
             playerNumber={1}
             playerName={player1Name}
             onNameChange={onPlayer1NameChange}
-            colorClass="text-prussian-blue"
+            colorClass="text-dusk-blue"
           />
           <PlayerNameEditor
             playerNumber={2}

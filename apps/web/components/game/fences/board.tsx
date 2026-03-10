@@ -122,7 +122,7 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 height={GRID_SPACING}
                 className={
                   owner === 1
-                    ? 'fill-prussian-blue/30'
+                    ? 'fill-dusk-blue/30'
                     : 'fill-cherry-blossom/30'
                 }
               />
@@ -154,12 +154,12 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 className={
                   placed
                     ? owner === 1
-                      ? 'stroke-prussian-blue'
+                      ? 'stroke-dusk-blue'
                       : 'stroke-cherry-blossom'
                     : clickable
                       ? hovered
                         ? gameState.currentPlayer === 1
-                          ? 'stroke-prussian-blue/60 cursor-pointer'
+                          ? 'stroke-dusk-blue/60 cursor-pointer'
                           : 'stroke-cherry-blossom/60 cursor-pointer'
                         : 'stroke-foreground/10 cursor-pointer'
                       : 'stroke-foreground/10'
@@ -199,12 +199,12 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 className={
                   placed
                     ? owner === 1
-                      ? 'stroke-prussian-blue'
+                      ? 'stroke-dusk-blue'
                       : 'stroke-cherry-blossom'
                     : clickable
                       ? hovered
                         ? gameState.currentPlayer === 1
-                          ? 'stroke-prussian-blue/60 cursor-pointer'
+                          ? 'stroke-dusk-blue/60 cursor-pointer'
                           : 'stroke-cherry-blossom/60 cursor-pointer'
                         : 'stroke-foreground/10 cursor-pointer'
                       : 'stroke-foreground/10'
@@ -293,7 +293,7 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 dominantBaseline="central"
                 className={
                   owner === 1
-                    ? 'fill-prussian-blue font-bold text-sm'
+                    ? 'fill-dusk-blue font-bold text-sm'
                     : 'fill-cherry-blossom font-bold text-sm'
                 }
                 fontSize={GRID_SPACING * 0.3}
