@@ -78,6 +78,14 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Abstract'],
   },
   {
+    id: 'row-call',
+    name: 'Row Call',
+    description: 'Choose the line, but your opponent picks the spot!',
+    href: '/games/row-call',
+    category: 'Strategy',
+    tags: ['2-Player', 'Quick'],
+  },
+  {
     id: 'scribbl',
     name: 'Scribble',
     description: 'Complete a scribble into a drawing!',
