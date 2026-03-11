@@ -20,6 +20,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   fences: { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
   'black-hole': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'order-and-chaos': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
+  sim: { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   scribbl: { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'bee-game': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'hide-and-seek': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
@@ -178,6 +179,38 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeLinejoin="round"
         strokeWidth={2}
         d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+      />
+    </>
+  ),
+
+  /**
+   * Sim – a hexagon with six dots and a triangle inside, representing
+   * the triangle-avoidance game on a hexagonal graph.
+   */
+  sim: (
+    <>
+      {/* Hexagon dots */}
+      <circle cx="12" cy="2.5" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="20.2" cy="7.2" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="20.2" cy="16.8" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="21.5" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="3.8" cy="16.8" r="1.8" fill="currentColor" stroke="none" />
+      <circle cx="3.8" cy="7.2" r="1.8" fill="currentColor" stroke="none" />
+      {/* Hexagon outline */}
+      <polygon
+        points="12,2.5 20.2,7.2 20.2,16.8 12,21.5 3.8,16.8 3.8,7.2"
+        fill="none"
+        strokeWidth={1.2}
+        strokeLinejoin="round"
+        opacity={0.3}
+      />
+      {/* Triangle inside (the losing condition) */}
+      <polygon
+        points="12,2.5 20.2,16.8 3.8,16.8"
+        fill="currentColor"
+        opacity={0.15}
+        strokeWidth={1.8}
+        strokeLinejoin="round"
       />
     </>
   ),

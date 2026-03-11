@@ -62,6 +62,14 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Area Control'],
   },
   {
+    id: 'sim',
+    name: 'Sim',
+    description: 'Avoid completing a triangle in your color — or lose!',
+    href: '/games/sim',
+    category: 'Strategy',
+    tags: ['2-Player', 'Abstract'],
+  },
+  {
     id: 'black-hole',
     name: 'Black Hole',
     description: 'A game of reverse-area control',
