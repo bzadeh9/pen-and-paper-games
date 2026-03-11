@@ -1,7 +1,7 @@
 'use client';
 
 import { GameIcon, gameColors } from '@/components/game-icon';
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Board } from '@/components/game/stained-glass/board';
 import { TurnIndicator } from '@/components/game/stained-glass/turn-indicator';
 import { GameStats } from '@/components/game/stained-glass/game-stats';
@@ -26,8 +26,8 @@ export default function StainedGlassPage() {
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
 
-  const engine = useMemo(() => new StainedGlassEngine(gridSize, mode), [gridSize, mode]);
-  const [gameState, setGameState] = useState(() => engine.getState());
+  const engineRef = useRef(new StainedGlassEngine(4, 'standard'));
+  const [gameState, setGameState] = useState(() => engineRef.current.getState());
   const [stats, setStats] = useState(() => getGameStatistics());
 
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -36,6 +36,9 @@ export default function StainedGlassPage() {
     (newMode: GameMode) => {
       if (gameState.status === 'setup' || gameState.status === 'ended') {
         setMode(newMode);
+        engineRef.current.setMode(newMode);
+        engineRef.current.reset();
+        setGameState(engineRef.current.getState());
       }
     },
     [gameState.status]
@@ -45,6 +48,8 @@ export default function StainedGlassPage() {
     (newSize: number) => {
       if (gameState.status === 'setup' || gameState.status === 'ended') {
         setGridSize(newSize);
+        engineRef.current.setGridSize(newSize);
+        setGameState(engineRef.current.getState());
       }
     },
     [gameState.status]
@@ -53,26 +58,26 @@ export default function StainedGlassPage() {
   const handleSectionClick = useCallback(
     (sectionId: number) => {
       if (gameState.status === 'setup') {
-        engine.startGame();
+        engineRef.current.startGame();
       }
 
-      const success = engine.makeMove(sectionId);
+      const success = engineRef.current.makeMove(sectionId);
       if (success) {
-        setGameState(engine.getState());
+        setGameState(engineRef.current.getState());
       }
     },
-    [engine, gameState.status]
+    [gameState.status]
   );
 
   const handleReset = useCallback(() => {
     if (gameState.status === 'setup') {
-      engine.startGame();
-      setGameState(engine.getState());
+      engineRef.current.startGame();
+      setGameState(engineRef.current.getState());
     } else {
-      engine.reset();
-      setGameState(engine.getState());
+      engineRef.current.reset();
+      setGameState(engineRef.current.getState());
     }
-  }, [engine, gameState.status]);
+  }, [gameState.status]);
 
   const handleResetStats = useCallback(() => {
     if (confirm('Are you sure you want to reset all statistics?')) {
@@ -85,7 +90,7 @@ export default function StainedGlassPage() {
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner) {
       Promise.resolve().then(() => {
-        const newStats = recordGame(gameState.winner!);
+        const newStats = recordGame(gameState.winner as 1 | 2);
         setStats(newStats);
       });
     }

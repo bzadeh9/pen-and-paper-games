@@ -7,7 +7,6 @@ interface GameStatsProps {
   stats: {
     player1Wins: number;
     player2Wins: number;
-    draws: number;
     gamesPlayed: number;
   };
   player1Name: string;

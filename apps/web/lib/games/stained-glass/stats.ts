@@ -3,7 +3,6 @@ import type { Player } from './types';
 interface GameStats {
   player1Wins: number;
   player2Wins: number;
-  draws: number;
   gamesPlayed: number;
 }
 
@@ -11,7 +10,7 @@ const STORAGE_KEY = 'stained-glass-stats';
 
 export function getGameStatistics(): GameStats {
   if (typeof window === 'undefined') {
-    return { player1Wins: 0, player2Wins: 0, draws: 0, gamesPlayed: 0 };
+    return { player1Wins: 0, player2Wins: 0, gamesPlayed: 0 };
   }
 
   try {
@@ -23,7 +22,7 @@ export function getGameStatistics(): GameStats {
     console.error('Failed to load game statistics:', error);
   }
 
-  return { player1Wins: 0, player2Wins: 0, draws: 0, gamesPlayed: 0 };
+  return { player1Wins: 0, player2Wins: 0, gamesPlayed: 0 };
 }
 
 export function recordGame(winner: Player): GameStats {
