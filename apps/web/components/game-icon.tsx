@@ -21,6 +21,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'black-hole': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'order-and-chaos': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
   sim: { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
+  nim: { bg: 'bg-powder-petal/20', text: 'text-powder-petal' },
   'row-call': { bg: 'bg-powder-petal/20', text: 'text-powder-petal' },
   scribbl: { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'bee-game': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
@@ -213,6 +214,32 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeWidth={1.8}
         strokeLinejoin="round"
       />
+    </>
+  ),
+
+  /**
+   * Nim – rows of circles in a pyramid pattern (1, 3, 5) with two circles
+   * crossed out, representing the item-removal game.
+   */
+  nim: (
+    <>
+      {/* Row 1: 1 item */}
+      <circle cx="12" cy="4" r="2" fill="currentColor" opacity={0.7} stroke="none" />
+      {/* Row 2: 3 items */}
+      <circle cx="7" cy="10" r="2" fill="currentColor" opacity={0.7} stroke="none" />
+      <circle cx="12" cy="10" r="2" fill="currentColor" opacity={0.7} stroke="none" />
+      <circle cx="17" cy="10" r="2" fill="currentColor" opacity={0.7} stroke="none" />
+      {/* Row 3: 5 items */}
+      <circle cx="4" cy="16" r="2" fill="currentColor" opacity={0.7} stroke="none" />
+      <circle cx="8" cy="16" r="2" fill="currentColor" opacity={0.7} stroke="none" />
+      <circle cx="12" cy="16" r="2" fill="currentColor" opacity={0.7} stroke="none" />
+      <circle cx="16" cy="16" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
+      <circle cx="20" cy="16" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
+      {/* Cross-out marks on last two items */}
+      <line x1="14.5" y1="14.5" x2="17.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="17.5" y1="14.5" x2="14.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="18.5" y1="14.5" x2="21.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="21.5" y1="14.5" x2="18.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
     </>
   ),
 

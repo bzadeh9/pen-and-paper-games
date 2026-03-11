@@ -70,6 +70,14 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Abstract'],
   },
   {
+    id: 'nim',
+    name: 'Nim',
+    description: 'Cross off items — but don\'t be the one to take the last!',
+    href: '/games/nim',
+    category: 'Strategy',
+    tags: ['2-Player', 'Quick'],
+  },
+  {
     id: 'black-hole',
     name: 'Black Hole',
     description: 'A game of reverse-area control',
