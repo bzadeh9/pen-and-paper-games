@@ -94,6 +94,14 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Quick'],
   },
   {
+    id: 'stained-glass',
+    name: 'Stained Glass',
+    description: 'Color panes to block your opponent — be the last to place!',
+    href: '/games/stained-glass',
+    category: 'Strategy',
+    tags: ['2-Player', 'Area Control'],
+  },
+  {
     id: 'abbee-and-dot',
     name: 'Abbee & Dot',
     description: 'Baha\'i Ayyam-i-Ha games with Abbee and Dot the bees!',
