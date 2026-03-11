@@ -21,6 +21,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'black-hole': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
   'order-and-chaos': { bg: 'bg-pastel-pink/20', text: 'text-pastel-pink' },
   sim: { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
+  'row-call': { bg: 'bg-powder-petal/20', text: 'text-powder-petal' },
   scribbl: { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'bee-game': { bg: 'bg-cherry-blossom/20', text: 'text-cherry-blossom' },
   'hide-and-seek': { bg: 'bg-dusty-mauve/20', text: 'text-dusty-mauve' },
@@ -212,6 +213,25 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeWidth={1.8}
         strokeLinejoin="round"
       />
+    </>
+  ),
+
+  /**
+   * Row Call – a 2×2 mini-grid with an arrow pointing at a row, representing
+   * the mechanic of choosing a row/column for your opponent to place into.
+   */
+  'row-call': (
+    <>
+      {/* 2×2 grid of dots */}
+      <circle cx="7" cy="7" r="2" fill="currentColor" stroke="none" />
+      <circle cx="17" cy="7" r="2" fill="currentColor" stroke="none" opacity={0.3} />
+      <circle cx="7" cy="17" r="2" fill="currentColor" stroke="none" opacity={0.3} />
+      <circle cx="17" cy="17" r="2" fill="currentColor" stroke="none" />
+      {/* Grid lines */}
+      <line x1="3" y1="12" x2="21" y2="12" strokeWidth={1} strokeLinecap="round" opacity={0.2} />
+      <line x1="12" y1="3" x2="12" y2="21" strokeWidth={1} strokeLinecap="round" opacity={0.2} />
+      {/* Arrow pointing at top row */}
+      <path d="M22 7l-2.5-2v4z" fill="currentColor" opacity={0.6} stroke="none" />
     </>
   ),
 
