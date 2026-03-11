@@ -5,7 +5,7 @@ export type LineType = 'row' | 'column';
 
 export interface LineSelection {
   type: LineType;
-  index: number; // 0-3
+  index: number; // 0-3 for rows (1-4) or columns (A-D)
 }
 
 export interface Cell {
