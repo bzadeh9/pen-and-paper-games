@@ -236,10 +236,10 @@ const iconPaths: Record<string, React.ReactNode> = {
       <circle cx="16" cy="16" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
       <circle cx="20" cy="16" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
       {/* Cross-out marks on last two items */}
-      <line x1="14.5" y1="14.5" x2="17.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
-      <line x1="17.5" y1="14.5" x2="14.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
-      <line x1="18.5" y1="14.5" x2="21.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
-      <line x1="21.5" y1="14.5" x2="18.5" y2="17.5" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="14.5" y1="14.5" x2="17.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="17.5" y1="14.5" x2="14.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="18.5" y1="14.5" x2="21.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="21.5" y1="14.5" x2="18.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
     </>
   ),
 

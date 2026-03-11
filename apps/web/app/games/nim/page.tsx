@@ -277,7 +277,7 @@ export default function NimPage() {
                           className="flex-1 text-left text-sm hover:text-foreground/80 transition-colors"
                         >
                           {name}{' '}
-                          <span className="text-foreground/30 text-xs">
+                          <span className="text-foreground/30 text-xs" aria-hidden="true">
                             ✎
                           </span>
                         </button>
