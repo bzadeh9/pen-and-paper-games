@@ -167,13 +167,9 @@ export function Board({
               }
               className={
                 owner
-                  ? losing
-                    ? owner === 1
-                      ? 'stroke-dusk-blue'
-                      : 'stroke-cherry-blossom'
-                    : owner === 1
-                      ? 'stroke-dusk-blue'
-                      : 'stroke-cherry-blossom'
+                  ? owner === 1
+                    ? 'stroke-dusk-blue'
+                    : 'stroke-cherry-blossom'
                   : clickable
                     ? hovered
                       ? gameState.currentPlayer === 1

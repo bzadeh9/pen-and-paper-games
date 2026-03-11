@@ -26,6 +26,9 @@ export function getGameStatistics(): GameStats {
   return { player1Wins: 0, player2Wins: 0, draws: 0, gamesPlayed: 0 };
 }
 
+/** Record a completed game. Note: draws are tracked for interface consistency
+ *  with other games but should not occur in Sim (Ramsey theory guarantees a
+ *  monochromatic triangle in K6). */
 export function recordGame(winner: Player | 'draw'): GameStats {
   const stats = getGameStatistics();
 
