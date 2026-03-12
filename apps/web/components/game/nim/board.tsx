@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { GameState } from '@/lib/games/nim/types';
 
 interface BoardProps {
@@ -9,6 +9,14 @@ interface BoardProps {
   player1Name: string;
   player2Name: string;
 }
+
+const ITEM_SIZE_CLASSES = 'w-8 h-8 md:w-10 md:h-10';
+const ROW_GAP_CLASSES = 'gap-1.5 md:gap-2';
+// Offset is half of (item size + row gap):
+// w-8 items with gap-1.5 between neighbors => (2rem + 0.375rem)/2,
+// md:w-10 items with md:gap-2 between neighbors => (2.5rem + 0.5rem)/2.
+const PYRAMID_OFFSET_CLASSES =
+  'translate-x-[calc((2rem+0.375rem)/2)] md:translate-x-[calc((2.5rem+0.5rem)/2)]';
 
 export function Board({ gameState, onMove, player1Name, player2Name }: BoardProps) {
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
@@ -48,11 +56,6 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
     setHoverCount(0);
   }, []);
 
-  const maxItems = useMemo(
-    () => Math.max(...gameState.rows),
-    [gameState.rows]
-  );
-
   const currentPlayerName =
     gameState.currentPlayer === 1 ? player1Name : player2Name;
 
@@ -60,6 +63,12 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
     <div className="flex flex-col items-center gap-4 p-4 md:p-6">
       {gameState.rows.map((rowCount, rowIndex) => {
         const isHoveredRow = selectedRow === rowIndex;
+        const rowClasses = [
+          'flex',
+          ROW_GAP_CLASSES,
+          ...(rowIndex % 2 === 1 ? [PYRAMID_OFFSET_CLASSES] : []),
+        ]
+          .join(' ');
         // Items that would be removed start at (rowCount - hoverCount)
         const removeStart = isHoveredRow ? rowCount - hoverCount : rowCount;
 
@@ -72,19 +81,8 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
             <span className="w-6 text-center text-xs font-medium text-foreground/40 mr-1">
               {rowCount}
             </span>
-            <div className="flex gap-1.5 md:gap-2">
-              {Array.from({ length: maxItems }, (_, itemIndex) => {
-                if (itemIndex >= rowCount) {
-                  // Empty slot (item was removed or never existed in this row)
-                  return (
-                    <div
-                      key={itemIndex}
-                      className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-foreground/10"
-                      aria-hidden="true"
-                    />
-                  );
-                }
-
+            <div className={rowClasses}>
+              {Array.from({ length: rowCount }, (_, itemIndex) => {
                 const wouldBeRemoved = isHoveredRow && itemIndex >= removeStart;
 
                 return (
@@ -93,7 +91,7 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                     onClick={() => handleItemClick(rowIndex, itemIndex)}
                     onMouseEnter={() => handleItemHover(rowIndex, itemIndex)}
                     disabled={!isPlaying}
-                    className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-2 transition-all duration-150
+                    className={`${ITEM_SIZE_CLASSES} rounded-full border-2 transition-all duration-150
                       ${
                         wouldBeRemoved
                           ? gameState.currentPlayer === 1
