@@ -6,17 +6,17 @@
   --prussian-blue: #003153;
   --dusk-blue: #2b4570;
   --dusty-denim: #6b8cae;
-  --alabaster-grey: #e8e8e8;
 
-  /* Game Palette Colors */
-  --powder-petal: #f8e5e5;
-  --pastel-pink: #ffcccc;
-  --cherry-blossom: #ffb3c1;
-  --dusty-mauve: #c9a0dc;
-
-  /* Bee Game Token Colors */
-  --bee-amber: #f59e0b;
-  --bee-sky: #0ea5e9;
+  /* Unified Game Palette */
+  --powder-blush: #ffadad;
+  --apricot-cream: #ffd6a5;
+  --cream: #fdffb6;
+  --tea-green: #caffbf;
+  --electric-aqua: #9bf6ff;
+  --baby-blue-ice: #a0c4ff;
+  --periwinkle: #bdb2ff;
+  --mauve: #ffc6ff;
+  --porcelain: #fffffc;
 
   --background: #ffffff;
   --foreground: var(--ink-black);
@@ -31,17 +31,17 @@
   --color-prussian-blue: var(--prussian-blue);
   --color-dusk-blue: var(--dusk-blue);
   --color-dusty-denim: var(--dusty-denim);
-  --color-alabaster-grey: var(--alabaster-grey);
   
-  /* Game Palette */
-  --color-powder-petal: var(--powder-petal);
-  --color-pastel-pink: var(--pastel-pink);
-  --color-cherry-blossom: var(--cherry-blossom);
-  --color-dusty-mauve: var(--dusty-mauve);
-
-  /* Bee Game Tokens */
-  --color-bee-amber: var(--bee-amber);
-  --color-bee-sky: var(--bee-sky);
+  /* Unified Game Palette */
+  --color-powder-blush: var(--powder-blush);
+  --color-apricot-cream: var(--apricot-cream);
+  --color-cream: var(--cream);
+  --color-tea-green: var(--tea-green);
+  --color-electric-aqua: var(--electric-aqua);
+  --color-baby-blue-ice: var(--baby-blue-ice);
+  --color-periwinkle: var(--periwinkle);
+  --color-mauve: var(--mauve);
+  --color-porcelain: var(--porcelain);
   
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -50,14 +50,14 @@
 /* Dark mode */
 .dark {
   --background: var(--ink-black);
-  --foreground: var(--alabaster-grey);
+  --foreground: var(--porcelain);
 }
 
 /* System preference dark mode */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
     --background: var(--ink-black);
-    --foreground: var(--alabaster-grey);
+    --foreground: var(--porcelain);
   }
 }
 
