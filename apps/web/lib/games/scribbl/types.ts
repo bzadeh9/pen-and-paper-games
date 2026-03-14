@@ -9,13 +9,15 @@ export interface DrawColor {
 export const DRAW_COLORS: DrawColor[] = [
   { name: 'Black', value: '#1a1a1a' },
   { name: 'White', value: '#ffffff' },
-  { name: 'Red', value: '#e53e3e' },
-  { name: 'Green', value: '#38a169' },
-  { name: 'Blue', value: '#3182ce' },
   { name: 'Powder Blush', value: '#ffadad' },
+  { name: 'Apricot Cream', value: '#ffd6a5' },
+  { name: 'Cream', value: '#fdffb6' },
+  { name: 'Tea Green', value: '#caffbf' },
+  { name: 'Electric Aqua', value: '#9bf6ff' },
+  { name: 'Baby Blue Ice', value: '#a0c4ff' },
   { name: 'Periwinkle', value: '#bdb2ff' },
   { name: 'Mauve', value: '#ffc6ff' },
-  { name: 'Cream', value: '#fdffb6' },
+  { name: 'Porcelain', value: '#fffffc' },
 ];
 
 export const PAPER_COLOR = '#fdf8f0';
