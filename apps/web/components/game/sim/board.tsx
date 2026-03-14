@@ -137,7 +137,7 @@ export function Board({
               .join(' ')}
             className={
               gameState.loser === 1
-                ? 'fill-dusk-blue/15'
+                ? 'fill-baby-blue-ice/15'
                 : 'fill-powder-blush/15'
             }
           />
@@ -168,12 +168,12 @@ export function Board({
               className={
                 owner
                   ? owner === 1
-                    ? 'stroke-dusk-blue'
+                    ? 'stroke-baby-blue-ice'
                     : 'stroke-powder-blush'
                   : clickable
                     ? hovered
                       ? gameState.currentPlayer === 1
-                        ? 'stroke-dusk-blue/60'
+                        ? 'stroke-baby-blue-ice/60'
                         : 'stroke-powder-blush/60'
                       : 'stroke-foreground/15'
                     : 'stroke-foreground/15'

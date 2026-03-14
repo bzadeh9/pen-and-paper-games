@@ -25,8 +25,8 @@ export function GameStats({ stats, onReset, player1Name, player2Name }: GameStat
           <span className="font-semibold">{stats.gamesPlayed}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-dusk-blue font-medium">{player1Name} Wins:</span>
-          <span className="font-semibold text-dusk-blue">
+          <span className="text-electric-aqua font-medium">{player1Name} Wins:</span>
+          <span className="font-semibold text-electric-aqua">
             {stats.player1Wins}
           </span>
         </div>

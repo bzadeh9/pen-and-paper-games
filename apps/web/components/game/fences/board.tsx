@@ -122,7 +122,7 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 height={GRID_SPACING}
                 className={
                   owner === 1
-                    ? 'fill-dusk-blue/30'
+                    ? 'fill-electric-aqua/30'
                     : 'fill-powder-blush/30'
                 }
               />
@@ -154,12 +154,12 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 className={
                   placed
                     ? owner === 1
-                      ? 'stroke-dusk-blue'
+                      ? 'stroke-electric-aqua'
                       : 'stroke-powder-blush'
                     : clickable
                       ? hovered
                         ? gameState.currentPlayer === 1
-                          ? 'stroke-dusk-blue/60 cursor-pointer'
+                          ? 'stroke-electric-aqua/60 cursor-pointer'
                           : 'stroke-powder-blush/60 cursor-pointer'
                         : 'stroke-foreground/10 cursor-pointer'
                       : 'stroke-foreground/10'
@@ -199,12 +199,12 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 className={
                   placed
                     ? owner === 1
-                      ? 'stroke-dusk-blue'
+                      ? 'stroke-electric-aqua'
                       : 'stroke-powder-blush'
                     : clickable
                       ? hovered
                         ? gameState.currentPlayer === 1
-                          ? 'stroke-dusk-blue/60 cursor-pointer'
+                          ? 'stroke-electric-aqua/60 cursor-pointer'
                           : 'stroke-powder-blush/60 cursor-pointer'
                         : 'stroke-foreground/10 cursor-pointer'
                       : 'stroke-foreground/10'
@@ -293,7 +293,7 @@ export function Board({ gameState, onLineClick, player1Name, player2Name }: Boar
                 dominantBaseline="central"
                 className={
                   owner === 1
-                    ? 'fill-dusk-blue font-bold text-sm'
+                    ? 'fill-electric-aqua font-bold text-sm'
                     : 'fill-powder-blush font-bold text-sm'
                 }
                 fontSize={GRID_SPACING * 0.3}

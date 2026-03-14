@@ -3,9 +3,6 @@
 :root {
   /* Site Theme Colors */
   --ink-black: #1a1a1a;
-  --prussian-blue: #003153;
-  --dusk-blue: #2b4570;
-  --dusty-denim: #6b8cae;
 
   /* Unified Game Palette */
   --powder-blush: #ffadad;
@@ -28,9 +25,6 @@
   
   /* Site Theme */
   --color-ink-black: var(--ink-black);
-  --color-prussian-blue: var(--prussian-blue);
-  --color-dusk-blue: var(--dusk-blue);
-  --color-dusty-denim: var(--dusty-denim);
   
   /* Unified Game Palette */
   --color-powder-blush: var(--powder-blush);
