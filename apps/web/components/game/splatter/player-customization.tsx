@@ -47,7 +47,7 @@ export function PlayerCustomization({
       {/* Color selection */}
       <div>
         <label className="mb-2 block text-sm font-medium">Color</label>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="flex flex-wrap gap-2">
           {PLAYER_COLOR_OPTIONS.map((option) => {
             const isSelected = selectedColor === option.value;
             const isDisabled = otherPlayerColor === option.value;
@@ -58,13 +58,13 @@ export function PlayerCustomization({
                 key={option.value}
                 onClick={() => !isDisabled && onColorChange(option.value)}
                 disabled={isDisabled}
-                className={`group relative flex h-12 items-center justify-center rounded-md border-2 transition-all ${
+                className={`group relative flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all ${
                   isSelected
                     ? 'border-foreground shadow-md'
                     : 'border-foreground/20 hover:border-foreground/40'
-                } ${isDisabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
+                } ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 style={{
-                  backgroundColor: color,
+                  backgroundColor: isDisabled ? '#9ca3af' : color,
                 }}
                 title={
                   isDisabled ? 'Already selected by other player' : option.label
