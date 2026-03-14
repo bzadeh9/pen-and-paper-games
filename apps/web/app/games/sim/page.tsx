@@ -210,7 +210,7 @@ export default function SimPage() {
                   className={`text-2xl font-bold ${
                     gameState.currentPlayer === 1
                       ? 'text-dusk-blue'
-                      : 'text-cherry-blossom'
+                      : 'text-powder-blush'
                   }`}
                 >
                   {currentPlayerName}
@@ -227,7 +227,7 @@ export default function SimPage() {
                   className={`text-2xl font-bold ${
                     gameState.winner === 1
                       ? 'text-dusk-blue'
-                      : 'text-cherry-blossom'
+                      : 'text-powder-blush'
                   }`}
                 >
                   🎉 {winnerName} wins!
@@ -256,7 +256,7 @@ export default function SimPage() {
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-3 h-3 rounded-full ${
-                          player === 1 ? 'bg-dusk-blue' : 'bg-cherry-blossom'
+                          player === 1 ? 'bg-dusk-blue' : 'bg-powder-blush'
                         }`}
                       />
                       {isEditing ? (
@@ -327,7 +327,7 @@ export default function SimPage() {
                   <span className="font-medium">{stats.player1Wins}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-cherry-blossom">
+                  <span className="text-powder-blush">
                     {player2Name} Wins
                   </span>
                   <span className="font-medium">{stats.player2Wins}</span>

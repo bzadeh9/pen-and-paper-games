@@ -20,8 +20,8 @@ import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 export default function KnightChasePage() {
   const [player1Color, setPlayer1Color] =
-    useState<PlayerColor>('cherryBlossom');
-  const [player2Color, setPlayer2Color] = useState<PlayerColor>('dustyMauve');
+    useState<PlayerColor>('powderBlush');
+  const [player2Color, setPlayer2Color] = useState<PlayerColor>('periwinkle');
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
   const [stats, setStats] = useState(() => getGameStatistics());

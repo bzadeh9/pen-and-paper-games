@@ -88,7 +88,7 @@ export class OrderAndChaosEngine {
   }
 
   private checkForFiveInARow(): boolean {
-    const colors: PieceColor[] = ['cherry-blossom', 'dusty-mauve'];
+    const colors: PieceColor[] = ['powder-blush', 'periwinkle'];
 
     for (const color of colors) {
       // Check horizontal
@@ -144,7 +144,7 @@ export class OrderAndChaosEngine {
   private isGameUnwinnable(): boolean {
     // Check if there's still any possible way to make a line of 5
     // This checks all possible lines of 5 to see if at least one is still achievable
-    const colors: PieceColor[] = ['cherry-blossom', 'dusty-mauve'];
+    const colors: PieceColor[] = ['powder-blush', 'periwinkle'];
 
     for (const color of colors) {
       // Check horizontal

@@ -20,7 +20,7 @@ export function GameControls({
     <div className="space-y-4">
       {/* Win/Draw Message */}
       {isGameEnded && (
-        <div className="rounded-lg bg-cherry-blossom/10 p-4 text-center border border-cherry-blossom/20">
+        <div className="rounded-lg bg-powder-blush/10 p-4 text-center border border-powder-blush/20">
           {winner ? (
             <>
               <p className="text-xl font-semibold">
@@ -45,7 +45,7 @@ export function GameControls({
       {gameStatus !== 'playing' || isGameEnded ? (
         <button
           onClick={onReset}
-          className="w-full rounded-lg bg-cherry-blossom px-6 py-3 font-semibold text-ink-black transition-all hover:bg-cherry-blossom/80 hover:scale-105"
+          className="w-full rounded-lg bg-powder-blush px-6 py-3 font-semibold text-ink-black transition-all hover:bg-powder-blush/80 hover:scale-105"
         >
           {isGameEnded ? 'Play Again' : 'Reset Game'}
         </button>

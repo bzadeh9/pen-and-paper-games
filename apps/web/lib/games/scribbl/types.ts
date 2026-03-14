@@ -12,10 +12,10 @@ export const DRAW_COLORS: DrawColor[] = [
   { name: 'Red', value: '#e53e3e' },
   { name: 'Green', value: '#38a169' },
   { name: 'Blue', value: '#3182ce' },
-  { name: 'Cherry Blossom', value: '#ffb3c1' },
-  { name: 'Dusty Mauve', value: '#c9a0dc' },
-  { name: 'Pastel Pink', value: '#ffcccc' },
-  { name: 'Powder Petal', value: '#f8e5e5' },
+  { name: 'Powder Blush', value: '#ffadad' },
+  { name: 'Periwinkle', value: '#bdb2ff' },
+  { name: 'Mauve', value: '#ffc6ff' },
+  { name: 'Cream', value: '#fdffb6' },
 ];
 
 export const PAPER_COLOR = '#fdf8f0';

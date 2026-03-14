@@ -30,12 +30,12 @@ export function GameStats({ stats, onReset }: GameStatsProps) {
 
         <div className="flex items-center justify-between">
           <span className="text-foreground/70">X Wins:</span>
-          <span className="font-bold text-cherry-blossom">{stats.xWins}</span>
+          <span className="font-bold text-powder-blush">{stats.xWins}</span>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-foreground/70">O Wins:</span>
-          <span className="font-bold text-dusty-mauve">{stats.oWins}</span>
+          <span className="font-bold text-periwinkle">{stats.oWins}</span>
         </div>
 
         <div className="flex items-center justify-between">

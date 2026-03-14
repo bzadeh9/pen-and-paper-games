@@ -125,7 +125,7 @@ export function GameControls({
             playerNumber={2}
             playerName={player2Name}
             onNameChange={onPlayer2NameChange}
-            colorClass="text-cherry-blossom"
+            colorClass="text-powder-blush"
           />
         </div>
       </div>

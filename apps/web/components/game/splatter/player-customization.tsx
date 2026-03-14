@@ -77,12 +77,7 @@ export function PlayerCustomization({
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                     style={{
-                      color:
-                        option.value === 'alabasterGrey' ||
-                        option.value === 'powderPetal' ||
-                        option.value === 'pastelPink'
-                          ? '#1a1a1a'
-                          : '#ffffff',
+                      color: '#1a1a1a',
                     }}
                   >
                     <path

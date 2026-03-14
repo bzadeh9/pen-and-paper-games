@@ -58,10 +58,9 @@ export function PlayerCustomization({
   };
 
   // Helper to get contrasting color for checkmark
-  const getCheckmarkColor = (color: PlayerColor): string => {
-    // Use dark checkmark for light colors
-    const lightColors = ['alabasterGrey', 'powderPetal', 'pastelPink'];
-    return lightColors.includes(color) ? '#000000' : '#FFFFFF';
+  // All unified palette colors are pastel/light, so always use dark checkmark
+  const getCheckmarkColor = (_color: PlayerColor): string => {
+    return '#000000';
   };
 
   return (

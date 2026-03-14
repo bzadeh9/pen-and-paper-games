@@ -138,7 +138,7 @@ export function Board({
             className={
               gameState.loser === 1
                 ? 'fill-dusk-blue/15'
-                : 'fill-cherry-blossom/15'
+                : 'fill-powder-blush/15'
             }
           />
         )}
@@ -169,12 +169,12 @@ export function Board({
                 owner
                   ? owner === 1
                     ? 'stroke-dusk-blue'
-                    : 'stroke-cherry-blossom'
+                    : 'stroke-powder-blush'
                   : clickable
                     ? hovered
                       ? gameState.currentPlayer === 1
                         ? 'stroke-dusk-blue/60'
-                        : 'stroke-cherry-blossom/60'
+                        : 'stroke-powder-blush/60'
                       : 'stroke-foreground/15'
                     : 'stroke-foreground/15'
               }
