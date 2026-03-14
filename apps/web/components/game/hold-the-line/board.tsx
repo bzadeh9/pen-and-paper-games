@@ -73,6 +73,8 @@ export function GameBoard({
   // Sync game state when engine changes
   useEffect(() => {
     setGameState(engine.getState());
+    setPendingMove(null);
+    setHoveredDot(null);
   }, [engine]);
 
   useEffect(() => {
@@ -112,8 +114,15 @@ export function GameBoard({
     }
 
     const validEnds = engine.getValidConnectionEnds(pos);
-    if (gameState.pathEnds && validEnds.length > 1) {
-      setPendingMove({ pos, ends: validEnds });
+    // Deduplicate ends by position — after the first move, pathEnds is [x, x]
+    // so getValidConnectionEnds returns the same position twice, which would
+    // incorrectly trigger the ambiguous-end selection flow.
+    const distinctEnds = validEnds.filter(
+      (end, i, arr) =>
+        arr.findIndex((e) => e.row === end.row && e.col === end.col) === i
+    );
+    if (gameState.pathEnds && distinctEnds.length > 1) {
+      setPendingMove({ pos, ends: distinctEnds });
       setErrorMessage(null);
       return;
     }
@@ -234,8 +243,13 @@ export function GameBoard({
       return [];
     }
 
-    const validEnds =
+    const rawEnds =
       pendingMove?.ends ?? engine.getValidConnectionEnds(previewDot);
+    // Deduplicate ends by position to avoid rendering overlapping dashed lines
+    const validEnds = rawEnds.filter(
+      (end, i, arr) =>
+        arr.findIndex((e) => e.row === end.row && e.col === end.col) === i
+    );
     if (validEnds.length === 0) return [];
 
     return validEnds.map((end) => ({
