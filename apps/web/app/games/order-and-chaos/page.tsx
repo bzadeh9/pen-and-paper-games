@@ -150,8 +150,8 @@ export default function OrderAndChaosPage() {
                 <li>
                   <strong>Display Mode:</strong> Choose between Color Mode
                   (colored circles) or X and O Mode (classic symbols). In X and
-                  O Mode, X represents powder blush and O represents dusty
-                  mauve.
+                  O Mode, X represents powder blush and O represents
+                  periwinkle.
                 </li>
                 <li>
                   <strong>The Turn:</strong> On your turn, select a color
@@ -203,8 +203,8 @@ export default function OrderAndChaosPage() {
                 </li>
                 <li>
                   <strong>The Decoy:</strong> Start building a powder blush
-                  line to force Chaos to react, then suddenly pivot to a dusty
-                  mauve line on the other side of the board.
+                  line to force Chaos to react, then suddenly pivot to a
+                  periwinkle line on the other side of the board.
                 </li>
               </ul>
 
