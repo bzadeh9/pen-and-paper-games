@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { generateWindowLayout } from './layout';
 
+const SMALL_PANE_THRESHOLD = 0.45;
+const LARGE_PANE_THRESHOLD = 1.4;
+
 function createSeededRandom(seed: number) {
   let value = seed >>> 0;
 
@@ -37,7 +40,7 @@ describe('generateWindowLayout', () => {
     const largestArea = areas[areas.length - 1];
 
     expect(layout.sections.length).toBeGreaterThanOrEqual(15);
-    expect(areas[0]).toBeLessThan(medianArea * 0.45);
-    expect(largestArea).toBeGreaterThan(medianArea * 1.4);
+    expect(areas[0]).toBeLessThan(medianArea * SMALL_PANE_THRESHOLD);
+    expect(largestArea).toBeGreaterThan(medianArea * LARGE_PANE_THRESHOLD);
   });
 });
