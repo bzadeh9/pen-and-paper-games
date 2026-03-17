@@ -74,6 +74,19 @@ export function Board({
       : `Section ${sectionId + 1}, unavailable`;
   };
 
+  const getSectionClassName = (isOwned: boolean, clickable: boolean) => {
+    if (isOwned) return '';
+    if (gameState.status !== 'playing') return '';
+
+    if (showPossibleMoves) {
+      return clickable
+        ? 'cursor-pointer transition-all duration-150 hover:brightness-90'
+        : 'opacity-40';
+    }
+
+    return 'cursor-pointer transition-all duration-150 hover:brightness-95';
+  };
+
   const showSetupOverlay = gameState.status === 'setup';
 
   return (
@@ -113,17 +126,7 @@ export function Board({
                   strokeWidth={1.5}
                   role="gridcell"
                   aria-label={getSectionLabel(layoutSection.id)}
-                  className={
-                    isOwned
-                      ? ''
-                      : gameState.status === 'playing'
-                        ? showPossibleMoves
-                          ? clickable
-                            ? 'cursor-pointer transition-all duration-150 hover:brightness-90'
-                            : 'opacity-40'
-                          : 'cursor-pointer transition-all duration-150 hover:brightness-95'
-                        : ''
-                  }
+                  className={getSectionClassName(isOwned, clickable)}
                   style={
                     clickable && showPossibleMoves
                       ? { filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { generateWindowLayout } from './layout';
 
-const SMALL_PANE_THRESHOLD = 0.45;
-const LARGE_PANE_THRESHOLD = 1.4;
+const SMALL_PANE_THRESHOLD = 0.45; // Smallest pane should be <45% of median area
+const LARGE_PANE_THRESHOLD = 1.4; // Largest pane should be >140% of median area
 
 function createSeededRandom(seed: number) {
   let value = seed >>> 0;

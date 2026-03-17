@@ -37,8 +37,8 @@ const PADDING = 15; // Inset padding so polygons don't touch frame edge
 const CLUSTER_RATIO = 0.3; // Share of seeds reserved for tighter clusters
 const CLUSTER_MIN_RATIO = 0.2; // Lower spacing multiplier for tiny accent panes
 const CLUSTER_MAX_RATIO = 0.42; // Upper spacing multiplier to keep clusters local
-const MIN_CLUSTER_DISTANCE = 10;
-const MAX_CLUSTER_DISTANCE = 22;
+const CLUSTER_DISTANCE_MIN_ABSOLUTE = 10; // Minimum spacing fallback in pixels
+const CLUSTER_DISTANCE_MAX_ABSOLUTE = 22; // Maximum spacing cap in pixels
 
 /**
  * Build the SVG path string for the arched window outline.
@@ -85,8 +85,14 @@ function isInsideWindow(p: Point): boolean {
 function generateSeedPoints(count: number): Point[] {
   const points: Point[] = [];
   const minDist = Math.max(40, 300 / Math.sqrt(count)); // Minimum distance between major panes
-  const clusterMinDist = Math.max(MIN_CLUSTER_DISTANCE, minDist * CLUSTER_MIN_RATIO);
-  const clusterMaxDist = Math.max(MAX_CLUSTER_DISTANCE, minDist * CLUSTER_MAX_RATIO);
+  const clusterMinDist = Math.max(
+    CLUSTER_DISTANCE_MIN_ABSOLUTE,
+    minDist * CLUSTER_MIN_RATIO
+  );
+  const clusterMaxDist = Math.min(
+    CLUSTER_DISTANCE_MAX_ABSOLUTE,
+    minDist * CLUSTER_MAX_RATIO
+  );
   const clusteredCount = Math.max(2, Math.floor(count * CLUSTER_RATIO));
   const evenlyDistributedTarget = Math.max(1, count - clusteredCount);
   const maxAttempts = count * 250;
