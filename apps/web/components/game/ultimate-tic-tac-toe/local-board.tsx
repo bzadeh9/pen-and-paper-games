@@ -14,8 +14,8 @@ export function LocalBoard({ board, isActive, onCellClick }: LocalBoardProps) {
   const hasWinner = board.winner !== null;
 
   const getWinnerColor = () => {
-    if (board.winner === 'X') return 'text-dusty-mauve';
-    if (board.winner === 'O') return 'text-pastel-pink';
+    if (board.winner === 'X') return 'text-periwinkle';
+    if (board.winner === 'O') return 'text-mauve';
     return 'text-foreground/60';
   };
 
@@ -23,7 +23,7 @@ export function LocalBoard({ board, isActive, onCellClick }: LocalBoardProps) {
     <div
       className={`
         relative rounded-lg border-2 transition-all duration-300 p-1
-        ${isActive ? 'border-cherry-blossom shadow-lg shadow-cherry-blossom/30' : 'border-foreground/20'}
+        ${isActive ? 'border-powder-blush shadow-lg shadow-powder-blush/30' : 'border-foreground/20'}
         ${hasWinner ? 'bg-foreground/5' : 'bg-background'}
       `}
     >

@@ -87,7 +87,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
 
   const playerName = (p: Player) => (p === 1 ? 'Abbee' : 'Dot');
   const playerColor = (p: Player) =>
-    p === 1 ? 'text-cherry-blossom' : 'text-dusty-mauve';
+    p === 1 ? 'text-powder-blush' : 'text-periwinkle';
 
   const {
     bee,
@@ -236,7 +236,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 />
               ))}
               <div
-                className="rounded-full border border-cherry-blossom bg-cherry-blossom/70 dark:bg-cherry-blossom/50"
+                className="rounded-full border border-powder-blush bg-powder-blush/70 dark:bg-powder-blush/50"
                 style={{
                   width: flower.width,
                   height: FLOWER_PETAL_HEIGHT,
@@ -245,7 +245,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
               />
               {/* Centre dot */}
               <div
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-300 bg-bee-amber"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-300 bg-apricot-cream"
                 style={{ width: 8, height: 8 }}
               />
             </div>

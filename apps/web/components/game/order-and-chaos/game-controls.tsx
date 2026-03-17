@@ -82,7 +82,7 @@ export function GameControls({
 
       {/* Win/Reset Message */}
       {isGameEnded && winner && (
-        <div className="rounded-lg bg-cherry-blossom/10 p-4 text-center border border-cherry-blossom/20">
+        <div className="rounded-lg bg-powder-blush/10 p-4 text-center border border-powder-blush/20">
           <p className="text-xl font-semibold">
             {winner === 'order' ? '🎉 Order Wins!' : '🌪️ Chaos Wins!'}
           </p>
@@ -97,7 +97,7 @@ export function GameControls({
       {/* Start/Reset Button */}
       <button
         onClick={isSetup ? onStart : onReset}
-        className="w-full rounded-lg bg-cherry-blossom px-6 py-3 font-semibold text-ink-black transition-all hover:bg-cherry-blossom/80 hover:scale-105"
+        className="w-full rounded-lg bg-powder-blush px-6 py-3 font-semibold text-ink-black transition-all hover:bg-powder-blush/80 hover:scale-105"
       >
         {isSetup ? 'Start Game' : isGameEnded ? 'Play Again' : 'Reset Game'}
       </button>

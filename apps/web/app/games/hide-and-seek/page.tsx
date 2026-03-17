@@ -83,7 +83,7 @@ export default function HideAndSeekPage() {
         </div>
 
         {/* Backstory */}
-        <div className="mb-6 rounded-lg border border-foreground/20 bg-powder-petal/30 px-6 py-5">
+        <div className="mb-6 rounded-lg border border-foreground/20 bg-cream/30 px-6 py-5">
           <h2 className="mb-2 text-lg font-semibold">
             The Story of Abbee &amp; Dot
           </h2>
@@ -189,7 +189,7 @@ export default function HideAndSeekPage() {
                     disabled={gameStatus !== 'hiding'}
                     className={`rounded-md border px-2 py-1 text-xs font-medium transition-all disabled:cursor-not-allowed ${
                       gridSize === size
-                        ? 'border-cherry-blossom bg-cherry-blossom/20 text-cherry-blossom'
+                        ? 'border-powder-blush bg-powder-blush/20 text-powder-blush'
                         : 'border-foreground/20 text-foreground/50 hover:border-foreground/40 hover:text-foreground/70 disabled:opacity-50'
                     }`}
                     aria-pressed={gridSize === size}
@@ -219,11 +219,11 @@ export default function HideAndSeekPage() {
               <h3 className="mb-3 text-lg font-semibold">Legend</h3>
               <div className="space-y-2 text-sm text-foreground/70">
                 <div className="flex items-center gap-2">
-                  <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-cherry-blossom bg-cherry-blossom/30" />
+                  <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-powder-blush bg-powder-blush/30" />
                   <span>Hidden gem 💎 (hiding phase)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-dusty-mauve bg-dusty-mauve/30" />
+                  <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-periwinkle bg-periwinkle/30" />
                   <span>Selected cell ✨ (seeking phase)</span>
                 </div>
                 <div className="flex items-center gap-2">

@@ -15,7 +15,7 @@ export function CellComponent({
 }: CellProps) {
   const getOwnerColor = (owner: Player | null) => {
     if (!owner) return '';
-    return owner === 'player1' ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
+    return owner === 'player1' ? 'bg-powder-blush' : 'bg-periwinkle';
   };
 
   const getOwnerLabel = (owner: Player | null) => {
@@ -37,7 +37,7 @@ export function CellComponent({
         ${!isDisabled && !cell.owner ? 'hover:scale-110 hover:shadow-lg cursor-pointer' : ''}
         ${isDisabled ? 'cursor-not-allowed' : ''}
         ${cell.owner ? 'scale-100 hover:scale-105' : ''}
-        ${isHighlighted && !cell.owner ? 'ring-2 ring-cherry-blossom/50 bg-cherry-blossom/5' : ''}
+        ${isHighlighted && !cell.owner ? 'ring-2 ring-powder-blush/50 bg-powder-blush/5' : ''}
       `}
       aria-label={`Cell ${columnLabel}${rowLabel}, ${getOwnerLabel(cell.owner)}`}
     >
