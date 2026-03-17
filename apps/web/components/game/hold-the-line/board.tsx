@@ -70,13 +70,6 @@ export function GameBoard({
     return offsets;
   });
 
-  // Sync game state when engine changes
-  useEffect(() => {
-    setGameState(engine.getState());
-    setPendingMove(null);
-    setHoveredDot(null);
-  }, [engine]);
-
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
       onGameEnd(gameState.winner);
@@ -98,6 +91,14 @@ export function GameBoard({
 
   const handleDotClick = (pos: Position) => {
     if (gameState.status !== 'playing') return;
+
+    const selectedPendingEnd = pendingMove?.ends.find(
+      (end) => end.row === pos.row && end.col === pos.col
+    );
+    if (selectedPendingEnd) {
+      handleEndSelection(selectedPendingEnd);
+      return;
+    }
 
     if (!engine.isValidMove(pos)) {
       // Provide feedback for invalid move
@@ -505,6 +506,13 @@ export function GameBoard({
               const { x, y } = getDotPosition(row, col);
               const visited = isVisited(pos);
               const valid = isValidMove(pos);
+              const isPendingEnd =
+                pendingMove?.ends.some(
+                  (end) => end.row === row && end.col === col
+                ) ?? false;
+              const isClickable =
+                gameState.status === 'playing' &&
+                ((valid && !visited) || isPendingEnd);
               const hovered =
                 hoveredDot?.row === row && hoveredDot?.col === col;
               const isPending =
@@ -520,22 +528,21 @@ export function GameBoard({
                     fill={visited ? USED_DOT_COLOR : NEUTRAL_DOT_COLOR}
                     opacity={visited ? 0.8 : 0.5}
                     className={`transition-all ${
-                      valid && !visited && gameState.status === 'playing'
-                        ? 'cursor-pointer'
-                        : ''
+                      isClickable ? 'cursor-pointer' : ''
                     }`}
-                    onClick={() =>
-                      valid && !visited && gameState.status === 'playing'
-                        ? handleDotClick(pos)
-                        : null
-                    }
+                    onClick={() => (isClickable ? handleDotClick(pos) : null)}
                     onMouseEnter={() => setHoveredDot(pos)}
                     onMouseLeave={() => setHoveredDot(null)}
+                    role={isClickable ? 'button' : undefined}
+                    aria-label={
+                      isPendingEnd
+                        ? `Connect from row ${row + 1} column ${col + 1}`
+                        : isClickable
+                          ? `Choose dot row ${row + 1} column ${col + 1}`
+                          : undefined
+                    }
                     style={{
-                      pointerEvents:
-                        valid && !visited && gameState.status === 'playing'
-                          ? 'auto'
-                          : 'none',
+                      pointerEvents: isClickable ? 'auto' : 'none',
                     }}
                   />
 
@@ -562,6 +569,7 @@ export function GameBoard({
                       fontWeight="bold"
                       fill="currentColor"
                       opacity="0.5"
+                      style={{ pointerEvents: 'none' }}
                     >
                       {gameState.moveHistory.findIndex(
                         (move) => move.row === row && move.col === col
