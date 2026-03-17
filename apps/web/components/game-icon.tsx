@@ -22,6 +22,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'order-and-chaos': { bg: 'bg-apricot-cream/20', text: 'text-apricot-cream' },
   sim: { bg: 'bg-electric-aqua/20', text: 'text-electric-aqua' },
   'row-call': { bg: 'bg-powder-blush/20', text: 'text-powder-blush' },
+  nim: { bg: 'bg-powder-blush/20', text: 'text-powder-blush' },
   scribbl: { bg: 'bg-tea-green/20', text: 'text-tea-green' },
   'bee-game': { bg: 'bg-apricot-cream/20', text: 'text-apricot-cream' },
   'hide-and-seek': { bg: 'bg-electric-aqua/20', text: 'text-electric-aqua' },

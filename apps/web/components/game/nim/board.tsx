@@ -95,8 +95,8 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                       ${
                         wouldBeRemoved
                           ? gameState.currentPlayer === 1
-                            ? 'border-dusk-blue bg-dusk-blue/30 scale-110'
-                            : 'border-cherry-blossom bg-cherry-blossom/30 scale-110'
+                            ? 'border-periwinkle bg-periwinkle/30 scale-110'
+                            : 'border-powder-blush bg-powder-blush/30 scale-110'
                           : 'border-foreground/30 bg-foreground/10 hover:border-foreground/50'
                       }
                       ${isPlaying ? 'cursor-pointer' : 'cursor-default'}
