@@ -3,10 +3,10 @@ import { render } from '@testing-library/react';
 import { GameIcon, gameColors } from './game-icon';
 
 describe('GameIcon', () => {
-  it('uses lighter knight chase colors', () => {
+  it('uses tea-green knight chase colors', () => {
     expect(gameColors['knight-chase']).toEqual({
-      bg: 'bg-powder-petal/20',
-      text: 'text-powder-petal',
+      bg: 'bg-tea-green/20',
+      text: 'text-tea-green',
     });
   });
 

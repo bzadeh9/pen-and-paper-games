@@ -32,8 +32,8 @@ window.webkitAudioContext = vi.fn().mockImplementation(() => audioContextMock);
 
 describe('KnightChase GameBoard', () => {
   const defaultProps = {
-    player1Color: 'cherryBlossom' as const,
-    player2Color: 'dustyMauve' as const,
+    player1Color: 'powderBlush' as const,
+    player2Color: 'periwinkle' as const,
     player1Name: 'Player 1',
     player2Name: 'Player 2',
   };

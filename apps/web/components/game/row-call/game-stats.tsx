@@ -32,13 +32,13 @@ export function GameStats({
         </div>
         <div className="flex justify-between">
           <span className="text-foreground/60">Player 1 Wins:</span>
-          <span className="font-semibold text-cherry-blossom">
+          <span className="font-semibold text-powder-blush">
             {player1Wins}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-foreground/60">Player 2 Wins:</span>
-          <span className="font-semibold text-dusty-mauve">{player2Wins}</span>
+          <span className="font-semibold text-periwinkle">{player2Wins}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-foreground/60">Draws:</span>

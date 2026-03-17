@@ -7,7 +7,7 @@ import { PlayerColor } from '@/lib/games/hold-the-line/types';
 describe('PlayerCustomization', () => {
   const defaultProps = {
     playerNumber: 1 as const,
-    selectedColor: 'cherryBlossom' as PlayerColor,
+    selectedColor: 'powderBlush' as PlayerColor,
     onColorChange: vi.fn(),
   };
 
@@ -117,11 +117,11 @@ describe('PlayerCustomization', () => {
     // Should have 5 color buttons (based on PLAYER_COLOR_OPTIONS)
     const colorButtons = screen.getAllByRole('button').filter((button) => {
       return (
-        button.title?.includes('Alabaster') ||
-        button.title?.includes('Powder') ||
-        button.title?.includes('Pastel') ||
-        button.title?.includes('Cherry') ||
-        button.title?.includes('Dusty')
+        button.title?.includes('Porcelain') ||
+        button.title?.includes('Cream') ||
+        button.title?.includes('Mauve') ||
+        button.title?.includes('Powder Blush') ||
+        button.title?.includes('Periwinkle')
       );
     });
 
@@ -132,17 +132,17 @@ describe('PlayerCustomization', () => {
     render(
       <PlayerCustomization
         {...defaultProps}
-        selectedColor="cherryBlossom"
-        otherPlayerColor="dustyMauve"
+        selectedColor="powderBlush"
+        otherPlayerColor="periwinkle"
       />
     );
 
-    const dustyMauveButton = screen.getByRole('button', {
-      name: /Dusty Mauve.*unavailable/i,
+    const periwinkleButton = screen.getByRole('button', {
+      name: /Periwinkle.*unavailable/i,
     });
 
-    expect(dustyMauveButton).toBeDisabled();
-    expect(dustyMauveButton).toHaveAttribute('aria-disabled', 'true');
+    expect(periwinkleButton).toBeDisabled();
+    expect(periwinkleButton).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('should call onColorChange when a color is selected', () => {
@@ -155,12 +155,12 @@ describe('PlayerCustomization', () => {
       />
     );
 
-    const pastelPinkButton = screen.getByRole('button', {
-      name: /Pastel Pink/i,
+    const mauveButton = screen.getByRole('button', {
+      name: /Mauve/i,
     });
 
-    fireEvent.click(pastelPinkButton);
-    expect(handleColorChange).toHaveBeenCalledWith('pastelPink');
+    fireEvent.click(mauveButton);
+    expect(handleColorChange).toHaveBeenCalledWith('mauve');
   });
 
   it('should not allow selecting disabled color', () => {
@@ -169,39 +169,39 @@ describe('PlayerCustomization', () => {
     render(
       <PlayerCustomization
         {...defaultProps}
-        selectedColor="cherryBlossom"
+        selectedColor="powderBlush"
         onColorChange={handleColorChange}
-        otherPlayerColor="dustyMauve"
+        otherPlayerColor="periwinkle"
       />
     );
 
-    const dustyMauveButton = screen.getByRole('button', {
-      name: /Dusty Mauve.*unavailable/i,
+    const periwinkleButton = screen.getByRole('button', {
+      name: /Periwinkle.*unavailable/i,
     });
 
-    fireEvent.click(dustyMauveButton);
+    fireEvent.click(periwinkleButton);
     // Should not call onColorChange for disabled color
     expect(handleColorChange).not.toHaveBeenCalled();
   });
 
   it('should show checkmark on selected color', () => {
     render(
-      <PlayerCustomization {...defaultProps} selectedColor="cherryBlossom" />
+      <PlayerCustomization {...defaultProps} selectedColor="powderBlush" />
     );
 
-    const cherryBlossomButton = screen.getByRole('button', {
-      name: /Cherry Blossom.*selected/i,
+    const powderBlushButton = screen.getByRole('button', {
+      name: /Powder Blush.*selected/i,
     });
 
     // Check if checkmark is present
-    expect(cherryBlossomButton.textContent).toContain('✓');
+    expect(powderBlushButton.textContent).toContain('✓');
   });
 
   it('should use contrasting checkmark color for light backgrounds', () => {
     const { container } = render(
       <PlayerCustomization
         {...defaultProps}
-        selectedColor="alabasterGrey" // Light color
+        selectedColor="porcelain" // Light color
       />
     );
 
@@ -211,18 +211,18 @@ describe('PlayerCustomization', () => {
     expect(checkmark).toHaveStyle({ color: '#000000' });
   });
 
-  it('should use white checkmark color for dark backgrounds', () => {
+  it('should use dark checkmark color for all pastel backgrounds', () => {
     const { container } = render(
       <PlayerCustomization
         {...defaultProps}
-        selectedColor="dustyMauve" // Darker color
+        selectedColor="periwinkle"
       />
     );
 
     const checkmark = container.querySelector('span[aria-hidden="true"]');
     expect(checkmark).toBeInTheDocument();
-    // Should have white color for dark background
-    expect(checkmark).toHaveStyle({ color: '#FFFFFF' });
+    // All unified palette colors are pastel/light, so always use dark checkmark
+    expect(checkmark).toHaveStyle({ color: '#000000' });
   });
 
   it('should not show name edit UI when onNameChange is not provided', () => {

@@ -69,7 +69,7 @@ export default function VirtueMemoryPage() {
         </div>
 
         {/* Backstory */}
-        <div className="mb-6 rounded-lg border border-foreground/20 bg-powder-petal/30 px-6 py-5">
+        <div className="mb-6 rounded-lg border border-foreground/20 bg-cream/30 px-6 py-5">
           <h2 className="mb-2 text-lg font-semibold">
             The Story of Abbee &amp; Dot
           </h2>

@@ -132,29 +132,29 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
 
             if (status === 'hiding') {
               if (isHiddenGem) {
-                cellClass += 'cursor-pointer border-cherry-blossom bg-cherry-blossom/40 scale-105 shadow-md';
+                cellClass += 'cursor-pointer border-powder-blush bg-powder-blush/40 scale-105 shadow-md';
               } else {
-                cellClass += 'cursor-pointer border-foreground/20 bg-background hover:border-cherry-blossom/60 hover:bg-cherry-blossom/10';
+                cellClass += 'cursor-pointer border-foreground/20 bg-background hover:border-powder-blush/60 hover:bg-powder-blush/10';
               }
             } else if (status === 'seeking') {
               if (restartRevealMode) {
                 if (isRevealed) {
-                  cellClass += 'cursor-default border-cherry-blossom bg-cherry-blossom/40';
+                  cellClass += 'cursor-default border-powder-blush bg-powder-blush/40';
                 } else {
                   cellClass += 'cursor-default border-foreground/20 bg-background';
                 }
               } else if (isHinted && !isSelected) {
-                cellClass += 'cursor-pointer border-cherry-blossom bg-cherry-blossom/20 hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
+                cellClass += 'cursor-pointer border-powder-blush bg-powder-blush/20 hover:border-periwinkle/60 hover:bg-periwinkle/10';
               } else if (isSelected) {
-                cellClass += 'cursor-pointer border-dusty-mauve bg-dusty-mauve/40 scale-105 shadow-md';
+                cellClass += 'cursor-pointer border-periwinkle bg-periwinkle/40 scale-105 shadow-md';
               } else if (wasInLastGuess) {
-                cellClass += 'cursor-pointer border-foreground/30 bg-foreground/5 hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
+                cellClass += 'cursor-pointer border-foreground/30 bg-foreground/5 hover:border-periwinkle/60 hover:bg-periwinkle/10';
               } else {
-                cellClass += 'cursor-pointer border-foreground/20 bg-background hover:border-dusty-mauve/60 hover:bg-dusty-mauve/10';
+                cellClass += 'cursor-pointer border-foreground/20 bg-background hover:border-periwinkle/60 hover:bg-periwinkle/10';
               }
             } else if (status === 'ended') {
               if (isRevealed) {
-                cellClass += 'cursor-default border-cherry-blossom bg-cherry-blossom/40';
+                cellClass += 'cursor-default border-powder-blush bg-powder-blush/40';
               } else {
                 cellClass += 'cursor-default border-foreground/20 bg-background';
               }
@@ -215,11 +215,11 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
       {gameState.status === 'hiding' && (
         <div className="text-center">
           <p className="text-lg font-semibold">
-            <span className="text-cherry-blossom">{hiderName}</span> is hiding the gems!
+            <span className="text-powder-blush">{hiderName}</span> is hiding the gems!
           </p>
           <p className="text-sm text-foreground/60">
             Select {GEMS_TO_HIDE} gems to hide.{' '}
-            <span className="font-medium text-cherry-blossom">
+            <span className="font-medium text-powder-blush">
               {gameState.hiddenGems.length}/{GEMS_TO_HIDE}
             </span>{' '}
             placed.
@@ -230,12 +230,12 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
       {gameState.status === 'seeking' && !restartRevealMode && (
         <div className="text-center">
           <p className="text-lg font-semibold">
-            <span className="text-dusty-mauve">{seekerName}</span> is searching!
+            <span className="text-periwinkle">{seekerName}</span> is searching!
           </p>
           {lastGuessCorrect !== null && (
             <p className="mt-2 rounded-lg border border-foreground/20 bg-background px-4 py-2 text-sm font-medium">
               Last guess:{' '}
-              <span className="font-bold text-dusty-mauve">
+              <span className="font-bold text-periwinkle">
                 {lastGuessCorrect} / {GEMS_TO_HIDE}
               </span>{' '}
               correct · Attempt {gameState.guesses.length}
@@ -246,7 +246,7 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
 
       {gameState.status === 'seeking' && restartRevealMode && (
         <div className="text-center">
-          <p className="text-lg font-semibold text-cherry-blossom">
+          <p className="text-lg font-semibold text-powder-blush">
             Here&apos;s where the gems were! 💎
           </p>
           <p className="text-sm text-foreground/60">
@@ -259,7 +259,7 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
         <div className="text-center">
           <p className="text-2xl font-bold">🎉 Found them all!</p>
           <p className="text-lg text-foreground/70">
-            <span className="font-semibold text-dusty-mauve">{seekerName}</span>{' '}
+            <span className="font-semibold text-periwinkle">{seekerName}</span>{' '}
             found all {GEMS_TO_HIDE} gems in{' '}
             <span className="font-semibold">{gameState.guesses.length}</span>{' '}
             {gameState.guesses.length === 1 ? 'guess' : 'guesses'}!
@@ -304,7 +304,7 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
               onClick={handleUseHint}
               disabled={gameState.hintUsed}
               title={gameState.hintUsed ? 'Hint already used' : 'Ask Abbee for a hint!'}
-              className="rounded-lg border-2 border-cherry-blossom px-4 py-3 text-sm font-bold text-cherry-blossom transition-all hover:bg-cherry-blossom/10 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-cherry-blossom focus:ring-offset-2"
+              className="rounded-lg border-2 border-powder-blush px-4 py-3 text-sm font-bold text-powder-blush transition-all hover:bg-powder-blush/10 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-powder-blush focus:ring-offset-2"
             >
               🐝 Hint
             </button>
@@ -361,9 +361,9 @@ export function GameBoard({ gridSize, onGameEnd, onStatusChange }: GameBoardProp
                 <span
                   className={`font-bold ${
                     g.correct === GEMS_TO_HIDE
-                      ? 'text-cherry-blossom'
+                      ? 'text-powder-blush'
                       : g.correct >= 2
-                        ? 'text-dusty-mauve'
+                        ? 'text-periwinkle'
                         : 'text-foreground/50'
                   }`}
                 >

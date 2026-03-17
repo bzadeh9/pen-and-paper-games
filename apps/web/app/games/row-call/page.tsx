@@ -134,12 +134,12 @@ export default function RowCallPage() {
               <h3 className="text-lg font-semibold mb-2">How Turns Work</h3>
               <ul className="mb-4 space-y-2">
                 <li>
-                  <strong className="text-cherry-blossom">Step 1:</strong> The
+                  <strong className="text-powder-blush">Step 1:</strong> The
                   active player (whose dot will be placed) chooses a row or
                   column.
                 </li>
                 <li>
-                  <strong className="text-dusty-mauve">Step 2:</strong> Their
+                  <strong className="text-periwinkle">Step 2:</strong> Their
                   opponent then picks exactly which empty cell in that row or
                   column to place the dot.
                 </li>

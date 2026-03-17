@@ -24,7 +24,7 @@ export function TurnIndicator({
   const activeLabel = activePlayer === 'player1' ? 'Player 1' : 'Player 2';
   const actingLabel = actingPlayer === 'player1' ? 'Player 1' : 'Player 2';
   const activeColor =
-    activePlayer === 'player1' ? 'text-cherry-blossom' : 'text-dusty-mauve';
+    activePlayer === 'player1' ? 'text-powder-blush' : 'text-periwinkle';
 
   const selectableRows = selectableLines.filter((l) => l.type === 'row');
   const selectableCols = selectableLines.filter((l) => l.type === 'column');
@@ -65,7 +65,7 @@ export function TurnIndicator({
                       h-10 w-10 rounded-lg border-2 font-semibold text-sm transition-all
                       ${
                         isSelectable
-                          ? 'border-foreground/20 hover:border-cherry-blossom hover:scale-110 cursor-pointer hover:bg-cherry-blossom/10'
+                          ? 'border-foreground/20 hover:border-powder-blush hover:scale-110 cursor-pointer hover:bg-powder-blush/10'
                           : 'border-foreground/10 text-foreground/30 cursor-not-allowed'
                       }
                     `}
@@ -99,7 +99,7 @@ export function TurnIndicator({
                       h-10 w-10 rounded-lg border-2 font-semibold text-sm transition-all
                       ${
                         isSelectable
-                          ? 'border-foreground/20 hover:border-cherry-blossom hover:scale-110 cursor-pointer hover:bg-cherry-blossom/10'
+                          ? 'border-foreground/20 hover:border-powder-blush hover:scale-110 cursor-pointer hover:bg-powder-blush/10'
                           : 'border-foreground/10 text-foreground/30 cursor-not-allowed'
                       }
                     `}

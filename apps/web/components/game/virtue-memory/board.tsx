@@ -47,7 +47,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
 
   const playerName = (p: Player) => (p === 1 ? 'Abbee' : 'Dot');
   const playerColor = (p: Player) =>
-    p === 1 ? 'text-cherry-blossom' : 'text-dusty-mauve';
+    p === 1 ? 'text-powder-blush' : 'text-periwinkle';
 
   const { cards, currentPlayer, status, winner, scores, isChecking } = gameState;
 
@@ -117,9 +117,9 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             'relative flex h-16 w-16 items-center justify-center rounded-lg border-2 transition-all select-none text-2xl ';
 
           if (card.isMatched) {
-            cellClass += 'border-cherry-blossom bg-cherry-blossom/20 cursor-default';
+            cellClass += 'border-powder-blush bg-powder-blush/20 cursor-default';
           } else if (card.isFlipped) {
-            cellClass += 'border-dusty-mauve bg-dusty-mauve/20 cursor-default';
+            cellClass += 'border-periwinkle bg-periwinkle/20 cursor-default';
           } else if (canClick) {
             cellClass +=
               'border-foreground/20 bg-background cursor-pointer hover:border-foreground/50 hover:bg-foreground/5 hover:scale-105';
@@ -158,7 +158,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
           .map((c) => (
             <span
               key={c.id}
-              className="rounded-full bg-dusty-mauve/10 px-3 py-1 text-xs font-medium text-dusty-mauve"
+              className="rounded-full bg-periwinkle/10 px-3 py-1 text-xs font-medium text-periwinkle"
             >
               {c.virtue}
             </span>

@@ -15,15 +15,15 @@ export function TurnIndicator({
   winner,
 }: TurnIndicatorProps) {
   const getPlayerColor = (player: Player | null) => {
-    if (player === 'X') return 'text-dusty-mauve';
-    if (player === 'O') return 'text-pastel-pink';
-    return 'text-cherry-blossom';
+    if (player === 'X') return 'text-periwinkle';
+    if (player === 'O') return 'text-mauve';
+    return 'text-powder-blush';
   };
 
   const getPlayerBgColor = (player: Player | null) => {
-    if (player === 'X') return 'bg-dusty-mauve/10 border-dusty-mauve';
-    if (player === 'O') return 'bg-pastel-pink/10 border-pastel-pink';
-    return 'bg-cherry-blossom/10 border-cherry-blossom';
+    if (player === 'X') return 'bg-periwinkle/10 border-periwinkle';
+    if (player === 'O') return 'bg-mauve/10 border-mauve';
+    return 'bg-powder-blush/10 border-powder-blush';
   };
 
   if (gameStatus === 'setup') {

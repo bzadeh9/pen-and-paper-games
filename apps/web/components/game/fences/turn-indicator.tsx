@@ -30,13 +30,13 @@ export function TurnIndicator({
         <h2 className="mb-4 text-2xl font-bold">Game Over!</h2>
         <div className="mb-4 space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-dusk-blue">
+            <span className="text-lg font-semibold text-electric-aqua">
               {player1Name}:
             </span>
             <span className="text-2xl font-bold">{player1Score} boxes</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-cherry-blossom">
+            <span className="text-lg font-semibold text-powder-blush">
               {player2Name}:
             </span>
             <span className="text-2xl font-bold">{player2Score} boxes</span>
@@ -48,7 +48,7 @@ export function TurnIndicator({
           ) : (
             <span
               className={
-                winner === 1 ? 'text-dusk-blue' : 'text-cherry-blossom'
+                winner === 1 ? 'text-electric-aqua' : 'text-powder-blush'
               }
             >
               {winner === 1 ? player1Name : player2Name} Wins! 🎉
@@ -68,7 +68,7 @@ export function TurnIndicator({
         <div className="mt-2 text-2xl font-bold">
           <span
             className={
-              currentPlayer === 1 ? 'text-dusk-blue' : 'text-cherry-blossom'
+              currentPlayer === 1 ? 'text-electric-aqua' : 'text-powder-blush'
             }
           >
             {currentPlayer === 1 ? player1Name : player2Name}&apos;s Turn
@@ -76,12 +76,12 @@ export function TurnIndicator({
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-        <div className="rounded bg-dusk-blue/10 dark:bg-dusk-blue/20 p-2 text-center border border-dusk-blue/30">
-          <div className="font-semibold text-dusk-blue">{player1Name}</div>
+        <div className="rounded bg-electric-aqua/10 dark:bg-electric-aqua/20 p-2 text-center border border-electric-aqua/30">
+          <div className="font-semibold text-electric-aqua">{player1Name}</div>
           <div className="text-lg font-bold">{player1Score}</div>
         </div>
-        <div className="rounded bg-cherry-blossom/10 dark:bg-cherry-blossom/20 p-2 text-center border border-cherry-blossom/30">
-          <div className="font-semibold text-cherry-blossom">{player2Name}</div>
+        <div className="rounded bg-powder-blush/10 dark:bg-powder-blush/20 p-2 text-center border border-powder-blush/30">
+          <div className="font-semibold text-powder-blush">{player2Name}</div>
           <div className="text-lg font-bold">{player2Score}</div>
         </div>
       </div>
