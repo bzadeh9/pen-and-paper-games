@@ -104,7 +104,7 @@ function generateSeedPoints(count: number): Point[] {
     Math.max(1, Math.floor(count * CLUSTER_RATIO))
   );
   const evenlyDistributedCount = Math.max(0, count - clusteredCount);
-  const maxAttempts = count * 250;
+  const maxAttempts = count * 250; // Extra retries keep clustered layouts from underfilling
 
   const isFarEnough = (candidate: Point, minimumDistance: number) =>
     points.every((existing) => {

@@ -6,7 +6,7 @@ import type { WindowLayout } from '@/lib/games/stained-glass/layout';
 
 const EMPTY_FILL = 'rgba(229, 231, 235, 0.3)';
 const EMPTY_FILL_FALLBACK = 'rgba(229, 231, 235, 0.5)';
-const HOVER_BRIGHTNESS_CLASS = 'hover:brightness-95';
+const HOVER_BRIGHTNESS_CLASS = 'hover:brightness-95'; // Slight cue without overpowering pane colors
 
 interface BoardProps {
   gameState: GameState;
