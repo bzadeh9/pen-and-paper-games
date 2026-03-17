@@ -34,6 +34,12 @@ const ARCH_RADIUS = 200; // half of width → semicircle
 const BODY_HEIGHT = 350;
 const TOTAL_HEIGHT = ARCH_RADIUS + BODY_HEIGHT; // 550
 const PADDING = 15; // Inset padding so polygons don't touch frame edge
+/**
+ * Clustered seeds create the noticeably smaller accent panes in each layout.
+ * Roughly 30% of seeds are placed in tighter local groups, with ratio-based
+ * spacing derived from the normal pane distance and absolute pixel bounds to
+ * keep the effect visible across every board size.
+ */
 const CLUSTER_RATIO = 0.3; // Share of seeds reserved for tighter clusters
 const CLUSTER_MIN_RATIO = 0.2; // Lower spacing multiplier for tiny accent panes
 const CLUSTER_MAX_RATIO = 0.42; // Upper spacing multiplier to keep clusters local

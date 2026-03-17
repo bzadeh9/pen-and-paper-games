@@ -65,7 +65,11 @@ export function Board({
       return `Section ${sectionId + 1}, colored by Player ${section.owner}`;
     }
 
-    if (gameState.status !== 'playing' || !showPossibleMoves) {
+    if (gameState.status !== 'playing') {
+      return `Section ${sectionId + 1}, uncolored`;
+    }
+
+    if (!showPossibleMoves) {
       return `Section ${sectionId + 1}, uncolored`;
     }
 

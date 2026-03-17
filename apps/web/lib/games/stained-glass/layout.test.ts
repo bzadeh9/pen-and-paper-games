@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { generateWindowLayout } from './layout';
 
+// These thresholds confirm the clustered-seed layout has visibly varied panes
+// without requiring an overly brittle exact geometry match.
 const SMALL_PANE_THRESHOLD = 0.45; // Smallest pane should be <45% of median area
 const LARGE_PANE_THRESHOLD = 1.4; // Largest pane should be >140% of median area
 
