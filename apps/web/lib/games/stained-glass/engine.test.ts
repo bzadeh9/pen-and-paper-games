@@ -45,9 +45,9 @@ describe('StainedGlassEngine', () => {
       expect(large.getState().sections).toHaveLength(MAX_GRID_SIZE * MAX_GRID_SIZE);
     });
 
-    it('should default to standard mode', () => {
-      const state = engine.getState();
-      expect(state.mode).toBe('standard');
+    it('should default to reverse mode', () => {
+      const state = new StainedGlassEngine().getState();
+      expect(state.mode).toBe('reverse');
     });
 
     it('should compute correct neighbors for corner section', () => {

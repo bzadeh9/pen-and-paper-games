@@ -7,6 +7,8 @@ import type { GameMode, GameStatus } from '@/lib/games/stained-glass/types';
 interface GameControlsProps {
   mode: GameMode;
   onModeChange: (mode: GameMode) => void;
+  easyMode: boolean;
+  onEasyModeChange: (easyMode: boolean) => void;
   gridSize: number;
   onGridSizeChange: (size: number) => void;
   onReset: () => void;
@@ -20,6 +22,8 @@ interface GameControlsProps {
 export function GameControls({
   mode,
   onModeChange,
+  easyMode,
+  onEasyModeChange,
   gridSize,
   onGridSizeChange,
   onReset,
@@ -78,6 +82,23 @@ export function GameControls({
         {gameStatus === 'playing' && (
           <p className="mt-2 text-xs text-foreground/60">Mode locked during game</p>
         )}
+      </div>
+
+      {/* Difficulty */}
+      <div className="rounded-lg border-2 border-foreground/20 bg-background p-4">
+        <h3 className="mb-3 text-lg font-semibold">Difficulty</h3>
+        <label htmlFor="easy-mode" className="flex cursor-pointer items-start gap-3">
+          <input
+            id="easy-mode"
+            type="checkbox"
+            checked={easyMode}
+            onChange={(e) => onEasyModeChange(e.target.checked)}
+            className="mt-0.5 h-4 w-4"
+          />
+          <span className="text-sm text-foreground/80">
+            <strong>Easy Mode:</strong> Show possible moves on the board
+          </span>
+        </label>
       </div>
 
       {/* Window Complexity Selector */}

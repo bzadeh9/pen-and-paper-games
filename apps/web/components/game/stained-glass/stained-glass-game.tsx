@@ -1,7 +1,7 @@
 'use client';
 
 import { GameIcon, gameColors } from '@/components/game-icon';
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Board } from '@/components/game/stained-glass/board';
 import { TurnIndicator } from '@/components/game/stained-glass/turn-indicator';
 import { GameStats } from '@/components/game/stained-glass/game-stats';
@@ -26,20 +26,21 @@ import {
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 export default function StainedGlassGame() {
-  const [mode, setMode] = useState<GameMode>('standard');
+  const [mode, setMode] = useState<GameMode>('reverse');
+  const [easyMode, setEasyMode] = useState(false);
   const [gridSize, setGridSize] = useState(4);
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
 
-  const engineRef = useRef(new StainedGlassEngine(4, 'standard'));
+  const [engine] = useState(() => new StainedGlassEngine(4, 'reverse'));
   const [layout, setLayout] = useState<WindowLayout>(() => {
     const l = generateWindowLayout(SECTION_COUNTS[4]);
-    engineRef.current.loadSections(
+    engine.loadSections(
       l.sections.map((s) => ({ id: s.id, neighbors: s.neighbors }))
     );
     return l;
   });
-  const [gameState, setGameState] = useState(() => engineRef.current.getState());
+  const [gameState, setGameState] = useState(() => engine.getState());
   const [stats, setStats] = useState(() => getGameStatistics());
 
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -49,25 +50,25 @@ export default function StainedGlassGame() {
    */
   const regenerateLayout = useCallback((size: number, currentMode?: GameMode) => {
     const newLayout = generateWindowLayout(SECTION_COUNTS[size] ?? 18);
-    engineRef.current.loadSections(
+    engine.loadSections(
       newLayout.sections.map((s) => ({ id: s.id, neighbors: s.neighbors }))
     );
     if (currentMode) {
-      engineRef.current.setMode(currentMode);
+      engine.setMode(currentMode);
     }
     setLayout(newLayout);
-    setGameState(engineRef.current.getState());
-  }, []);
+    setGameState(engine.getState());
+  }, [engine]);
 
   const handleModeChange = useCallback(
-    (newMode: GameMode) => {
-      if (gameState.status === 'setup' || gameState.status === 'ended') {
-        setMode(newMode);
-        engineRef.current.setMode(newMode);
-        regenerateLayout(gridSize, newMode);
-      }
-    },
-    [gameState.status, gridSize, regenerateLayout]
+      (newMode: GameMode) => {
+        if (gameState.status === 'setup' || gameState.status === 'ended') {
+          setMode(newMode);
+          engine.setMode(newMode);
+          regenerateLayout(gridSize, newMode);
+        }
+      },
+    [engine, gameState.status, gridSize, regenerateLayout]
   );
 
   const handleGridSizeChange = useCallback(
@@ -83,26 +84,26 @@ export default function StainedGlassGame() {
   const handleSectionClick = useCallback(
     (sectionId: number) => {
       if (gameState.status === 'setup') {
-        engineRef.current.startGame();
+        engine.startGame();
       }
 
-      const success = engineRef.current.makeMove(sectionId);
+      const success = engine.makeMove(sectionId);
       if (success) {
-        setGameState(engineRef.current.getState());
+        setGameState(engine.getState());
       }
     },
-    [gameState.status]
+    [engine, gameState.status]
   );
 
   const handleReset = useCallback(() => {
     if (gameState.status === 'setup') {
-      engineRef.current.startGame();
-      setGameState(engineRef.current.getState());
+      engine.startGame();
+      setGameState(engine.getState());
     } else {
-      engineRef.current.reset();
+      engine.reset();
       regenerateLayout(gridSize, mode);
     }
-  }, [gameState.status, gridSize, mode, regenerateLayout]);
+  }, [engine, gameState.status, gridSize, mode, regenerateLayout]);
 
   const handleResetStats = useCallback(() => {
     if (confirm('Are you sure you want to reset all statistics?')) {
@@ -238,6 +239,8 @@ export default function StainedGlassGame() {
             <GameControls
               mode={mode}
               onModeChange={handleModeChange}
+              easyMode={easyMode}
+              onEasyModeChange={setEasyMode}
               gridSize={gridSize}
               onGridSizeChange={handleGridSizeChange}
               onReset={handleReset}
@@ -255,6 +258,7 @@ export default function StainedGlassGame() {
               <Board
                 gameState={gameState}
                 layout={layout}
+                showPossibleMoves={easyMode}
                 onSectionClick={handleSectionClick}
               />
             </div>

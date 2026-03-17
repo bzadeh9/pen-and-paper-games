@@ -7,7 +7,7 @@ export const DEFAULT_GRID_SIZE = 4;
 export class StainedGlassEngine {
   private state: GameState;
 
-  constructor(gridSize: number = DEFAULT_GRID_SIZE, mode: GameMode = 'standard') {
+  constructor(gridSize: number = DEFAULT_GRID_SIZE, mode: GameMode = 'reverse') {
     const validatedSize = Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, gridSize));
     this.state = this.createInitialState(validatedSize, mode);
   }

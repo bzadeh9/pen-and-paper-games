@@ -10,10 +10,16 @@ const EMPTY_FILL_FALLBACK = 'rgba(229, 231, 235, 0.5)';
 interface BoardProps {
   gameState: GameState;
   layout: WindowLayout;
+  showPossibleMoves: boolean;
   onSectionClick: (sectionId: number) => void;
 }
 
-export function Board({ gameState, layout, onSectionClick }: BoardProps) {
+export function Board({
+  gameState,
+  layout,
+  showPossibleMoves,
+  onSectionClick,
+}: BoardProps) {
   const getSectionFill = (sectionId: number) => {
     const section = gameState.sections[sectionId];
     if (!section) return EMPTY_FILL_FALLBACK;
@@ -51,6 +57,22 @@ export function Board({ gameState, layout, onSectionClick }: BoardProps) {
 
   const polygonToPath = (polygon: { x: number; y: number }[]) =>
     polygon.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+
+  const getSectionLabel = (sectionId: number) => {
+    const section = gameState.sections[sectionId];
+
+    if (section?.owner) {
+      return `Section ${sectionId + 1}, colored by Player ${section.owner}`;
+    }
+
+    if (gameState.status !== 'playing' || !showPossibleMoves) {
+      return `Section ${sectionId + 1}, uncolored`;
+    }
+
+    return isClickable(sectionId)
+      ? `Section ${sectionId + 1}, available`
+      : `Section ${sectionId + 1}, unavailable`;
+  };
 
   const showSetupOverlay = gameState.status === 'setup';
 
@@ -90,23 +112,23 @@ export function Board({ gameState, layout, onSectionClick }: BoardProps) {
                   stroke={getSectionStroke(layoutSection.id)}
                   strokeWidth={1.5}
                   role="gridcell"
-                  aria-label={
-                    section?.owner
-                      ? `Section ${layoutSection.id + 1}, colored by Player ${section.owner}`
-                      : clickable
-                        ? `Section ${layoutSection.id + 1}, available`
-                        : `Section ${layoutSection.id + 1}, unavailable`
-                  }
+                  aria-label={getSectionLabel(layoutSection.id)}
                   className={
-                    clickable
-                      ? 'cursor-pointer transition-all duration-150 hover:brightness-90'
-                      : isOwned
-                        ? ''
-                        : gameState.status === 'playing'
-                          ? 'opacity-40'
-                          : ''
+                    isOwned
+                      ? ''
+                      : gameState.status === 'playing'
+                        ? showPossibleMoves
+                          ? clickable
+                            ? 'cursor-pointer transition-all duration-150 hover:brightness-90'
+                            : 'opacity-40'
+                          : 'cursor-pointer transition-all duration-150 hover:brightness-95'
+                        : ''
                   }
-                  style={clickable ? { filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' } : undefined}
+                  style={
+                    clickable && showPossibleMoves
+                      ? { filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }
+                      : undefined
+                  }
                   tabIndex={clickable ? 0 : undefined}
                   onClick={() => clickable && onSectionClick(layoutSection.id)}
                   onKeyDown={(e) => {

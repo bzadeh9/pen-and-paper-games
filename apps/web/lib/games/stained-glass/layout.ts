@@ -79,10 +79,52 @@ function isInsideWindow(p: Point): boolean {
  */
 function generateSeedPoints(count: number): Point[] {
   const points: Point[] = [];
-  const minDist = Math.max(40, 300 / Math.sqrt(count)); // Minimum distance between points
-  let attempts = 0;
-  const maxAttempts = count * 200;
+  const minDist = Math.max(40, 300 / Math.sqrt(count)); // Minimum distance between major panes
+  const clusterMinDist = Math.max(10, minDist * 0.2);
+  const clusterMaxDist = Math.max(22, minDist * 0.42);
+  const clusteredCount = Math.max(2, Math.floor(count * 0.3));
+  const evenlyDistributedTarget = Math.max(1, count - clusteredCount);
+  const maxAttempts = count * 250;
 
+  const isFarEnough = (candidate: Point, minimumDistance: number) =>
+    points.every((existing) => {
+      const dx = candidate.x - existing.x;
+      const dy = candidate.y - existing.y;
+      return dx * dx + dy * dy >= minimumDistance * minimumDistance;
+    });
+
+  let attempts = 0;
+  while (points.length < evenlyDistributedTarget && attempts < maxAttempts) {
+    attempts++;
+    const candidate: Point = {
+      x: PADDING + Math.random() * (WINDOW_WIDTH - 2 * PADDING),
+      y: PADDING + Math.random() * (TOTAL_HEIGHT - 2 * PADDING),
+    };
+
+    if (!isInsideWindow(candidate)) continue;
+    if (isFarEnough(candidate, minDist)) {
+      points.push(candidate);
+    }
+  }
+
+  attempts = 0;
+  while (points.length > 0 && points.length < count && attempts < maxAttempts) {
+    attempts++;
+    const anchor = points[Math.floor(Math.random() * points.length)];
+    const angle = Math.random() * Math.PI * 2;
+    const distance = clusterMinDist + Math.random() * (clusterMaxDist - clusterMinDist);
+    const candidate: Point = {
+      x: anchor.x + Math.cos(angle) * distance,
+      y: anchor.y + Math.sin(angle) * distance,
+    };
+
+    if (!isInsideWindow(candidate)) continue;
+    if (isFarEnough(candidate, clusterMinDist)) {
+      points.push(candidate);
+    }
+  }
+
+  attempts = 0;
   while (points.length < count && attempts < maxAttempts) {
     attempts++;
     const candidate: Point = {
@@ -91,19 +133,7 @@ function generateSeedPoints(count: number): Point[] {
     };
 
     if (!isInsideWindow(candidate)) continue;
-
-    // Check minimum distance from existing points
-    let tooClose = false;
-    for (const existing of points) {
-      const dx = candidate.x - existing.x;
-      const dy = candidate.y - existing.y;
-      if (dx * dx + dy * dy < minDist * minDist) {
-        tooClose = true;
-        break;
-      }
-    }
-
-    if (!tooClose) {
+    if (isFarEnough(candidate, clusterMinDist)) {
       points.push(candidate);
     }
   }
