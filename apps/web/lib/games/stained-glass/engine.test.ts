@@ -323,4 +323,74 @@ describe('StainedGlassEngine', () => {
       expect(state1.sections[0].neighbors).toEqual(state2.sections[0].neighbors);
     });
   });
+
+  describe('loadSections', () => {
+    it('should load a custom topology', () => {
+      // Triangle of 3 sections: 0—1—2, where 0-1, 1-2 are neighbors
+      engine.loadSections([
+        { id: 0, neighbors: [1] },
+        { id: 1, neighbors: [0, 2] },
+        { id: 2, neighbors: [1] },
+      ]);
+      const state = engine.getState();
+      expect(state.sections).toHaveLength(3);
+      expect(state.sections[0].neighbors).toEqual([1]);
+      expect(state.sections[1].neighbors).toEqual([0, 2]);
+    });
+
+    it('should reset game state when loading sections', () => {
+      // Start game manually (not via makeMove to keep control)
+      engine.startGame();
+      engine.makeMove(0);
+      // Move to ended status via a small game
+      const small = new StainedGlassEngine(3, 'standard');
+      small.makeMove(0); small.makeMove(2); small.makeMove(4);
+      small.makeMove(6); small.makeMove(8);
+      // small is now ended; test loadSections on the setup engine
+      const fresh = new StainedGlassEngine(4, 'standard');
+      fresh.loadSections([
+        { id: 0, neighbors: [1] },
+        { id: 1, neighbors: [0] },
+      ]);
+      const state = fresh.getState();
+      expect(state.currentPlayer).toBe(1);
+      expect(state.status).toBe('setup');
+      expect(state.winner).toBeNull();
+      expect(state.sections.every((s) => s.owner === null)).toBe(true);
+    });
+
+    it('should not load sections during play', () => {
+      engine.startGame();
+      engine.makeMove(0);
+      engine.loadSections([
+        { id: 0, neighbors: [1] },
+        { id: 1, neighbors: [0] },
+      ]);
+      // Should still have original 16 sections
+      expect(engine.getState().sections).toHaveLength(16);
+    });
+
+    it('should support gameplay on custom topology', () => {
+      // Linear chain: 0—1—2—3
+      engine.loadSections([
+        { id: 0, neighbors: [1] },
+        { id: 1, neighbors: [0, 2] },
+        { id: 2, neighbors: [1, 3] },
+        { id: 3, neighbors: [2] },
+      ]);
+
+      // Standard mode: cannot be adjacent to opponent
+      engine.makeMove(0); // P1 takes 0 → blocks P2 from 1
+      const state = engine.getState();
+      expect(state.sections[0].owner).toBe(1);
+      expect(state.currentPlayer).toBe(2);
+
+      // P2 cannot take 1 (adj to P1), can take 2 or 3
+      const result = engine.makeMove(1);
+      expect(result).toBe(false);
+
+      const result2 = engine.makeMove(3);
+      expect(result2).toBe(true);
+    });
+  });
 });

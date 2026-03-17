@@ -2,48 +2,180 @@
 
 import React from 'react';
 import type { GameState } from '@/lib/games/stained-glass/types';
-import { cn } from '@/lib/utils';
+import type { WindowLayout } from '@/lib/games/stained-glass/layout';
 
 interface BoardProps {
   gameState: GameState;
+  layout: WindowLayout;
   onSectionClick: (sectionId: number) => void;
 }
 
-export function Board({ gameState, onSectionClick }: BoardProps) {
-  const gridSize = Math.round(Math.sqrt(gameState.sections.length));
-
-  const getSectionColor = (sectionId: number) => {
+export function Board({ gameState, layout, onSectionClick }: BoardProps) {
+  const getSectionFill = (sectionId: number) => {
     const section = gameState.sections[sectionId];
-    if (section.owner === 1) return 'bg-dusty-mauve text-white';
-    if (section.owner === 2) return 'bg-cherry-blossom text-white';
-    return 'bg-gray-200 dark:bg-gray-700';
+    if (!section) return 'rgba(229, 231, 235, 0.5)'; // gray fallback
+    if (section.owner === 1) return 'var(--periwinkle)';
+    if (section.owner === 2) return 'var(--powder-blush)';
+    return 'rgba(229, 231, 235, 0.3)';
+  };
+
+  const getSectionStroke = (sectionId: number) => {
+    const section = gameState.sections[sectionId];
+    if (!section) return 'rgba(0,0,0,0.15)';
+    if (section.owner === 1) return 'rgba(120, 100, 180, 0.6)';
+    if (section.owner === 2) return 'rgba(200, 120, 120, 0.6)';
+    return 'rgba(0, 0, 0, 0.15)';
   };
 
   const isClickable = (sectionId: number) => {
     if (gameState.status !== 'playing') return false;
     const section = gameState.sections[sectionId];
-    if (section.owner !== null) return false;
+    if (!section || section.owner !== null) return false;
 
     const currentPlayer = gameState.currentPlayer;
 
     if (gameState.mode === 'standard') {
       const opponent = currentPlayer === 1 ? 2 : 1;
       return !section.neighbors.some(
-        (nId) => gameState.sections[nId].owner === opponent
+        (nId) => gameState.sections[nId]?.owner === opponent
       );
     } else {
       return !section.neighbors.some(
-        (nId) => gameState.sections[nId].owner === currentPlayer
+        (nId) => gameState.sections[nId]?.owner === currentPlayer
       );
     }
   };
 
+  const polygonToPath = (polygon: { x: number; y: number }[]) =>
+    polygon.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+
   const showSetupOverlay = gameState.status === 'setup';
 
   return (
-    <div className="relative rounded-xl border-4 border-foreground/30 bg-background p-4">
+    <div className="relative" role="grid" aria-label="Stained glass game board">
+      <svg
+        viewBox={`-4 -4 ${layout.width + 8} ${layout.height + 8}`}
+        className="w-full h-auto"
+        style={{ maxHeight: '70vh' }}
+      >
+        {/* Background fill for window */}
+        <defs>
+          <clipPath id="window-clip">
+            <path d={layout.outlinePath} />
+          </clipPath>
+        </defs>
+
+        {/* Window background */}
+        <path
+          d={layout.outlinePath}
+          fill="rgba(245, 245, 245, 0.6)"
+          stroke="none"
+        />
+
+        {/* Section polygons (clipped to window) */}
+        <g clipPath="url(#window-clip)">
+          {layout.sections.map((layoutSection) => {
+            const clickable = isClickable(layoutSection.id);
+            const section = gameState.sections[layoutSection.id];
+            const isOwned = section?.owner !== null;
+
+            return (
+              <g key={layoutSection.id}>
+                <path
+                  d={polygonToPath(layoutSection.polygon)}
+                  fill={getSectionFill(layoutSection.id)}
+                  stroke={getSectionStroke(layoutSection.id)}
+                  strokeWidth={1.5}
+                  role="gridcell"
+                  aria-label={
+                    section?.owner
+                      ? `Section ${layoutSection.id + 1}, colored by Player ${section.owner}`
+                      : clickable
+                        ? `Section ${layoutSection.id + 1}, available`
+                        : `Section ${layoutSection.id + 1}, unavailable`
+                  }
+                  className={
+                    clickable
+                      ? 'cursor-pointer transition-all duration-150 hover:brightness-90'
+                      : isOwned
+                        ? ''
+                        : gameState.status === 'playing'
+                          ? 'opacity-40'
+                          : ''
+                  }
+                  style={clickable ? { filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' } : undefined}
+                  tabIndex={clickable ? 0 : undefined}
+                  onClick={() => clickable && onSectionClick(layoutSection.id)}
+                  onKeyDown={(e) => {
+                    if (clickable && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault();
+                      onSectionClick(layoutSection.id);
+                    }
+                  }}
+                />
+                {/* Player label */}
+                {isOwned && (
+                  <text
+                    x={layoutSection.center.x}
+                    y={layoutSection.center.y}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize="11"
+                    fontWeight="bold"
+                    fill="rgba(0,0,0,0.45)"
+                    pointerEvents="none"
+                  >
+                    P{section?.owner}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </g>
+
+        {/* Window frame (drawn on top) */}
+        <path
+          d={layout.outlinePath}
+          fill="none"
+          stroke="rgba(60, 50, 40, 0.7)"
+          strokeWidth={5}
+          strokeLinejoin="round"
+        />
+
+        {/* Leading lines (decorative dividers drawn over polygons) */}
+        <g clipPath="url(#window-clip)" opacity={0.25} pointerEvents="none">
+          {/* Vertical center line */}
+          <line
+            x1={layout.width / 2}
+            y1={0}
+            x2={layout.width / 2}
+            y2={layout.height}
+            stroke="rgba(60, 50, 40, 0.5)"
+            strokeWidth={2}
+          />
+          {/* Horizontal lines */}
+          <line
+            x1={0}
+            y1={layout.height * 0.4}
+            x2={layout.width}
+            y2={layout.height * 0.4}
+            stroke="rgba(60, 50, 40, 0.5)"
+            strokeWidth={2}
+          />
+          <line
+            x1={0}
+            y1={layout.height * 0.7}
+            x2={layout.width}
+            y2={layout.height * 0.7}
+            stroke="rgba(60, 50, 40, 0.5)"
+            strokeWidth={2}
+          />
+        </g>
+      </svg>
+
+      {/* Setup overlay */}
       {showSetupOverlay && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10 rounded-xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm z-10 rounded-xl">
           <div className="text-center p-6">
             <p className="text-lg font-semibold text-foreground/80">
               Choose a mode and click Start Game
@@ -51,44 +183,6 @@ export function Board({ gameState, onSectionClick }: BoardProps) {
           </div>
         </div>
       )}
-      <div
-        className="grid gap-2"
-        style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}
-        role="grid"
-        aria-label="Stained glass game board"
-      >
-        {gameState.sections.map((section) => {
-          const clickable = isClickable(section.id);
-          return (
-            <button
-              key={section.id}
-              onClick={() => onSectionClick(section.id)}
-              disabled={!clickable}
-              role="gridcell"
-              aria-label={
-                section.owner
-                  ? `Section ${section.id + 1}, colored by Player ${section.owner}`
-                  : clickable
-                    ? `Section ${section.id + 1}, available`
-                    : `Section ${section.id + 1}, unavailable`
-              }
-              className={cn(
-                'aspect-square rounded-lg border-2 border-foreground/20 transition-all duration-200 flex items-center justify-center text-sm font-bold',
-                getSectionColor(section.id),
-                clickable && 'hover:scale-105 hover:shadow-lg cursor-pointer hover:border-foreground/50',
-                !clickable && gameState.status === 'playing' && section.owner === null && 'opacity-50 cursor-not-allowed',
-                section.owner !== null && 'shadow-inner'
-              )}
-            >
-              {section.owner && (
-                <span className="text-xs md:text-sm font-bold opacity-80">
-                  P{section.owner}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }

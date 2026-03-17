@@ -29,6 +29,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'maze-game': { bg: 'bg-baby-blue-ice/20', text: 'text-baby-blue-ice' },
   'virtue-memory': { bg: 'bg-mauve/20', text: 'text-mauve' },
   'flower-hop': { bg: 'bg-tea-green/20', text: 'text-tea-green' },
+  'stained-glass': { bg: 'bg-mauve/20', text: 'text-mauve' },
 };
 
 const iconPaths: Record<string, React.ReactNode> = {

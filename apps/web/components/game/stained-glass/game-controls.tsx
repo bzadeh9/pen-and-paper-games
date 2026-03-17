@@ -80,12 +80,12 @@ export function GameControls({
         )}
       </div>
 
-      {/* Grid Size Selector */}
+      {/* Window Complexity Selector */}
       <div className="rounded-lg border-2 border-foreground/20 bg-background p-4">
-        <h3 className="mb-3 text-lg font-semibold">Grid Size</h3>
+        <h3 className="mb-3 text-lg font-semibold">Window Size</h3>
         <div className="flex items-center gap-3">
-          <label htmlFor="grid-size" className="text-sm text-foreground/80">
-            {gridSize}×{gridSize} ({gridSize * gridSize} panes)
+          <label htmlFor="grid-size" className="text-sm text-foreground/80 whitespace-nowrap">
+            {['Small', 'Medium', 'Large', 'Extra Large'][gridSize - 3]}
           </label>
           <input
             id="grid-size"
@@ -108,7 +108,7 @@ export function GameControls({
         <h3 className="mb-3 text-lg font-semibold">Players</h3>
         <div className="space-y-3">
           <div>
-            <label htmlFor="player1-name" className="block text-sm font-medium text-dusty-mauve mb-1">
+            <label htmlFor="player1-name" className="block text-sm font-medium text-periwinkle mb-1">
               Player 1
             </label>
             <input
@@ -120,7 +120,7 @@ export function GameControls({
             />
           </div>
           <div>
-            <label htmlFor="player2-name" className="block text-sm font-medium text-cherry-blossom mb-1">
+            <label htmlFor="player2-name" className="block text-sm font-medium text-powder-blush mb-1">
               Player 2
             </label>
             <input

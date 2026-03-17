@@ -56,6 +56,24 @@ export class StainedGlassEngine {
     return sections;
   }
 
+  /**
+   * Load a custom section topology (e.g. from a Voronoi layout generator).
+   * Each entry provides the section id and its neighbor IDs.
+   */
+  loadSections(sectionData: { id: number; neighbors: number[] }[]): void {
+    if (this.state.status === 'playing') return;
+    this.state.sections = sectionData.map((s) => ({
+      id: s.id,
+      owner: null,
+      neighbors: [...s.neighbors],
+    }));
+    this.state.player1Score = 0;
+    this.state.player2Score = 0;
+    this.state.winner = null;
+    this.state.currentPlayer = 1;
+    this.state.status = 'setup';
+  }
+
   getState(): GameState {
     return {
       ...this.state,

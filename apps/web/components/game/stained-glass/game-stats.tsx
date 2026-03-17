@@ -24,12 +24,12 @@ export function GameStats({ stats, player1Name, player2Name, onReset }: GameStat
           <span className="font-semibold">{stats.gamesPlayed}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-dusty-mauve font-medium">{player1Name} Wins:</span>
-          <span className="font-semibold text-dusty-mauve">{stats.player1Wins}</span>
+          <span className="text-periwinkle font-medium">{player1Name} Wins:</span>
+          <span className="font-semibold text-periwinkle">{stats.player1Wins}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-cherry-blossom font-medium">{player2Name} Wins:</span>
-          <span className="font-semibold text-cherry-blossom">{stats.player2Wins}</span>
+          <span className="text-powder-blush font-medium">{player2Name} Wins:</span>
+          <span className="font-semibold text-powder-blush">{stats.player2Wins}</span>
         </div>
       </div>
       <Button onClick={onReset} variant="outline" className="mt-4 w-full" size="sm">
