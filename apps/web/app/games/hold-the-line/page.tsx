@@ -232,6 +232,7 @@ export default function HoldTheLinePage() {
           {/* Center: Game board */}
           <div className="flex items-start justify-center">
             <GameBoard
+              key={gridSize}
               player1Color={player1Color}
               player2Color={player2Color}
               player1Name={player1Name}
