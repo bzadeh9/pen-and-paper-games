@@ -100,7 +100,7 @@ function generateSeedPoints(count: number): Point[] {
     minDist * CLUSTER_MAX_RATIO
   );
   const clusteredCount = Math.max(2, Math.floor(count * CLUSTER_RATIO));
-  const evenlyDistributedTarget = Math.max(1, count - clusteredCount);
+  const evenlyDistributedCount = Math.max(0, count - clusteredCount);
   const maxAttempts = count * 250;
 
   const isFarEnough = (candidate: Point, minimumDistance: number) =>
@@ -111,7 +111,7 @@ function generateSeedPoints(count: number): Point[] {
     });
 
   let attempts = 0;
-  while (points.length < evenlyDistributedTarget && attempts < maxAttempts) {
+  while (points.length < evenlyDistributedCount && attempts < maxAttempts) {
     attempts++;
     const candidate: Point = {
       x: PADDING + Math.random() * (WINDOW_WIDTH - 2 * PADDING),

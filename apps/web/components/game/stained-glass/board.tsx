@@ -84,7 +84,7 @@ export function Board({
 
     if (showPossibleMoves) {
       return clickable
-        ? 'cursor-pointer transition-all duration-150 hover:brightness-90'
+        ? 'cursor-pointer transition-all duration-150 hover:brightness-95'
         : 'opacity-40';
     }
 

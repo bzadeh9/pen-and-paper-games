@@ -41,7 +41,7 @@ describe('generateWindowLayout', () => {
     const medianArea = areas[Math.floor(areas.length / 2)];
     const largestArea = areas[areas.length - 1];
 
-    expect(layout.sections.length).toBeGreaterThanOrEqual(15);
+    expect(layout.sections.length).toBe(18);
     expect(areas[0]).toBeLessThan(medianArea * SMALL_PANE_THRESHOLD);
     expect(largestArea).toBeGreaterThan(medianArea * LARGE_PANE_THRESHOLD);
   });
