@@ -19,8 +19,8 @@ function BeeToken({ player, role }: { player: Player; role: string }) {
       <div
         className={`flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full border-2 ${
           isAbbee
-            ? 'border-bee-amber bg-bee-amber/30'
-            : 'border-bee-sky bg-bee-sky/30'
+            ? 'border-apricot-cream bg-apricot-cream/30'
+            : 'border-electric-aqua bg-electric-aqua/30'
         }`}
       >
         <span className="text-base md:text-lg" role="img" aria-label={isAbbee ? 'Abbee bee' : 'Dot bee'}>
@@ -29,7 +29,7 @@ function BeeToken({ player, role }: { player: Player; role: string }) {
       </div>
       <span
         className={`absolute -bottom-1 text-[8px] font-bold leading-none ${
-          isAbbee ? 'text-bee-amber' : 'text-bee-sky'
+          isAbbee ? 'text-apricot-cream' : 'text-electric-aqua'
         }`}
       >
         {isAbbee ? 'A' : 'D'}
@@ -115,7 +115,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 }}
                 className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all ${
                   gameState.startingRunner === 1
-                    ? 'border-bee-amber bg-bee-amber/20 text-bee-amber'
+                    ? 'border-apricot-cream bg-apricot-cream/20 text-apricot-cream'
                     : 'border-foreground/20 text-foreground/60 hover:border-foreground/40'
                 }`}
                 aria-pressed={gameState.startingRunner === 1}
@@ -129,7 +129,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                 }}
                 className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all ${
                   gameState.startingRunner === 2
-                    ? 'border-bee-sky bg-bee-sky/20 text-bee-sky'
+                    ? 'border-electric-aqua bg-electric-aqua/20 text-electric-aqua'
                     : 'border-foreground/20 text-foreground/60 hover:border-foreground/40'
                 }`}
                 aria-pressed={gameState.startingRunner === 2}
@@ -154,8 +154,8 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {gameState.status === 'playing' && (
         <div className="text-center">
           {gameState.justSwapped && (
-            <div className="mb-3 rounded-lg border-2 border-bee-amber bg-bee-amber/10 px-4 py-3 animate-pulse" role="alert">
-              <p className="text-base font-bold text-bee-amber">
+            <div className="mb-3 rounded-lg border-2 border-apricot-cream bg-apricot-cream/10 px-4 py-3 animate-pulse" role="alert">
+              <p className="text-base font-bold text-apricot-cream">
                 🔄 Roles Swapped!
               </p>
               <p className="text-sm text-foreground/70">
@@ -165,7 +165,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             </div>
           )}
           <p className="text-lg font-semibold">
-            <span className={gameState.currentPlayer === 1 ? 'text-bee-amber' : 'text-bee-sky'}>
+            <span className={gameState.currentPlayer === 1 ? 'text-apricot-cream' : 'text-electric-aqua'}>
               {currentPlayerName}
             </span>
             &apos;s Turn ({currentPlayerState.role})
@@ -198,19 +198,19 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-foreground/70">
         <div className="flex items-center gap-1">
-          <div className="h-4 w-4 rounded-full border-2 border-bee-amber bg-bee-amber/30" />
+          <div className="h-4 w-4 rounded-full border-2 border-apricot-cream bg-apricot-cream/30" />
           <span>Abbee</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="h-4 w-4 rounded-full border-2 border-bee-sky bg-bee-sky/30" />
+          <div className="h-4 w-4 rounded-full border-2 border-electric-aqua bg-electric-aqua/30" />
           <span>Dot</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="h-4 w-4 rounded-full bg-cherry-blossom/40 border border-cherry-blossom" />
+          <div className="h-4 w-4 rounded-full bg-powder-blush/40 border border-powder-blush" />
           <span>Virtue Zone</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="h-4 w-4 rounded-full bg-dusty-mauve/40 border border-dusty-mauve" />
+          <div className="h-4 w-4 rounded-full bg-periwinkle/40 border border-periwinkle" />
           <span>Home</span>
         </div>
       </div>
@@ -219,7 +219,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       <div className="flex flex-wrap gap-4 text-sm">
         {([1, 2] as Player[]).map((p) => (
           <div key={p} className="text-center">
-            <span className={`font-semibold ${p === 1 ? 'text-bee-amber' : 'text-bee-sky'}`}>
+            <span className={`font-semibold ${p === 1 ? 'text-apricot-cream' : 'text-electric-aqua'}`}>
               {p === 1 ? 'Abbee' : 'Dot'}:
             </span>
             {gameState.players[p].collectedVirtues.length > 0 ? (
@@ -265,14 +265,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                   key={`${row}-${col}`}
                   className={`relative flex items-center justify-center border border-foreground/20 transition-all ${
                     virtueZone || isRunnerSafe
-                      ? 'bg-cherry-blossom/20'
+                      ? 'bg-powder-blush/20'
                       : isHomeTile
-                        ? 'bg-dusty-mauve/20'
+                        ? 'bg-periwinkle/20'
                         : valid && showPossibleMoves && gameState.status === 'playing'
-                          ? 'bg-powder-petal/50 hover:bg-cherry-blossom/30'
+                          ? 'bg-cream/50 hover:bg-powder-blush/30'
                           : 'bg-background'
                   } ${valid && gameState.status === 'playing' ? 'cursor-pointer' : 'cursor-default'} ${
-                    isHovered && valid ? 'ring-2 ring-cherry-blossom' : ''
+                    isHovered && valid ? 'ring-2 ring-powder-blush' : ''
                   }`}
                   style={{ minWidth: '40px', minHeight: '40px' }}
                   onClick={() => handleCellClick(pos)}
@@ -282,14 +282,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                   aria-label={`Cell ${row + 1},${col + 1}${virtueZone ? ` - ${virtueZone.virtue} virtue zone` : ''}${isRunnerSafe ? ' - safe zone' : ''}${isHomeTile ? ' - Home' : ''}${playerAt ? ` - ${playerAt === 1 ? 'Abbee' : 'Dot'}` : ''}`}
                 >
                   {(virtueZone || isRunnerSafe) && !playerAt && (
-                    <span className="text-[9px] md:text-[10px] font-medium text-cherry-blossom leading-tight text-center select-none">
+                    <span className="text-[9px] md:text-[10px] font-medium text-powder-blush leading-tight text-center select-none">
                       {virtueZone ? virtueZone.virtue : '🛡️'}
                     </span>
                   )}
                   {isHomeTile && !playerAt && (
                     <div className="flex flex-col items-center gap-0 leading-none">
                       <span className="text-sm select-none" aria-hidden="true">🏠</span>
-                      <span className="text-[8px] font-medium text-dusty-mauve leading-tight text-center select-none">
+                      <span className="text-[8px] font-medium text-periwinkle leading-tight text-center select-none">
                         Home
                       </span>
                     </div>

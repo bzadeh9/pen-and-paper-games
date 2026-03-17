@@ -12,8 +12,8 @@ interface CellProps {
 
 export function Cell({ value, onClick, isActive, isDisabled }: CellProps) {
   const getPlayerColor = () => {
-    if (value === 'X') return 'text-dusty-mauve';
-    if (value === 'O') return 'text-pastel-pink';
+    if (value === 'X') return 'text-periwinkle';
+    if (value === 'O') return 'text-mauve';
     return '';
   };
 
@@ -25,7 +25,7 @@ export function Cell({ value, onClick, isActive, isDisabled }: CellProps) {
       className={`
         relative aspect-square w-full border border-foreground/20 
         transition-all duration-200
-        ${isActive && !isDisabled ? 'bg-cherry-blossom/10 hover:bg-cherry-blossom/20 cursor-pointer' : ''}
+        ${isActive && !isDisabled ? 'bg-powder-blush/10 hover:bg-powder-blush/20 cursor-pointer' : ''}
         ${!isActive || isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
         ${!isDisabled && !value ? 'hover:bg-foreground/5' : ''}
       `}

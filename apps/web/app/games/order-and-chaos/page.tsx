@@ -124,7 +124,7 @@ export default function OrderAndChaosPage() {
               <h3 className="text-lg font-semibold mb-2">The Core Concept</h3>
               <p className="mb-4">
                 Order and Chaos is a masterpiece of asymmetric design. The game
-                is played with shared pieces (cherry blossom and dusty mauve
+                is played with shared pieces (powder blush and periwinkle
                 markers, or X and O symbols). Unlike Tic-Tac-Toe, where you
                 &quot;own&quot; a symbol, in Order and Chaos, both players can
                 use both colors or symbols.
@@ -133,13 +133,13 @@ export default function OrderAndChaosPage() {
               <h3 className="text-lg font-semibold mb-2">The Roles</h3>
               <ul className="mb-4 space-y-2">
                 <li>
-                  <strong className="text-cherry-blossom">Order:</strong> The
+                  <strong className="text-powder-blush">Order:</strong> The
                   builder. Order&apos;s goal is to create a sequence of
                   five-in-a-row of the same color or symbol (horizontal,
                   vertical, or diagonal).
                 </li>
                 <li>
-                  <strong className="text-dusty-mauve">Chaos:</strong> The
+                  <strong className="text-periwinkle">Chaos:</strong> The
                   spoiler. Chaos&apos;s goal is to prevent Order from completing
                   a line until the entire board is filled.
                 </li>
@@ -150,18 +150,18 @@ export default function OrderAndChaosPage() {
                 <li>
                   <strong>Display Mode:</strong> Choose between Color Mode
                   (colored circles) or X and O Mode (classic symbols). In X and
-                  O Mode, X represents cherry blossom and O represents dusty
-                  mauve.
+                  O Mode, X represents powder blush and O represents
+                  periwinkle.
                 </li>
                 <li>
                   <strong>The Turn:</strong> On your turn, select a color
-                  (cherry blossom or dusty mauve) or symbol (X or O) and place
+                  (powder blush or periwinkle) or symbol (X or O) and place
                   it in any empty cell on the 6×6 grid.
                 </li>
                 <li>
                   <strong>The Flexibility:</strong> You are never locked into
-                  one color or symbol. You might play cherry blossom (or X) on
-                  turn one and dusty mauve (or O) on turn two if it helps your
+                  one color or symbol. You might play powder blush (or X) on
+                  turn one and periwinkle (or O) on turn two if it helps your
                   objective.
                 </li>
                 <li>
@@ -202,9 +202,9 @@ export default function OrderAndChaosPage() {
                   because Chaos can only block one side at a time.
                 </li>
                 <li>
-                  <strong>The Decoy:</strong> Start building a cherry blossom
-                  line to force Chaos to react, then suddenly pivot to a dusty
-                  mauve line on the other side of the board.
+                  <strong>The Decoy:</strong> Start building a powder blush
+                  line to force Chaos to react, then suddenly pivot to a
+                  periwinkle line on the other side of the board.
                 </li>
               </ul>
 

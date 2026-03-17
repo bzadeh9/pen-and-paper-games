@@ -55,7 +55,7 @@ A collection of classic pen and paper games, re-imagined for the web.
 *   **The Roles:**
     *   **Order:** Aims to create a sequence of five-in-a-row of the same color (horizontal, vertical, or diagonal).
     *   **Chaos:** Aims to prevent Order from completing a line until the entire board is filled.
-*   **The Turn:** On your turn, select a color (cherry blossom or dusty mauve) and place it in any empty cell on the 6x6 grid.
+*   **The Turn:** On your turn, select a color (powder blush or periwinkle) and place it in any empty cell on the 6×6 grid.
 *   **Winning:**
     *   As soon as a line of five same-colored pieces appears, **Order** wins immediately.
     *   If the board is filled and no five-in-a-row exists, **Chaos** wins.
@@ -108,3 +108,21 @@ This is a [Next.js](https://nextjs.org) project.
 *   **Styling:** [Tailwind CSS](https://tailwindcss.com)
 *   **Testing:** [Vitest](https://vitest.dev)
 *   **Repo Structure:** Monorepo with `apps/web` application.
+
+## Colour Palette
+
+All games share a unified 9-colour pastel palette defined in `apps/web/app/globals.css`. Each colour is available as a Tailwind CSS utility (e.g. `bg-powder-blush`, `text-periwinkle`).
+
+| Name | Default (500) | CSS Variable | Tailwind Class |
+|------|:---:|---|---|
+| **Powder Blush** | `#ffadad` | `--powder-blush` | `powder-blush` |
+| **Apricot Cream** | `#ffd6a5` | `--apricot-cream` | `apricot-cream` |
+| **Cream** | `#fdffb6` | `--cream` | `cream` |
+| **Tea Green** | `#caffbf` | `--tea-green` | `tea-green` |
+| **Electric Aqua** | `#9bf6ff` | `--electric-aqua` | `electric-aqua` |
+| **Baby Blue Ice** | `#a0c4ff` | `--baby-blue-ice` | `baby-blue-ice` |
+| **Periwinkle** | `#bdb2ff` | `--periwinkle` | `periwinkle` |
+| **Mauve** | `#ffc6ff` | `--mauve` | `mauve` |
+| **Porcelain** | `#fffffc` | `--porcelain` | `porcelain` |
+
+See `apps/web/app/games/theme/page.tsx` for a live theme guide with visual swatches and usage examples.

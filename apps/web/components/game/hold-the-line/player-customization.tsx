@@ -58,10 +58,9 @@ export function PlayerCustomization({
   };
 
   // Helper to get contrasting color for checkmark
-  const getCheckmarkColor = (color: PlayerColor): string => {
-    // Use dark checkmark for light colors
-    const lightColors = ['alabasterGrey', 'powderPetal', 'pastelPink'];
-    return lightColors.includes(color) ? '#000000' : '#FFFFFF';
+  // All unified palette colors are pastel/light, so always use dark checkmark
+  const getCheckmarkColor = (_color: PlayerColor): string => {
+    return '#000000';
   };
 
   return (
@@ -131,9 +130,13 @@ export function PlayerCustomization({
                 !isSelected && !isDisabled && 'border-foreground/20',
                 !isDisabled && 'hover:scale-110',
                 isDisabled &&
-                  'cursor-not-allowed opacity-40 border-foreground/10'
+                  'cursor-not-allowed border-foreground/10'
               )}
-              style={{ backgroundColor: PLAYER_COLORS[option.value] }}
+              style={{
+                backgroundColor: isDisabled
+                  ? '#9ca3af'
+                  : PLAYER_COLORS[option.value],
+              }}
               title={
                 isDisabled
                   ? `${option.label} (selected by other player)`

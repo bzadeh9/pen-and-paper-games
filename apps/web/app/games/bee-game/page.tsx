@@ -59,7 +59,7 @@ export default function BeeGamePage() {
         </div>
 
         {/* Backstory */}
-        <div className="mb-6 rounded-lg border border-foreground/20 bg-powder-petal/30 px-6 py-5">
+        <div className="mb-6 rounded-lg border border-foreground/20 bg-cream/30 px-6 py-5">
           <h2 className="mb-2 text-lg font-semibold">The Story of Abbee &amp; Dot</h2>
           <p className="text-sm leading-relaxed text-foreground/80">
             Every year during Ayyam-i-ha, two tiny bees named Abbee and Dot
