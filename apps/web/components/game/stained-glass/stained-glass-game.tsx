@@ -99,6 +99,7 @@ export default function StainedGlassGame() {
       engineRef.current.startGame();
       setGameState(engineRef.current.getState());
     } else {
+      engineRef.current.reset();
       regenerateLayout(gridSize, mode);
     }
   }, [gameState.status, gridSize, mode, regenerateLayout]);
