@@ -235,7 +235,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     const gate = gateByKey.get(key);
     const gc = gate ? GATE_COLORS[gate.id % GATE_COLORS.length] : null;
 
-    let bg = '#f8e5e5';
+    let bg = '#fdffb6';
     if (isStart) bg = '#d1fae5';
     if (isEnd) bg = '#fef3c7';
     // Gate rooms are very obvious - prominent color
@@ -245,8 +245,8 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
     if (!isP1Valid && isP2Valid) bg = '#e8d8f8';
     if (isP1Valid && isP2Valid) bg = '#f0d0ec';
     // Players always on top
-    if (isP1 && !isP2) bg = '#ffb3c1';
-    if (!isP1 && isP2) bg = '#c9a0dc';
+    if (isP1 && !isP2) bg = '#ffadad';
+    if (!isP1 && isP2) bg = '#bdb2ff';
     if (isP1 && isP2) bg = '#e0a0cc';
 
     // Gate rooms get a thick prominent border
@@ -257,9 +257,9 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       : isP1Valid && isP2Valid
       ? '#d090d0'
       : isP1Valid
-      ? '#ffb3c1'
+      ? '#ffadad'
       : isP2Valid
-      ? '#c9a0dc'
+      ? '#bdb2ff'
       : 'transparent';
 
     return {
@@ -319,7 +319,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
             onClick={() => handleSizeChange(size)}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
               mazeSize === size
-                ? 'border border-dusty-mauve bg-dusty-mauve/20 text-dusty-mauve'
+                ? 'border border-periwinkle bg-periwinkle/20 text-periwinkle'
                 : 'border border-foreground/20 bg-foreground/5 text-foreground/60 hover:bg-foreground/10'
             }`}
           >
@@ -331,7 +331,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {/* Status bar */}
       <div className="rounded-lg border border-foreground/20 bg-background px-4 py-2 text-center text-sm font-medium">
         {status === 'ended' ? (
-          <span className="text-cherry-blossom">
+          <span className="text-powder-blush">
             🎉 Both found the bees! Amazing teamwork!
           </span>
         ) : (
@@ -383,7 +383,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                     top: row * (CELL_SIZE + WALL_SIZE) + 4,
                     width: WALL_SIZE,
                     height: CELL_SIZE - 8,
-                    backgroundColor: '#f8e5e5',
+                    backgroundColor: '#fdffb6',
                     borderRadius: 2,
                     zIndex: 0,
                   }}
@@ -400,7 +400,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
                     top: row * (CELL_SIZE + WALL_SIZE) + CELL_SIZE,
                     width: CELL_SIZE - 8,
                     height: WALL_SIZE,
-                    backgroundColor: '#f8e5e5',
+                    backgroundColor: '#fdffb6',
                     borderRadius: 2,
                     zIndex: 0,
                   }}
@@ -472,14 +472,14 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       <div className="flex w-full max-w-sm justify-between px-2">
         <DPad
           label="👦 Boy (WASD)"
-          playerColor="#ffb3c1"
+          playerColor="#ffadad"
           validDirs={p1ValidDirs}
           onMove={(dir) => handleMove(1, dir)}
           disabled={status !== 'playing'}
         />
         <DPad
           label="👧 Girl (↑↓←→)"
-          playerColor="#c9a0dc"
+          playerColor="#bdb2ff"
           validDirs={p2ValidDirs}
           onMove={(dir) => handleMove(2, dir)}
           disabled={status !== 'playing'}
@@ -489,7 +489,7 @@ export function GameBoard({ onGameEnd }: GameBoardProps) {
       {status === 'ended' && (
         <button
           onClick={handleReset}
-          className="rounded-lg border border-cherry-blossom bg-cherry-blossom/10 px-6 py-2 text-sm font-medium text-cherry-blossom transition-colors hover:bg-cherry-blossom/20"
+          className="rounded-lg border border-powder-blush bg-powder-blush/10 px-6 py-2 text-sm font-medium text-powder-blush transition-colors hover:bg-powder-blush/20"
         >
           Play Again
         </button>

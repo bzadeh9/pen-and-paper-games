@@ -61,11 +61,13 @@ export function PlayerCustomization({
                   isSelected
                     ? 'border-foreground scale-110'
                     : isDisabled
-                      ? 'border-foreground/20 opacity-30 cursor-not-allowed'
+                      ? 'border-foreground/20 cursor-not-allowed'
                       : 'border-foreground/20 hover:border-foreground/40 hover:scale-105'
                 }`}
                 style={{
-                  backgroundColor: PLAYER_COLORS[value],
+                  backgroundColor: isDisabled
+                    ? '#9ca3af'
+                    : PLAYER_COLORS[value],
                 }}
                 aria-label={`${label} ${isDisabled ? '(in use)' : ''}`}
                 title={`${label} ${isDisabled ? '(in use)' : ''}`}

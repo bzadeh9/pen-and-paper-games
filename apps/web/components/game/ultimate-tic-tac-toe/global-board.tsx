@@ -34,8 +34,8 @@ export function GlobalBoard({ gameState, onCellClick }: GlobalBoardProps) {
 
   const getBorderColor = () => {
     if (gameState.status !== 'playing') return 'border-foreground/30';
-    if (gameState.currentPlayer === 'X') return 'border-dusty-mauve';
-    if (gameState.currentPlayer === 'O') return 'border-pastel-pink';
+    if (gameState.currentPlayer === 'X') return 'border-periwinkle';
+    if (gameState.currentPlayer === 'O') return 'border-mauve';
     return 'border-foreground/30';
   };
 

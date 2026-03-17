@@ -21,28 +21,28 @@ export function CellComponent({
 }: CellProps) {
   const getColorClass = (color: PieceColor | null) => {
     if (!color) return 'bg-background';
-    return color === 'cherry-blossom' ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
+    return color === 'powder-blush' ? 'bg-powder-blush' : 'bg-periwinkle';
   };
 
   const getSymbol = (color: PieceColor | null) => {
     if (!color) return null;
-    return color === 'cherry-blossom' ? 'X' : 'O';
+    return color === 'powder-blush' ? 'X' : 'O';
   };
 
   const showPreview = !cell.color && selectedColor && !isDisabled;
 
   const getPreviewClass = () => {
     if (!showPreview) return '';
-    return selectedColor === 'cherry-blossom'
-      ? 'ring-2 ring-cherry-blossom/40'
-      : 'ring-2 ring-dusty-mauve/40';
+    return selectedColor === 'powder-blush'
+      ? 'ring-2 ring-powder-blush/40'
+      : 'ring-2 ring-periwinkle/40';
   };
 
   const getTextColor = (color: PieceColor | null) => {
     if (!color) return '';
-    return color === 'cherry-blossom'
-      ? 'text-cherry-blossom'
-      : 'text-dusty-mauve';
+    return color === 'powder-blush'
+      ? 'text-powder-blush'
+      : 'text-periwinkle';
   };
 
   return (

@@ -18,7 +18,7 @@ export function Header() {
   return (
     <>
       {/* Early Development Disclaimer Banner */}
-      <div className="w-full bg-cherry-blossom/20 py-2 text-center">
+      <div className="w-full bg-powder-blush/20 py-2 text-center">
         <p className="text-sm font-medium text-foreground/80">
           ℹ️ Please be patient whilst we work on this, we&apos;re just kids 🤙
         </p>
@@ -31,7 +31,7 @@ export function Header() {
             className="flex items-center space-x-2 font-bold text-xl tracking-tight hover:opacity-80 transition-opacity"
           >
             <svg
-              className="h-6 w-6 text-cherry-blossom"
+              className="h-6 w-6 text-powder-blush"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

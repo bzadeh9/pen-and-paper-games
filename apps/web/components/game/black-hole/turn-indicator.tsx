@@ -39,13 +39,13 @@ export function TurnIndicator({
         <h2 className="mb-4 text-2xl font-bold">Game Over!</h2>
         <div className="mb-4 space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-dusty-mauve">
+            <span className="text-lg font-semibold text-periwinkle">
               Player 1:
             </span>
             <span className="text-2xl font-bold">{player1Score}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-cherry-blossom">
+            <span className="text-lg font-semibold text-powder-blush">
               Player 2:
             </span>
             <span className="text-2xl font-bold">{player2Score}</span>
@@ -57,7 +57,7 @@ export function TurnIndicator({
           ) : (
             <span
               className={
-                winner === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'
+                winner === 1 ? 'text-periwinkle' : 'text-powder-blush'
               }
             >
               Player {winner} Wins! 🎉
@@ -78,7 +78,7 @@ export function TurnIndicator({
         <div className="mt-2 text-2xl font-bold">
           <span
             className={
-              currentPlayer === 1 ? 'text-dusty-mauve' : 'text-cherry-blossom'
+              currentPlayer === 1 ? 'text-periwinkle' : 'text-powder-blush'
             }
           >
             Player {currentPlayer}&apos;s Turn
@@ -89,12 +89,12 @@ export function TurnIndicator({
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-        <div className="rounded bg-dusty-mauve/10 dark:bg-dusty-mauve/20 p-2 text-center border border-dusty-mauve/30">
-          <div className="font-semibold text-dusty-mauve">Player 1</div>
+        <div className="rounded bg-periwinkle/10 dark:bg-periwinkle/20 p-2 text-center border border-periwinkle/30">
+          <div className="font-semibold text-periwinkle">Player 1</div>
           <div className="text-lg font-bold">Next: {player1Counter}</div>
         </div>
-        <div className="rounded bg-cherry-blossom/10 dark:bg-cherry-blossom/20 p-2 text-center border border-cherry-blossom/30">
-          <div className="font-semibold text-cherry-blossom">Player 2</div>
+        <div className="rounded bg-powder-blush/10 dark:bg-powder-blush/20 p-2 text-center border border-powder-blush/30">
+          <div className="font-semibold text-powder-blush">Player 2</div>
           <div className="text-lg font-bold">Next: {player2Counter}</div>
         </div>
       </div>

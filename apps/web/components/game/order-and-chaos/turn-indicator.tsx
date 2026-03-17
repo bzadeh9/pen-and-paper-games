@@ -25,15 +25,15 @@ export function TurnIndicator({
 
   const renderPiecePreview = (color: PieceColor) => {
     if (displayMode === 'symbol') {
-      const symbol = color === 'cherry-blossom' ? 'X' : 'O';
+      const symbol = color === 'powder-blush' ? 'X' : 'O';
       const colorClass =
-        color === 'cherry-blossom' ? 'text-cherry-blossom' : 'text-dusty-mauve';
+        color === 'powder-blush' ? 'text-powder-blush' : 'text-periwinkle';
       return (
         <span className={`text-3xl font-bold ${colorClass}`}>{symbol}</span>
       );
     }
     const bgClass =
-      color === 'cherry-blossom' ? 'bg-cherry-blossom' : 'bg-dusty-mauve';
+      color === 'powder-blush' ? 'bg-powder-blush' : 'bg-periwinkle';
     return <div className={`h-10 w-10 rounded-full ${bgClass}`} />;
   };
 
@@ -52,7 +52,7 @@ export function TurnIndicator({
         <>
           <h2 className="mb-4 text-2xl font-semibold">
             Current Turn:{' '}
-            <span className="text-cherry-blossom">{playerName}</span>
+            <span className="text-powder-blush">{playerName}</span>
           </h2>
 
           {!isGameEnded && (
@@ -64,40 +64,40 @@ export function TurnIndicator({
               </p>
               <div className="flex gap-4">
                 <button
-                  onClick={() => onColorSelect('cherry-blossom')}
+                  onClick={() => onColorSelect('powder-blush')}
                   className={`
                     flex h-16 w-16 items-center justify-center rounded-lg border-2 transition-all
                     ${
-                      selectedColor === 'cherry-blossom'
-                        ? 'border-cherry-blossom ring-2 ring-cherry-blossom ring-offset-2 scale-110'
-                        : 'border-foreground/20 hover:border-cherry-blossom hover:scale-105'
+                      selectedColor === 'powder-blush'
+                        ? 'border-powder-blush ring-2 ring-powder-blush ring-offset-2 scale-110'
+                        : 'border-foreground/20 hover:border-powder-blush hover:scale-105'
                     }
                   `}
                   aria-label={
                     displayMode === 'symbol'
                       ? 'Select X'
-                      : 'Select cherry blossom color'
+                      : 'Select powder blush color'
                   }
                 >
-                  {renderPiecePreview('cherry-blossom')}
+                  {renderPiecePreview('powder-blush')}
                 </button>
                 <button
-                  onClick={() => onColorSelect('dusty-mauve')}
+                  onClick={() => onColorSelect('periwinkle')}
                   className={`
                     flex h-16 w-16 items-center justify-center rounded-lg border-2 transition-all
                     ${
-                      selectedColor === 'dusty-mauve'
-                        ? 'border-dusty-mauve ring-2 ring-dusty-mauve ring-offset-2 scale-110'
-                        : 'border-foreground/20 hover:border-dusty-mauve hover:scale-105'
+                      selectedColor === 'periwinkle'
+                        ? 'border-periwinkle ring-2 ring-periwinkle ring-offset-2 scale-110'
+                        : 'border-foreground/20 hover:border-periwinkle hover:scale-105'
                     }
                   `}
                   aria-label={
                     displayMode === 'symbol'
                       ? 'Select O'
-                      : 'Select dusty mauve color'
+                      : 'Select periwinkle color'
                   }
                 >
-                  {renderPiecePreview('dusty-mauve')}
+                  {renderPiecePreview('periwinkle')}
                 </button>
               </div>
             </div>
