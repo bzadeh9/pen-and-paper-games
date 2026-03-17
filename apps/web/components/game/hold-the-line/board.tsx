@@ -70,11 +70,6 @@ export function GameBoard({
     return offsets;
   });
 
-  // Sync game state when engine changes
-  useEffect(() => {
-    setGameState(engine.getState());
-  }, [engine]);
-
   useEffect(() => {
     if (gameState.status === 'ended' && gameState.winner && onGameEnd) {
       onGameEnd(gameState.winner);
@@ -97,6 +92,14 @@ export function GameBoard({
   const handleDotClick = (pos: Position) => {
     if (gameState.status !== 'playing') return;
 
+    const selectedPendingEnd = pendingMove?.ends.find(
+      (end) => end.row === pos.row && end.col === pos.col
+    );
+    if (selectedPendingEnd) {
+      handleEndSelection(selectedPendingEnd);
+      return;
+    }
+
     if (!engine.isValidMove(pos)) {
       // Provide feedback for invalid move
       // Note: Move can be invalid for multiple reasons (not adjacent, already visited, or would intersect)
@@ -112,8 +115,15 @@ export function GameBoard({
     }
 
     const validEnds = engine.getValidConnectionEnds(pos);
-    if (gameState.pathEnds && validEnds.length > 1) {
-      setPendingMove({ pos, ends: validEnds });
+    // Deduplicate ends by position — after the first move, pathEnds is [x, x]
+    // so getValidConnectionEnds returns the same position twice, which would
+    // incorrectly trigger the ambiguous-end selection flow.
+    const distinctEnds = validEnds.filter(
+      (end, i, arr) =>
+        arr.findIndex((e) => e.row === end.row && e.col === end.col) === i
+    );
+    if (gameState.pathEnds && distinctEnds.length > 1) {
+      setPendingMove({ pos, ends: distinctEnds });
       setErrorMessage(null);
       return;
     }
@@ -234,8 +244,13 @@ export function GameBoard({
       return [];
     }
 
-    const validEnds =
+    const rawEnds =
       pendingMove?.ends ?? engine.getValidConnectionEnds(previewDot);
+    // Deduplicate ends by position to avoid rendering overlapping dashed lines
+    const validEnds = rawEnds.filter(
+      (end, i, arr) =>
+        arr.findIndex((e) => e.row === end.row && e.col === end.col) === i
+    );
     if (validEnds.length === 0) return [];
 
     return validEnds.map((end) => ({
@@ -491,6 +506,13 @@ export function GameBoard({
               const { x, y } = getDotPosition(row, col);
               const visited = isVisited(pos);
               const valid = isValidMove(pos);
+              const isPendingEnd =
+                pendingMove?.ends.some(
+                  (end) => end.row === row && end.col === col
+                ) ?? false;
+              const isClickable =
+                gameState.status === 'playing' &&
+                ((valid && !visited) || isPendingEnd);
               const hovered =
                 hoveredDot?.row === row && hoveredDot?.col === col;
               const isPending =
@@ -506,22 +528,21 @@ export function GameBoard({
                     fill={visited ? USED_DOT_COLOR : NEUTRAL_DOT_COLOR}
                     opacity={visited ? 0.8 : 0.5}
                     className={`transition-all ${
-                      valid && !visited && gameState.status === 'playing'
-                        ? 'cursor-pointer'
-                        : ''
+                      isClickable ? 'cursor-pointer' : ''
                     }`}
-                    onClick={() =>
-                      valid && !visited && gameState.status === 'playing'
-                        ? handleDotClick(pos)
-                        : null
-                    }
+                    onClick={() => (isClickable ? handleDotClick(pos) : null)}
                     onMouseEnter={() => setHoveredDot(pos)}
                     onMouseLeave={() => setHoveredDot(null)}
+                    role={isClickable ? 'button' : undefined}
+                    aria-label={
+                      isPendingEnd
+                        ? `Connect from row ${row + 1} column ${col + 1}`
+                        : isClickable
+                          ? `Choose dot row ${row + 1} column ${col + 1}`
+                          : undefined
+                    }
                     style={{
-                      pointerEvents:
-                        valid && !visited && gameState.status === 'playing'
-                          ? 'auto'
-                          : 'none',
+                      pointerEvents: isClickable ? 'auto' : 'none',
                     }}
                   />
 
@@ -548,6 +569,7 @@ export function GameBoard({
                       fontWeight="bold"
                       fill="currentColor"
                       opacity="0.5"
+                      style={{ pointerEvents: 'none' }}
                     >
                       {gameState.moveHistory.findIndex(
                         (move) => move.row === row && move.col === col
