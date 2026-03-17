@@ -67,7 +67,6 @@ function isInsideWindow(p: Point): boolean {
     const dy = p.y - cy;
     const r = ARCH_RADIUS - pad;
     if (dx * dx + dy * dy > r * r) return false;
-    if (p.y > cy) return true; // Below center of arch is always fine
     return true;
   }
 
@@ -350,7 +349,9 @@ export function generateWindowLayout(sectionCount: number): WindowLayout {
 }
 
 /**
- * Section count presets for different "grid sizes".
+ * Section count presets for each window size (3 = Small … 6 = Extra Large).
+ * Values are chosen to produce a good visual density within the arched window:
+ * roughly size² × 1.0–1.1, then rounded to feel balanced during gameplay.
  */
 export const SECTION_COUNTS: Record<number, number> = {
   3: 12,

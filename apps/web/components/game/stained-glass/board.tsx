@@ -4,6 +4,9 @@ import React from 'react';
 import type { GameState } from '@/lib/games/stained-glass/types';
 import type { WindowLayout } from '@/lib/games/stained-glass/layout';
 
+const EMPTY_FILL = 'rgba(229, 231, 235, 0.3)';
+const EMPTY_FILL_FALLBACK = 'rgba(229, 231, 235, 0.5)';
+
 interface BoardProps {
   gameState: GameState;
   layout: WindowLayout;
@@ -13,10 +16,10 @@ interface BoardProps {
 export function Board({ gameState, layout, onSectionClick }: BoardProps) {
   const getSectionFill = (sectionId: number) => {
     const section = gameState.sections[sectionId];
-    if (!section) return 'rgba(229, 231, 235, 0.5)'; // gray fallback
+    if (!section) return EMPTY_FILL_FALLBACK;
     if (section.owner === 1) return 'var(--periwinkle)';
     if (section.owner === 2) return 'var(--powder-blush)';
-    return 'rgba(229, 231, 235, 0.3)';
+    return EMPTY_FILL;
   };
 
   const getSectionStroke = (sectionId: number) => {
