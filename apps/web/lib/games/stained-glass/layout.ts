@@ -99,7 +99,10 @@ function generateSeedPoints(count: number): Point[] {
     CLUSTER_DISTANCE_MAX_ABSOLUTE,
     minDist * CLUSTER_MAX_RATIO
   );
-  const clusteredCount = Math.max(2, Math.floor(count * CLUSTER_RATIO));
+  const clusteredCount = Math.min(
+    count,
+    Math.max(1, Math.floor(count * CLUSTER_RATIO))
+  );
   const evenlyDistributedCount = Math.max(0, count - clusteredCount);
   const maxAttempts = count * 250;
 

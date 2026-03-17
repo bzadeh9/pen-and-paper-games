@@ -6,6 +6,7 @@ import type { WindowLayout } from '@/lib/games/stained-glass/layout';
 
 const EMPTY_FILL = 'rgba(229, 231, 235, 0.3)';
 const EMPTY_FILL_FALLBACK = 'rgba(229, 231, 235, 0.5)';
+const HOVER_BRIGHTNESS_CLASS = 'hover:brightness-95';
 
 interface BoardProps {
   gameState: GameState;
@@ -84,11 +85,11 @@ export function Board({
 
     if (showPossibleMoves) {
       return clickable
-        ? 'cursor-pointer transition-all duration-150 hover:brightness-95'
+        ? `cursor-pointer transition-all duration-150 ${HOVER_BRIGHTNESS_CLASS}`
         : 'opacity-40';
     }
 
-    return 'cursor-pointer transition-all duration-150 hover:brightness-95';
+    return `cursor-pointer transition-all duration-150 ${HOVER_BRIGHTNESS_CLASS}`;
   };
 
   const showSetupOverlay = gameState.status === 'setup';
