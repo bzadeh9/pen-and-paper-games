@@ -29,6 +29,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'maze-game': { bg: 'bg-baby-blue-ice/20', text: 'text-baby-blue-ice' },
   'virtue-memory': { bg: 'bg-mauve/20', text: 'text-mauve' },
   'flower-hop': { bg: 'bg-tea-green/20', text: 'text-tea-green' },
+  'stained-glass': { bg: 'bg-mauve/20', text: 'text-mauve' },
 };
 
 const iconPaths: Record<string, React.ReactNode> = {
@@ -447,6 +448,33 @@ const iconPaths: Record<string, React.ReactNode> = {
       <ellipse cx="5" cy="6" rx="2" ry="1.5" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
       <line x1="4.5" y1="4.5" x2="4" y2="3" strokeWidth={0.7} strokeLinecap="round" />
       <line x1="5.5" y1="4.5" x2="6" y2="3" strokeWidth={0.7} strokeLinecap="round" />
+    </>
+  ),
+
+  /**
+   * Stained Glass – an arched window frame divided into pane sections,
+   * with a few colored panes representing the area-control mechanic.
+   */
+  'stained-glass': (
+    <>
+      {/* Window frame (arched top) */}
+      <path
+        d="M4 21V8a8 8 0 0116 0v13"
+        fill="none"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Bottom frame */}
+      <line x1="4" y1="21" x2="20" y2="21" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Vertical divider */}
+      <line x1="12" y1="4" x2="12" y2="21" strokeWidth={1.2} strokeLinecap="round" opacity={0.6} />
+      {/* Horizontal dividers */}
+      <line x1="4" y1="12" x2="20" y2="12" strokeWidth={1.2} strokeLinecap="round" opacity={0.6} />
+      <line x1="4" y1="17" x2="20" y2="17" strokeWidth={1.2} strokeLinecap="round" opacity={0.6} />
+      {/* Colored panes */}
+      <rect x="5" y="13" width="6" height="3.5" rx="0.5" fill="currentColor" opacity={0.35} stroke="none" />
+      <rect x="13" y="17.5" width="6" height="3" rx="0.5" fill="currentColor" opacity={0.2} stroke="none" />
     </>
   ),
 };
