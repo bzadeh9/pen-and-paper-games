@@ -3,16 +3,19 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
 
 export function Header() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Games', href: '/games' },
+    { name: 'Leaderboard', href: '/leaderboard' },
   ];
 
   return (
@@ -64,9 +67,55 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Right side: Theme Toggle & Mobile Menu */}
+          {/* Right side: Theme Toggle, Auth & Mobile Menu */}
           <div className="flex items-center space-x-2">
             <ThemeToggle />
+
+            {/* Auth controls (desktop) */}
+            <div className="hidden md:flex items-center space-x-2">
+              {session?.user ? (
+                <>
+                  {session.user.role === 'ADMIN' && (
+                    <Link
+                      href="/admin"
+                      className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                    >
+                      Admin
+                    </Link>
+                  )}
+                  <Link
+                    href="/profile"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-periwinkle text-sm font-bold text-ink-black"
+                    aria-label="Profile"
+                  >
+                    {(session.user.name || session.user.email || 'U')
+                      .charAt(0)
+                      .toUpperCase()}
+                  </Link>
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="rounded-md bg-periwinkle px-3 py-1.5 text-sm font-medium text-ink-black transition-colors hover:bg-periwinkle/80"
+                  >
+                    Sign up
+                  </Link>
+                </>
+              )}
+            </div>
 
             {/* Mobile menu button */}
             <button
@@ -126,6 +175,55 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
+              {/* Mobile auth links */}
+              <div className="mt-4 border-t border-foreground/10 pt-4 space-y-2">
+                {session?.user ? (
+                  <>
+                    <Link
+                      href="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
+                    >
+                      Profile
+                    </Link>
+                    {session.user.role === 'ADMIN' && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-3 py-2 rounded-md text-base font-medium text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
+                      >
+                        Admin
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        signOut({ callbackUrl: '/' });
+                      }}
+                      className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
+                    >
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-periwinkle hover:bg-foreground/5"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
+              </div>
             </nav>
           </div>
         )}

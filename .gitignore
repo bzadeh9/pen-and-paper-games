@@ -51,3 +51,6 @@ next-env.d.ts
 # changesets
 .changeset/*.md
 !.changeset/README.md
+
+# prisma
+**/lib/generated/prisma
