@@ -37,6 +37,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!**/.env.example
 
 # vercel
 .vercel
@@ -51,3 +53,6 @@ next-env.d.ts
 # changesets
 .changeset/*.md
 !.changeset/README.md
+
+# prisma
+**/lib/generated/prisma
