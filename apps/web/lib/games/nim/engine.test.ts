@@ -12,6 +12,7 @@ describe('NimEngine', () => {
     it('should start with default rows [1, 3, 5, 7]', () => {
       const state = engine.getState();
       expect(state.rows).toEqual(DEFAULT_ROWS);
+      expect(state.rowStates).toEqual([[true], [true, true, true], [true, true, true, true, true], [true, true, true, true, true, true, true]]);
     });
 
     it('should start with player 1', () => {
@@ -80,6 +81,12 @@ describe('NimEngine', () => {
       engine.makeMove(0, 1); // empties row 0
       expect(engine.isValidMove(0, 1)).toBe(false);
     });
+
+    it('should validate selected contiguous segment start index', () => {
+      const game = new NimEngine([5]);
+      expect(game.isValidMove(0, 2, 2)).toBe(true);
+      expect(game.isValidMove(0, 2, 4)).toBe(false);
+    });
   });
 
   describe('makeMove', () => {
@@ -114,6 +121,14 @@ describe('NimEngine', () => {
 
     it('should return false for invalid moves', () => {
       expect(engine.makeMove(0, 2)).toBe(false);
+    });
+
+    it('should cross out only the chosen contiguous segment', () => {
+      const game = new NimEngine([5]);
+      game.makeMove(0, 2, 1); // crosses out indexes 1 and 2
+      const state = game.getState();
+      expect(state.rows[0]).toBe(3);
+      expect(state.rowStates[0]).toEqual([true, false, false, true, true]);
     });
   });
 

@@ -3,10 +3,14 @@
 import React, { useCallback, useState } from 'react';
 import type { GameState } from '@/lib/games/nim/types';
 import { Button } from '@/components/ui/button';
+import {
+  getFirstValidSegmentStart,
+  getValidSegmentStarts,
+} from '@/lib/games/nim/segments';
 
 interface BoardProps {
   gameState: GameState;
-  onMove: (rowIndex: number, count: number) => void;
+  onMove: (rowIndex: number, count: number, startIndex?: number) => void;
   player1Name: string;
   player2Name: string;
 }
@@ -17,6 +21,7 @@ const ROW_GAP_CLASSES = 'gap-3 md:gap-4';
 export function Board({ gameState, onMove, player1Name, player2Name }: BoardProps) {
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [removeCount, setRemoveCount] = useState<number>(1);
+  const [removeStart, setRemoveStart] = useState<number>(0);
 
   const isPlaying = gameState.status === 'playing';
 
@@ -25,20 +30,33 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
       if (!isPlaying) return;
       if (gameState.rows[rowIndex] === 0) return;
       setSelectedRow(rowIndex);
-      setRemoveCount((current) => Math.min(current, gameState.rows[rowIndex]));
+      const nextCount = Math.min(removeCount, gameState.rows[rowIndex]);
+      const nextStart = getFirstValidSegmentStart(gameState.rowStates[rowIndex], nextCount) ?? 0;
+      setRemoveCount(nextCount);
+      setRemoveStart(nextStart);
     },
-    [isPlaying, gameState.rows]
+    [isPlaying, gameState.rows, gameState.rowStates, removeCount]
   );
+
+  const validSegmentStarts =
+    selectedRow === null
+      ? []
+      : getValidSegmentStarts(gameState.rowStates[selectedRow], removeCount);
 
   const handleRemove = useCallback(() => {
     if (!isPlaying || selectedRow === null) return;
     const rowRemaining = gameState.rows[selectedRow];
     if (rowRemaining <= 0) return;
     const count = Math.min(removeCount, rowRemaining);
-    onMove(selectedRow, count);
+    const startIndex = validSegmentStarts.includes(removeStart)
+      ? removeStart
+      : validSegmentStarts[0];
+    if (startIndex === undefined) return;
+    onMove(selectedRow, count, startIndex);
     setSelectedRow(null);
     setRemoveCount(1);
-  }, [isPlaying, selectedRow, gameState.rows, removeCount, onMove]);
+    setRemoveStart(0);
+  }, [isPlaying, selectedRow, gameState.rows, removeCount, removeStart, onMove, validSegmentStarts]);
 
   const currentPlayerName =
     gameState.currentPlayer === 1 ? player1Name : player2Name;
@@ -69,11 +87,13 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
               } ${isPlaying && rowCount > 0 ? 'cursor-pointer' : 'cursor-default opacity-60'}`}
               aria-label={`Select row ${rowIndex + 1} with ${rowCount} lines`}
             >
-              {Array.from({ length: rowCount }, (_, itemIndex) => {
+              {gameState.rowStates[rowIndex].map((isActive, itemIndex) => {
                 return (
                   <span
                     key={itemIndex}
-                    className={`${LINE_SIZE_CLASSES} inline-block rounded-full bg-foreground/70`}
+                    className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${
+                      isActive ? 'bg-foreground/70' : 'bg-foreground/20'
+                    }`}
                     aria-hidden="true"
                   />
                 );
@@ -88,12 +108,61 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
           <p className="mb-3 text-center text-sm text-foreground/60">
             {currentPlayerName}: row {selectedRow + 1}
           </p>
+          <div className="mb-3 flex items-center justify-center gap-2">
+            {validSegmentStarts.map((start, idx) => {
+              let positionLabel = 'Middle';
+              const totalPositions = validSegmentStarts.length;
+
+              if (totalPositions === 1) {
+                positionLabel = 'Only';
+              } else if (idx === 0) {
+                positionLabel = 'Left';
+              } else if (idx === totalPositions - 1) {
+                positionLabel = 'Right';
+              } else if (totalPositions === 3) {
+                positionLabel = 'Middle';
+              } else if (totalPositions === 4) {
+                positionLabel = idx === 1 ? 'Mid-Left' : 'Mid-Right';
+              } else if (totalPositions > 4) {
+                const middleIndex = Math.floor(totalPositions / 2);
+                if (totalPositions % 2 === 1 && idx === middleIndex) {
+                  positionLabel = 'Middle';
+                } else if (idx < middleIndex) {
+                  positionLabel = 'Mid-Left';
+                } else {
+                  positionLabel = 'Mid-Right';
+                }
+              }
+
+              return (
+                <Button
+                  key={start}
+                  type="button"
+                  variant={removeStart === start ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setRemoveStart(start)}
+                  aria-label={`Select ${positionLabel.toLowerCase()} segment`}
+                >
+                  {positionLabel}
+                </Button>
+              );
+            })}
+          </div>
           <div className="flex items-center justify-center gap-3">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setRemoveCount((current) => Math.max(1, current - 1))}
+              onClick={() => {
+                const nextCount = Math.max(1, removeCount - 1);
+                setRemoveCount(nextCount);
+                const nextStart =
+                  getFirstValidSegmentStart(
+                    gameState.rowStates[selectedRow],
+                    nextCount
+                  ) ?? 0;
+                setRemoveStart(nextStart);
+              }}
               disabled={removeCount === 1}
               aria-label="Remove one fewer line"
             >
@@ -104,17 +173,22 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
               aria-live="polite"
               aria-atomic="true"
             >
-              Remove {removeCount}
+              Cross Out {removeCount}
             </span>
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() =>
-                setRemoveCount((current) =>
-                  Math.min(gameState.rows[selectedRow], current + 1)
-                )
-              }
+              onClick={() => {
+                const nextCount = Math.min(gameState.rows[selectedRow], removeCount + 1);
+                setRemoveCount(nextCount);
+                const nextStart =
+                  getFirstValidSegmentStart(
+                    gameState.rowStates[selectedRow],
+                    nextCount
+                  ) ?? 0;
+                setRemoveStart(nextStart);
+              }}
               disabled={removeCount === gameState.rows[selectedRow]}
               aria-label="Remove one more line"
             >
@@ -124,9 +198,10 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
               type="button"
               size="sm"
               onClick={handleRemove}
-              aria-label={`Confirm removing ${removeCount} lines from row ${selectedRow + 1}`}
+              disabled={!validSegmentStarts.includes(removeStart)}
+              aria-label={`Confirm crossing out ${removeCount} lines from row ${selectedRow + 1}`}
             >
-              Remove
+              Cross Out
             </Button>
           </div>
         </div>

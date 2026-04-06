@@ -29,8 +29,8 @@ export default function NimPage() {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
   const handleMove = useCallback(
-    (rowIndex: number, count: number) => {
-      const success = engine.makeMove(rowIndex, count);
+    (rowIndex: number, count: number, startIndex?: number) => {
+      const success = engine.makeMove(rowIndex, count, startIndex);
       if (success) {
         setGameState(engine.getState());
       }
@@ -152,11 +152,11 @@ export default function NimPage() {
                       • On your turn, select one row of lines
                     </li>
                     <li>
-                      • Choose exactly how many lines to remove from that row
+                      • Choose exactly how many lines to cross out from that row
                       (at least 1, up to all remaining in that row)
                     </li>
                     <li>
-                      • Confirm your move using the Remove button
+                      • Choose where in the row (left/middle/right), then confirm with the Cross Out button
                     </li>
                   </ul>
                 </div>

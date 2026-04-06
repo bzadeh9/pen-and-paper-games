@@ -4,6 +4,8 @@ export type GameStatus = 'playing' | 'ended';
 export interface GameState {
   /** Array where each element represents the number of items remaining in that row */
   rows: number[];
+  /** Per-row line states (true = active, false = crossed out) */
+  rowStates: boolean[][];
   /** Current player (1 or 2) */
   currentPlayer: Player;
   /** Game status */
