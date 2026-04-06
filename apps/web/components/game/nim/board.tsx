@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import type { GameState } from '@/lib/games/nim/types';
+import { Button } from '@/components/ui/button';
 
 interface BoardProps {
   gameState: GameState;
@@ -10,115 +11,131 @@ interface BoardProps {
   player2Name: string;
 }
 
-const ITEM_SIZE_CLASSES = 'w-8 h-8 md:w-10 md:h-10';
-const ROW_GAP_CLASSES = 'gap-1.5 md:gap-2';
-// Offset is half of (item size + row gap):
-// w-8 items with gap-1.5 between neighbors => (2rem + 0.375rem)/2,
-// md:w-10 items with md:gap-2 between neighbors => (2.5rem + 0.5rem)/2.
-const PYRAMID_OFFSET_CLASSES =
-  'translate-x-[calc((2rem+0.375rem)/2)] md:translate-x-[calc((2.5rem+0.5rem)/2)]';
+const LINE_SIZE_CLASSES = 'h-8 w-1.5 md:h-10 md:w-2';
+const ROW_GAP_CLASSES = 'gap-3 md:gap-4';
+const PYRAMID_OFFSET_CLASSES = 'translate-x-[1rem] md:translate-x-[1.25rem]';
 
 export function Board({ gameState, onMove, player1Name, player2Name }: BoardProps) {
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
-  const [hoverCount, setHoverCount] = useState<number>(0);
+  const [removeCount, setRemoveCount] = useState<number>(1);
 
   const isPlaying = gameState.status === 'playing';
 
-  const handleItemClick = useCallback(
-    (rowIndex: number, itemIndex: number) => {
-      if (!isPlaying) return;
-      if (gameState.rows[rowIndex] === 0) return;
-
-      // itemIndex is 0-based; clicking on item i means removing items from
-      // the end of the row down to (and including) item i.
-      // So count = row length - itemIndex
-      const count = gameState.rows[rowIndex] - itemIndex;
-      onMove(rowIndex, count);
-      setSelectedRow(null);
-      setHoverCount(0);
-    },
-    [isPlaying, gameState.rows, onMove]
-  );
-
-  const handleItemHover = useCallback(
-    (rowIndex: number, itemIndex: number) => {
+  const handleRowSelect = useCallback(
+    (rowIndex: number) => {
       if (!isPlaying) return;
       if (gameState.rows[rowIndex] === 0) return;
       setSelectedRow(rowIndex);
-      // Items from itemIndex to end will be "selected" for removal
-      setHoverCount(gameState.rows[rowIndex] - itemIndex);
+      setRemoveCount((current) => Math.min(current, gameState.rows[rowIndex]));
     },
     [isPlaying, gameState.rows]
   );
 
-  const handleMouseLeave = useCallback(() => {
+  const handleRemove = useCallback(() => {
+    if (!isPlaying || selectedRow === null) return;
+    const rowRemaining = gameState.rows[selectedRow];
+    if (rowRemaining <= 0) return;
+    const count = Math.min(removeCount, rowRemaining);
+    onMove(selectedRow, count);
     setSelectedRow(null);
-    setHoverCount(0);
-  }, []);
+    setRemoveCount(1);
+  }, [isPlaying, selectedRow, gameState.rows, removeCount, onMove]);
 
   const currentPlayerName =
     gameState.currentPlayer === 1 ? player1Name : player2Name;
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4 md:p-6">
+    <div className="flex flex-col items-center gap-6 p-4 md:p-6">
       {gameState.rows.map((rowCount, rowIndex) => {
-        const isHoveredRow = selectedRow === rowIndex;
+        const isSelectedRow = selectedRow === rowIndex;
         const rowClasses = [
           'flex',
           ROW_GAP_CLASSES,
           ...(rowIndex % 2 === 1 ? [PYRAMID_OFFSET_CLASSES] : []),
         ]
           .join(' ');
-        // Items that would be removed start at (rowCount - hoverCount)
-        const removeStart = isHoveredRow ? rowCount - hoverCount : rowCount;
 
         return (
           <div
             key={rowIndex}
-            className="flex items-center gap-1 justify-center"
-            onMouseLeave={handleMouseLeave}
+            className="flex items-center justify-center gap-2"
           >
-            <span className="w-6 text-center text-xs font-medium text-foreground/40 mr-1">
+            <span className="mr-2 w-6 text-center text-xs font-medium text-foreground/40">
               {rowCount}
             </span>
-            <div className={rowClasses}>
+            <button
+              onClick={() => handleRowSelect(rowIndex)}
+              disabled={!isPlaying || rowCount === 0}
+              className={`${rowClasses} rounded-lg border px-3 py-2 transition-colors ${
+                isSelectedRow
+                  ? gameState.currentPlayer === 1
+                    ? 'border-periwinkle bg-periwinkle/10'
+                    : 'border-powder-blush bg-powder-blush/10'
+                  : 'border-transparent hover:border-foreground/20'
+              } ${isPlaying && rowCount > 0 ? 'cursor-pointer' : 'cursor-default opacity-60'}`}
+              aria-label={`Select row ${rowIndex + 1} with ${rowCount} lines`}
+            >
               {Array.from({ length: rowCount }, (_, itemIndex) => {
-                const wouldBeRemoved = isHoveredRow && itemIndex >= removeStart;
-
                 return (
-                  <button
+                  <span
                     key={itemIndex}
-                    onClick={() => handleItemClick(rowIndex, itemIndex)}
-                    onMouseEnter={() => handleItemHover(rowIndex, itemIndex)}
-                    disabled={!isPlaying}
-                    className={`${ITEM_SIZE_CLASSES} rounded-full border-2 transition-all duration-150
-                      ${
-                        wouldBeRemoved
-                          ? gameState.currentPlayer === 1
-                            ? 'border-periwinkle bg-periwinkle/30 scale-110'
-                            : 'border-powder-blush bg-powder-blush/30 scale-110'
-                          : 'border-foreground/30 bg-foreground/10 hover:border-foreground/50'
-                      }
-                      ${isPlaying ? 'cursor-pointer' : 'cursor-default'}
-                    `}
-                    aria-label={`Row ${rowIndex + 1}, item ${itemIndex + 1}${wouldBeRemoved ? ' (will be removed)' : ''}`}
-                  >
-                    <div
-                      className={`w-full h-full rounded-full ${
-                        wouldBeRemoved ? 'opacity-50' : ''
-                      }`}
-                    />
-                  </button>
+                    className={`${LINE_SIZE_CLASSES} inline-block rounded-full bg-foreground/70`}
+                    aria-hidden="true"
+                  />
                 );
               })}
-            </div>
+            </button>
           </div>
         );
       })}
-      {isPlaying && selectedRow !== null && hoverCount > 0 && (
-        <p className="text-sm text-foreground/50 mt-2">
-          {currentPlayerName} removes {hoverCount} from row {selectedRow + 1}
-        </p>
+
+      {isPlaying && selectedRow !== null && gameState.rows[selectedRow] > 0 && (
+        <div className="w-full max-w-md rounded-lg border border-foreground/20 bg-background p-3 md:p-4">
+          <p className="mb-3 text-center text-sm text-foreground/60">
+            {currentPlayerName}: row {selectedRow + 1}
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setRemoveCount((current) => Math.max(1, current - 1))}
+              disabled={removeCount === 1}
+              aria-label="Remove one fewer line"
+            >
+              −
+            </Button>
+            <span
+              className="min-w-24 text-center text-sm font-medium"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              Remove {removeCount}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setRemoveCount((current) =>
+                  Math.min(gameState.rows[selectedRow], current + 1)
+                )
+              }
+              disabled={removeCount === gameState.rows[selectedRow]}
+              aria-label="Remove one more line"
+            >
+              +
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleRemove}
+              aria-label={`Confirm removing ${removeCount} lines from row ${selectedRow + 1}`}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -149,15 +149,14 @@ export default function NimPage() {
                   </h3>
                   <ul className="space-y-2 text-foreground/80">
                     <li>
-                      • On your turn, click an item in any single row to remove
-                      it and all items to its right
+                      • On your turn, select one row of lines
                     </li>
                     <li>
-                      • You must remove at least one item per turn
+                      • Choose exactly how many lines to remove from that row
+                      (at least 1, up to all remaining in that row)
                     </li>
                     <li>
-                      • You may remove as many items as you want, but only from
-                      one row
+                      • Confirm your move using the Remove button
                     </li>
                   </ul>
                 </div>
