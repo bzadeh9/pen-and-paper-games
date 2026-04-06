@@ -219,28 +219,26 @@ const iconPaths: Record<string, React.ReactNode> = {
   ),
 
   /**
-   * Nim – rows of circles in a pyramid pattern (1, 3, 5) with two circles
-   * crossed out, representing the item-removal game.
+   * Nim – rows of short vertical lines in a neat pyramid pattern (1, 3, 5)
+   * with one crossed-out line, representing line removal.
    */
   nim: (
     <>
-      {/* Row 1: 1 item */}
-      <circle cx="12" cy="4" r="2" fill="currentColor" opacity={0.7} stroke="none" />
-      {/* Row 2: 3 items */}
-      <circle cx="7" cy="10" r="2" fill="currentColor" opacity={0.7} stroke="none" />
-      <circle cx="12" cy="10" r="2" fill="currentColor" opacity={0.7} stroke="none" />
-      <circle cx="17" cy="10" r="2" fill="currentColor" opacity={0.7} stroke="none" />
-      {/* Row 3: 5 items */}
-      <circle cx="4" cy="16" r="2" fill="currentColor" opacity={0.7} stroke="none" />
-      <circle cx="8" cy="16" r="2" fill="currentColor" opacity={0.7} stroke="none" />
-      <circle cx="12" cy="16" r="2" fill="currentColor" opacity={0.7} stroke="none" />
-      <circle cx="16" cy="16" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
-      <circle cx="20" cy="16" r="2" fill="currentColor" opacity={0.3} stroke="currentColor" strokeWidth={0.8} />
-      {/* Cross-out marks on last two items */}
-      <line x1="14.5" y1="14.5" x2="17.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
-      <line x1="17.5" y1="14.5" x2="14.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
-      <line x1="18.5" y1="14.5" x2="21.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
-      <line x1="21.5" y1="14.5" x2="18.5" y2="17.5" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
+      {/* Row 1: 1 line */}
+      <line x1="12" y1="3.5" x2="12" y2="6.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Row 2: 3 lines */}
+      <line x1="8" y1="8.5" x2="8" y2="11.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="12" y1="8.5" x2="12" y2="11.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="16" y1="8.5" x2="16" y2="11.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Row 3: 5 lines */}
+      <line x1="4" y1="13.5" x2="4" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="8" y1="13.5" x2="8" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="12" y1="13.5" x2="12" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="16" y1="13.5" x2="16" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="20" y1="13.5" x2="20" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Cross-out mark on one line */}
+      <line x1="18.4" y1="13.1" x2="21.6" y2="16.9" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="21.6" y1="13.1" x2="18.4" y2="16.9" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
     </>
   ),
 

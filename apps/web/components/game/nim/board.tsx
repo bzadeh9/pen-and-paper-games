@@ -13,7 +13,6 @@ interface BoardProps {
 
 const LINE_SIZE_CLASSES = 'h-8 w-1.5 md:h-10 md:w-2';
 const ROW_GAP_CLASSES = 'gap-3 md:gap-4';
-const PYRAMID_OFFSET_CLASSES = 'translate-x-[1rem] md:translate-x-[1.25rem]';
 
 export function Board({ gameState, onMove, player1Name, player2Name }: BoardProps) {
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
@@ -48,12 +47,7 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
     <div className="flex flex-col items-center gap-6 p-4 md:p-6">
       {gameState.rows.map((rowCount, rowIndex) => {
         const isSelectedRow = selectedRow === rowIndex;
-        const rowClasses = [
-          'flex',
-          ROW_GAP_CLASSES,
-          ...(rowIndex % 2 === 1 ? [PYRAMID_OFFSET_CLASSES] : []),
-        ]
-          .join(' ');
+        const rowClasses = ['flex', ROW_GAP_CLASSES, 'justify-center'].join(' ');
 
         return (
           <div
