@@ -58,6 +58,30 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
     setRemoveStart(0);
   }, [isPlaying, selectedRow, gameState.rows, removeCount, removeStart, onMove, validSegmentStarts]);
 
+  const getSegmentStartForLine = useCallback(
+    (lineIndex: number): number | null => {
+      if (selectedRow === null) return null;
+      const starts = getValidSegmentStarts(
+        gameState.rowStates[selectedRow],
+        removeCount
+      );
+      const containingStarts = starts.filter(
+        (start) => lineIndex >= start && lineIndex < start + removeCount
+      );
+
+      if (containingStarts.length === 0) return starts[0] ?? null;
+
+      return containingStarts.reduce((best, current) => {
+        const bestCenter = best + (removeCount - 1) / 2;
+        const currentCenter = current + (removeCount - 1) / 2;
+        return Math.abs(currentCenter - lineIndex) < Math.abs(bestCenter - lineIndex)
+          ? current
+          : best;
+      }, containingStarts[0]);
+    },
+    [selectedRow, gameState.rowStates, removeCount]
+  );
+
   const currentPlayerName =
     gameState.currentPlayer === 1 ? player1Name : player2Name;
 
@@ -75,9 +99,18 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
             <span className="mr-2 w-6 text-center text-xs font-medium text-foreground/40">
               {rowCount}
             </span>
-            <button
+            <div
               onClick={() => handleRowSelect(rowIndex)}
-              disabled={!isPlaying || rowCount === 0}
+              onKeyDown={(e) => {
+                if (!isPlaying || rowCount === 0) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleRowSelect(rowIndex);
+                }
+              }}
+              role="button"
+              tabIndex={isPlaying && rowCount > 0 ? 0 : -1}
+              aria-disabled={!isPlaying || rowCount === 0}
               className={`${rowClasses} rounded-lg border px-3 py-2 transition-colors ${
                 isSelectedRow
                   ? gameState.currentPlayer === 1
@@ -88,17 +121,52 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
               aria-label={`Select row ${rowIndex + 1} with ${rowCount} lines`}
             >
               {gameState.rowStates[rowIndex].map((isActive, itemIndex) => {
+                const isPreviewedSegment =
+                  isSelectedRow &&
+                  isActive &&
+                  removeStart >= 0 &&
+                  itemIndex >= removeStart &&
+                  itemIndex < removeStart + removeCount;
+                const lineColorClass = !isActive
+                  ? 'bg-foreground/20'
+                  : isPreviewedSegment
+                    ? gameState.currentPlayer === 1
+                      ? 'bg-periwinkle'
+                      : 'bg-powder-blush'
+                    : 'bg-foreground/70';
+
+                if (isSelectedRow && isActive && isPlaying) {
+                  return (
+                    <button
+                      key={itemIndex}
+                      type="button"
+                      className="rounded px-1 py-1"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        const nextStart = getSegmentStartForLine(itemIndex);
+                        if (nextStart !== null) {
+                          setRemoveStart(nextStart);
+                        }
+                      }}
+                      aria-label={`Select segment using line ${itemIndex + 1}`}
+                    >
+                      <span
+                        className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${lineColorClass}`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  );
+                }
+
                 return (
                   <span
                     key={itemIndex}
-                    className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${
-                      isActive ? 'bg-foreground/70' : 'bg-foreground/20'
-                    }`}
+                    className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${lineColorClass}`}
                     aria-hidden="true"
                   />
                 );
               })}
-            </button>
+            </div>
           </div>
         );
       })}
@@ -108,46 +176,9 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
           <p className="mb-3 text-center text-sm text-foreground/60">
             {currentPlayerName}: row {selectedRow + 1}
           </p>
-          <div className="mb-3 flex items-center justify-center gap-2">
-            {validSegmentStarts.map((start, idx) => {
-              let positionLabel = 'Middle';
-              const totalPositions = validSegmentStarts.length;
-
-              if (totalPositions === 1) {
-                positionLabel = 'Only';
-              } else if (idx === 0) {
-                positionLabel = 'Left';
-              } else if (idx === totalPositions - 1) {
-                positionLabel = 'Right';
-              } else if (totalPositions === 3) {
-                positionLabel = 'Middle';
-              } else if (totalPositions === 4) {
-                positionLabel = idx === 1 ? 'Mid-Left' : 'Mid-Right';
-              } else if (totalPositions > 4) {
-                const middleIndex = Math.floor(totalPositions / 2);
-                if (totalPositions % 2 === 1 && idx === middleIndex) {
-                  positionLabel = 'Middle';
-                } else if (idx < middleIndex) {
-                  positionLabel = 'Mid-Left';
-                } else {
-                  positionLabel = 'Mid-Right';
-                }
-              }
-
-              return (
-                <Button
-                  key={start}
-                  type="button"
-                  variant={removeStart === start ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setRemoveStart(start)}
-                  aria-label={`Select ${positionLabel.toLowerCase()} segment`}
-                >
-                  {positionLabel}
-                </Button>
-              );
-            })}
-          </div>
+          <p className="mb-3 text-center text-xs text-foreground/50">
+            Tap a line in the selected row to choose where this segment starts.
+          </p>
           <div className="flex items-center justify-center gap-3">
             <Button
               type="button"

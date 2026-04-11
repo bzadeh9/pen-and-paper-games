@@ -156,7 +156,7 @@ export default function NimPage() {
                       (at least 1, up to all remaining in that row)
                     </li>
                     <li>
-                      • Choose where in the row (left/middle/right), then confirm with the Cross Out button
+                      • Tap/click a line in that row to choose the segment position, then confirm with the Cross Out button
                     </li>
                   </ul>
                 </div>
