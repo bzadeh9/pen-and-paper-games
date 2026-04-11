@@ -17,6 +17,8 @@ interface BoardProps {
 
 const LINE_SIZE_CLASSES = 'h-8 w-1.5 md:h-10 md:w-2';
 const ROW_GAP_CLASSES = 'gap-3 md:gap-4';
+const LINE_FOCUS_CLASSES =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/50 focus-visible:ring-offset-1';
 
 export function Board({ gameState, onMove, player1Name, player2Name }: BoardProps) {
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
@@ -57,6 +59,23 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
     setRemoveCount(1);
     setRemoveStart(0);
   }, [isPlaying, selectedRow, gameState.rows, removeCount, removeStart, onMove, validSegmentStarts]);
+
+  const moveSegmentSelection = useCallback(
+    (direction: -1 | 1) => {
+      if (validSegmentStarts.length === 0) return;
+      const currentIndex = validSegmentStarts.indexOf(removeStart);
+      if (currentIndex < 0) {
+        setRemoveStart(validSegmentStarts[0]);
+        return;
+      }
+      const nextIndex = Math.min(
+        validSegmentStarts.length - 1,
+        Math.max(0, currentIndex + direction)
+      );
+      setRemoveStart(validSegmentStarts[nextIndex]);
+    },
+    [validSegmentStarts, removeStart]
+  );
 
   const getSegmentStartForLine = useCallback(
     (lineIndex: number): number | null => {
@@ -102,6 +121,7 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
             <div
               onClick={() => handleRowSelect(rowIndex)}
               onKeyDown={(e) => {
+                if (e.target !== e.currentTarget) return;
                 if (!isPlaying || rowCount === 0) return;
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
@@ -134,18 +154,34 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                       ? 'bg-periwinkle'
                       : 'bg-powder-blush'
                     : 'bg-foreground/70';
+                const isSelectableLine =
+                  isSelectedRow &&
+                  isActive &&
+                  validSegmentStarts.some(
+                    (start) =>
+                      itemIndex >= start && itemIndex < start + removeCount
+                  );
 
-                if (isSelectedRow && isActive && isPlaying) {
+                if (isSelectableLine && isPlaying) {
                   return (
                     <button
                       key={itemIndex}
                       type="button"
-                      className="rounded px-1 py-1"
+                      className={`rounded px-1 py-1 ${LINE_FOCUS_CLASSES}`}
                       onClick={(event) => {
                         event.stopPropagation();
                         const nextStart = getSegmentStartForLine(itemIndex);
                         if (nextStart !== null) {
                           setRemoveStart(nextStart);
+                        }
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'ArrowLeft') {
+                          event.preventDefault();
+                          moveSegmentSelection(-1);
+                        } else if (event.key === 'ArrowRight') {
+                          event.preventDefault();
+                          moveSegmentSelection(1);
                         }
                       }}
                       aria-label={`Select segment using line ${itemIndex + 1}`}
