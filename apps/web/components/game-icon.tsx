@@ -22,6 +22,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   'order-and-chaos': { bg: 'bg-apricot-cream/20', text: 'text-apricot-cream' },
   sim: { bg: 'bg-electric-aqua/20', text: 'text-electric-aqua' },
   'row-call': { bg: 'bg-powder-blush/20', text: 'text-powder-blush' },
+  nim: { bg: 'bg-powder-blush/20', text: 'text-powder-blush' },
   scribbl: { bg: 'bg-tea-green/20', text: 'text-tea-green' },
   'bee-game': { bg: 'bg-apricot-cream/20', text: 'text-apricot-cream' },
   'hide-and-seek': { bg: 'bg-electric-aqua/20', text: 'text-electric-aqua' },
@@ -214,6 +215,30 @@ const iconPaths: Record<string, React.ReactNode> = {
         strokeWidth={1.8}
         strokeLinejoin="round"
       />
+    </>
+  ),
+
+  /**
+   * Nim – rows of short vertical lines in a neat pyramid pattern (1, 3, 5)
+   * with one crossed-out line, representing line removal.
+   */
+  nim: (
+    <>
+      {/* Row 1: 1 line */}
+      <line x1="12" y1="3.5" x2="12" y2="6.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Row 2: 3 lines */}
+      <line x1="8" y1="8.5" x2="8" y2="11.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="12" y1="8.5" x2="12" y2="11.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="16" y1="8.5" x2="16" y2="11.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Row 3: 5 lines */}
+      <line x1="4" y1="13.5" x2="4" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="8" y1="13.5" x2="8" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="12" y1="13.5" x2="12" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="16" y1="13.5" x2="16" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="20" y1="13.5" x2="20" y2="16.5" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Cross-out mark on one line */}
+      <line x1="18.4" y1="13.1" x2="21.6" y2="16.9" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="21.6" y1="13.1" x2="18.4" y2="16.9" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
     </>
   ),
 
