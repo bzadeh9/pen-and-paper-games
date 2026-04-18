@@ -149,14 +149,13 @@ export default function NimPage() {
                   </h3>
                   <ul className="space-y-2 text-foreground/80">
                     <li>
-                      • On your turn, select one row of lines
+                      • On your turn, tap/click any active line to cross it out immediately
                     </li>
                     <li>
-                      • Choose exactly how many lines to cross out from that row
-                      (at least 1, up to all remaining in that row)
+                      • After your first line, only subsequent lines in that same group can be crossed out
                     </li>
                     <li>
-                      • Tap/click a line in that row to choose the segment position, then confirm with the Cross Out button
+                      • Finish your turn by pressing the I&apos;m done button to pass play to the next player
                     </li>
                   </ul>
                 </div>
