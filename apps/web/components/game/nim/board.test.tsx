@@ -36,17 +36,20 @@ describe('Nim Board', () => {
       screen.getByText('Crossed out 1 line in row 2')
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Cross out line 2 in row 2' })
-    ).not.toBeInTheDocument();
-    expect(
       screen.queryByRole('button', { name: 'Cross out line 1 in row 1' })
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Cross out line 1 in row 2' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Cross out line 3 in row 2' })
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: "I'm done with my turn" }));
     expect(onMove).toHaveBeenCalledWith(1, 1, 1);
   });
 
-  it('locks selection to the same group and only allows subsequent lines', () => {
+  it('locks selection to the same group and allows selecting any line in it', () => {
     const onMove = vi.fn();
     render(
       <Board
@@ -68,20 +71,18 @@ describe('Nim Board', () => {
       screen.getByRole('button', { name: 'Cross out line 4 in row 2' })
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Cross out line 5 in row 2' })
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Cross out line 5 in row 2' })
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Cross out line 1 in row 1' })
     ).not.toBeInTheDocument();
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Cross out line 4 in row 2' })
-    );
-    expect(
       screen.getByRole('button', { name: 'Cross out line 5 in row 2' })
-    ).toBeInTheDocument();
+    );
+    expect(screen.getByText('Crossed out 3 lines in row 2')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: "I'm done with my turn" }));
-    expect(onMove).toHaveBeenCalledWith(1, 2, 2);
+    expect(onMove).toHaveBeenCalledWith(1, 3, 2);
   });
 });

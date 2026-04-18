@@ -152,7 +152,7 @@ export default function NimPage() {
                       • On your turn, tap/click any active line to cross it out immediately
                     </li>
                     <li>
-                      • After your first line, only subsequent lines in that same group can be crossed out
+                      • After your first line, only that same group remains active and you can select any line within it
                     </li>
                     <li>
                       • Finish your turn by pressing the I&apos;m done button to pass play to the next player

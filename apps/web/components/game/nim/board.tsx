@@ -18,7 +18,9 @@ const LINE_FOCUS_CLASSES =
 
 export function Board({ gameState, onMove, player1Name, player2Name }: BoardProps) {
   const [activeRow, setActiveRow] = useState<number | null>(null);
+  const [activeGroupStart, setActiveGroupStart] = useState<number | null>(null);
   const [activeGroupEnd, setActiveGroupEnd] = useState<number | null>(null);
+  const [activeAnchor, setActiveAnchor] = useState<number | null>(null);
   const [removeStart, setRemoveStart] = useState<number | null>(null);
   const [removeCount, setRemoveCount] = useState<number>(0);
   const [selectionBase, setSelectionBase] = useState<boolean[][] | null>(null);
@@ -27,7 +29,9 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
 
   const clearTurnSelection = useCallback(() => {
     setActiveRow(null);
+    setActiveGroupStart(null);
     setActiveGroupEnd(null);
+    setActiveAnchor(null);
     setRemoveStart(null);
     setRemoveCount(0);
     setSelectionBase(null);
@@ -36,62 +40,95 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
   const isSelectionActive =
     isPlaying &&
     activeRow !== null &&
+    activeGroupStart !== null &&
     removeStart !== null &&
     activeGroupEnd !== null &&
+    activeAnchor !== null &&
     selectionBase === gameState.rowStates;
   const selectedRow = isSelectionActive ? activeRow : null;
+  const selectedGroupStart = isSelectionActive ? activeGroupStart : null;
   const selectedStart = isSelectionActive ? removeStart : null;
   const selectedGroupEnd = isSelectionActive ? activeGroupEnd : null;
+  const selectedAnchor = isSelectionActive ? activeAnchor : null;
   const selectedCount = isSelectionActive ? removeCount : 0;
 
-  const getGroupEnd = useCallback((row: boolean[], startIndex: number): number => {
-    let end = startIndex;
+  const getGroupBounds = useCallback((row: boolean[], index: number): [number, number] => {
+    let start = index;
+    while (start - 1 >= 0 && row[start - 1]) {
+      start -= 1;
+    }
+
+    let end = index;
     while (end + 1 < row.length && row[end + 1]) {
       end += 1;
     }
-    return end;
+
+    return [start, end];
   }, []);
 
-  const getNextSelectableIndex = useCallback((): number | null => {
-    if (selectedRow === null || selectedStart === null || selectedGroupEnd === null) {
-      return null;
-    }
-    const nextIndex = selectedStart + selectedCount;
-    if (nextIndex > selectedGroupEnd) return null;
-    return gameState.rowStates[selectedRow][nextIndex] ? nextIndex : null;
-  }, [selectedRow, selectedGroupEnd, selectedCount, selectedStart, gameState.rowStates]);
+  const isLineInSelectedGroup = useCallback(
+    (rowIndex: number, lineIndex: number) => {
+      if (
+        selectedRow === null ||
+        selectedGroupStart === null ||
+        selectedGroupEnd === null
+      ) {
+        return false;
+      }
+      return (
+        rowIndex === selectedRow &&
+        lineIndex >= selectedGroupStart &&
+        lineIndex <= selectedGroupEnd
+      );
+    },
+    [selectedRow, selectedGroupStart, selectedGroupEnd]
+  );
+
+  const applySelectionFromAnchor = useCallback(
+    (lineIndex: number) => {
+      if (selectedAnchor === null) return;
+      const nextStart = Math.min(selectedAnchor, lineIndex);
+      const nextEnd = Math.max(selectedAnchor, lineIndex);
+      setRemoveStart(nextStart);
+      setRemoveCount(nextEnd - nextStart + 1);
+    },
+    [selectedAnchor]
+  );
 
   const handleLineCrossOut = useCallback(
     (rowIndex: number, lineIndex: number) => {
       if (!isPlaying || !gameState.rowStates[rowIndex][lineIndex]) return;
 
       if (selectedRow === null) {
-        const groupEnd = getGroupEnd(gameState.rowStates[rowIndex], lineIndex);
+        const [groupStart, groupEnd] = getGroupBounds(
+          gameState.rowStates[rowIndex],
+          lineIndex
+        );
         setActiveRow(rowIndex);
+        setActiveGroupStart(groupStart);
         setActiveGroupEnd(groupEnd);
+        setActiveAnchor(lineIndex);
         setRemoveStart(lineIndex);
         setRemoveCount(1);
         setSelectionBase(gameState.rowStates);
         return;
       }
 
-      const nextIndex = getNextSelectableIndex();
-      if (rowIndex !== selectedRow || nextIndex === null || lineIndex !== nextIndex) return;
-      setRemoveCount((count) => count + 1);
+      if (!isLineInSelectedGroup(rowIndex, lineIndex)) return;
+      applySelectionFromAnchor(lineIndex);
     },
     [
       isPlaying,
       gameState.rowStates,
       selectedRow,
-      getGroupEnd,
-      getNextSelectableIndex,
+      getGroupBounds,
+      isLineInSelectedGroup,
+      applySelectionFromAnchor,
     ]
   );
 
   const currentPlayerName =
     gameState.currentPlayer === 1 ? player1Name : player2Name;
-
-  const nextSelectableIndex = getNextSelectableIndex();
 
   const handleDone = useCallback(() => {
     if (!isPlaying || selectedRow === null || selectedStart === null || selectedCount < 1) return;
@@ -134,9 +171,9 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                   itemIndex < selectedStart + selectedCount;
                 const isWithinActiveGroup =
                   isSelectedRow &&
-                  selectedStart !== null &&
+                  selectedGroupStart !== null &&
                   selectedGroupEnd !== null &&
-                  itemIndex >= selectedStart &&
+                  itemIndex >= selectedGroupStart &&
                   itemIndex <= selectedGroupEnd;
                 const lineColorClass = !isActive
                   ? 'bg-foreground/20'
@@ -147,7 +184,7 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                     : 'bg-foreground/70';
                 const isSelectableLine = isPlaying && isActive && (
                   selectedRow === null ||
-                  (isSelectedRow && nextSelectableIndex !== null && itemIndex === nextSelectableIndex)
+                  isLineInSelectedGroup(rowIndex, itemIndex)
                 );
                 const activeGroupClass = isWithinActiveGroup && !isPreviewedSegment
                   ? 'ring-1 ring-foreground/20'
@@ -194,7 +231,7 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
           <p className="mb-3 text-center text-xs text-foreground/50">
             {selectedRow === null
               ? 'Tap/click any active line to start crossing out that group.'
-              : `Keep crossing out subsequent lines in row ${selectedRow + 1}, then end your turn.`}
+              : `Select any line in row ${selectedRow + 1}'s active group, then end your turn.`}
           </p>
           <div
             className="mb-3 text-center text-sm font-medium"
