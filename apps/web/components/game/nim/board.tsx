@@ -3,10 +3,6 @@
 import React, { useCallback, useState } from 'react';
 import type { GameState } from '@/lib/games/nim/types';
 import { Button } from '@/components/ui/button';
-import {
-  getFirstValidSegmentStart,
-  getValidSegmentStarts,
-} from '@/lib/games/nim/segments';
 
 interface BoardProps {
   gameState: GameState;
@@ -21,93 +17,131 @@ const LINE_FOCUS_CLASSES =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/50 focus-visible:ring-offset-1';
 
 export function Board({ gameState, onMove, player1Name, player2Name }: BoardProps) {
-  const [selectedRow, setSelectedRow] = useState<number | null>(null);
-  const [removeCount, setRemoveCount] = useState<number>(1);
-  const [removeStart, setRemoveStart] = useState<number>(0);
+  const [activeRow, setActiveRow] = useState<number | null>(null);
+  const [activeGroupStart, setActiveGroupStart] = useState<number | null>(null);
+  const [activeGroupEnd, setActiveGroupEnd] = useState<number | null>(null);
+  const [activeAnchor, setActiveAnchor] = useState<number | null>(null);
+  const [removeStart, setRemoveStart] = useState<number | null>(null);
+  const [removeCount, setRemoveCount] = useState<number>(0);
+  const [selectionBase, setSelectionBase] = useState<boolean[][] | null>(null);
 
   const isPlaying = gameState.status === 'playing';
 
-  const handleRowSelect = useCallback(
-    (rowIndex: number) => {
-      if (!isPlaying) return;
-      if (gameState.rows[rowIndex] === 0) return;
-      setSelectedRow(rowIndex);
-      const nextCount = Math.min(removeCount, gameState.rows[rowIndex]);
-      const nextStart = getFirstValidSegmentStart(gameState.rowStates[rowIndex], nextCount) ?? 0;
-      setRemoveCount(nextCount);
-      setRemoveStart(nextStart);
+  const clearTurnSelection = useCallback(() => {
+    setActiveRow(null);
+    setActiveGroupStart(null);
+    setActiveGroupEnd(null);
+    setActiveAnchor(null);
+    setRemoveStart(null);
+    setRemoveCount(0);
+    setSelectionBase(null);
+  }, []);
+
+  const isSelectionActive =
+    isPlaying &&
+    activeRow !== null &&
+    activeGroupStart !== null &&
+    removeStart !== null &&
+    activeGroupEnd !== null &&
+    activeAnchor !== null &&
+    selectionBase === gameState.rowStates;
+  const selectedRow = isSelectionActive ? activeRow : null;
+  const selectedGroupStart = isSelectionActive ? activeGroupStart : null;
+  const selectedStart = isSelectionActive ? removeStart : null;
+  const selectedGroupEnd = isSelectionActive ? activeGroupEnd : null;
+  const selectedAnchor = isSelectionActive ? activeAnchor : null;
+  const selectedCount = isSelectionActive ? removeCount : 0;
+
+  const getGroupBounds = useCallback((row: boolean[], index: number): [number, number] => {
+    let start = index;
+    while (start - 1 >= 0 && row[start - 1]) {
+      start -= 1;
+    }
+
+    let end = index;
+    while (end + 1 < row.length && row[end + 1]) {
+      end += 1;
+    }
+
+    return [start, end];
+  }, []);
+
+  const isLineInSelectedGroup = useCallback(
+    (rowIndex: number, lineIndex: number) => {
+      if (
+        selectedRow === null ||
+        selectedGroupStart === null ||
+        selectedGroupEnd === null
+      ) {
+        return false;
+      }
+      return (
+        rowIndex === selectedRow &&
+        lineIndex >= selectedGroupStart &&
+        lineIndex <= selectedGroupEnd
+      );
     },
-    [isPlaying, gameState.rows, gameState.rowStates, removeCount]
+    [selectedRow, selectedGroupStart, selectedGroupEnd]
   );
 
-  const validSegmentStarts =
-    selectedRow === null
-      ? []
-      : getValidSegmentStarts(gameState.rowStates[selectedRow], removeCount);
+  const applySelectionFromAnchor = useCallback(
+    (lineIndex: number) => {
+      if (selectedAnchor === null) return;
+      const nextStart = Math.min(selectedAnchor, lineIndex);
+      const nextEnd = Math.max(selectedAnchor, lineIndex);
+      setRemoveStart(nextStart);
+      setRemoveCount(nextEnd - nextStart + 1);
+    },
+    [selectedAnchor]
+  );
 
-  const handleRemove = useCallback(() => {
-    if (!isPlaying || selectedRow === null) return;
-    const rowRemaining = gameState.rows[selectedRow];
-    if (rowRemaining <= 0) return;
-    const count = Math.min(removeCount, rowRemaining);
-    const startIndex = validSegmentStarts.includes(removeStart)
-      ? removeStart
-      : validSegmentStarts[0];
-    if (startIndex === undefined) return;
-    onMove(selectedRow, count, startIndex);
-    setSelectedRow(null);
-    setRemoveCount(1);
-    setRemoveStart(0);
-  }, [isPlaying, selectedRow, gameState.rows, removeCount, removeStart, onMove, validSegmentStarts]);
+  const handleLineCrossOut = useCallback(
+    (rowIndex: number, lineIndex: number) => {
+      if (!isPlaying || !gameState.rowStates[rowIndex][lineIndex]) return;
 
-  const moveSegmentSelection = useCallback(
-    (direction: -1 | 1) => {
-      if (validSegmentStarts.length === 0) return;
-      const currentIndex = validSegmentStarts.indexOf(removeStart);
-      if (currentIndex < 0) {
-        setRemoveStart(validSegmentStarts[0]);
+      if (selectedRow === null) {
+        const [groupStart, groupEnd] = getGroupBounds(
+          gameState.rowStates[rowIndex],
+          lineIndex
+        );
+        setActiveRow(rowIndex);
+        setActiveGroupStart(groupStart);
+        setActiveGroupEnd(groupEnd);
+        setActiveAnchor(lineIndex);
+        setRemoveStart(lineIndex);
+        setRemoveCount(1);
+        setSelectionBase(gameState.rowStates);
         return;
       }
-      const nextIndex = Math.min(
-        validSegmentStarts.length - 1,
-        Math.max(0, currentIndex + direction)
-      );
-      setRemoveStart(validSegmentStarts[nextIndex]);
+
+      if (!isLineInSelectedGroup(rowIndex, lineIndex)) return;
+      applySelectionFromAnchor(lineIndex);
     },
-    [validSegmentStarts, removeStart]
-  );
-
-  const getSegmentStartForLine = useCallback(
-    (lineIndex: number): number | null => {
-      if (selectedRow === null) return null;
-      const starts = getValidSegmentStarts(
-        gameState.rowStates[selectedRow],
-        removeCount
-      );
-      const containingStarts = starts.filter(
-        (start) => lineIndex >= start && lineIndex < start + removeCount
-      );
-
-      if (containingStarts.length === 0) return starts[0] ?? null;
-
-      return containingStarts.reduce((best, current) => {
-        const bestCenter = best + (removeCount - 1) / 2;
-        const currentCenter = current + (removeCount - 1) / 2;
-        return Math.abs(currentCenter - lineIndex) < Math.abs(bestCenter - lineIndex)
-          ? current
-          : best;
-      }, containingStarts[0]);
-    },
-    [selectedRow, gameState.rowStates, removeCount]
+    [
+      isPlaying,
+      gameState.rowStates,
+      selectedRow,
+      getGroupBounds,
+      isLineInSelectedGroup,
+      applySelectionFromAnchor,
+    ]
   );
 
   const currentPlayerName =
     gameState.currentPlayer === 1 ? player1Name : player2Name;
 
+  const handleDone = useCallback(() => {
+    if (!isPlaying || selectedRow === null || selectedStart === null || selectedCount < 1) return;
+    onMove(selectedRow, selectedCount, selectedStart);
+    clearTurnSelection();
+  }, [isPlaying, selectedRow, selectedStart, selectedCount, onMove, clearTurnSelection]);
+
   return (
     <div className="flex flex-col items-center gap-6 p-4 md:p-6">
       {gameState.rows.map((rowCount, rowIndex) => {
         const isSelectedRow = selectedRow === rowIndex;
+        const isRowInteractable =
+          isPlaying && rowCount > 0 && (selectedRow === null || isSelectedRow);
         const rowClasses = ['flex', ROW_GAP_CLASSES, 'justify-center'].join(' ');
 
         return (
@@ -119,34 +153,28 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
               {rowCount}
             </span>
             <div
-              onClick={() => handleRowSelect(rowIndex)}
-              onKeyDown={(e) => {
-                if (e.target !== e.currentTarget) return;
-                if (!isPlaying || rowCount === 0) return;
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleRowSelect(rowIndex);
-                }
-              }}
-              role="button"
-              tabIndex={isPlaying && rowCount > 0 ? 0 : -1}
-              aria-disabled={!isPlaying || rowCount === 0}
+              role="group"
               className={`${rowClasses} rounded-lg border px-3 py-2 transition-colors ${
                 isSelectedRow
                   ? gameState.currentPlayer === 1
                     ? 'border-periwinkle bg-periwinkle/10'
                     : 'border-powder-blush bg-powder-blush/10'
                   : 'border-transparent hover:border-foreground/20'
-              } ${isPlaying && rowCount > 0 ? 'cursor-pointer' : 'cursor-default opacity-60'}`}
-              aria-label={`Select row ${rowIndex + 1} with ${rowCount} lines`}
+              } ${isRowInteractable ? 'cursor-pointer' : 'cursor-default opacity-60'}`}
+              aria-label={`Row ${rowIndex + 1} with ${rowCount} lines${isSelectedRow ? ', active group selected' : ''}`}
             >
               {gameState.rowStates[rowIndex].map((isActive, itemIndex) => {
                 const isPreviewedSegment =
                   isSelectedRow &&
-                  isActive &&
-                  removeStart >= 0 &&
-                  itemIndex >= removeStart &&
-                  itemIndex < removeStart + removeCount;
+                  selectedStart !== null &&
+                  itemIndex >= selectedStart &&
+                  itemIndex < selectedStart + selectedCount;
+                const isWithinActiveGroup =
+                  isSelectedRow &&
+                  selectedGroupStart !== null &&
+                  selectedGroupEnd !== null &&
+                  itemIndex >= selectedGroupStart &&
+                  itemIndex <= selectedGroupEnd;
                 const lineColorClass = !isActive
                   ? 'bg-foreground/20'
                   : isPreviewedSegment
@@ -154,15 +182,15 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                       ? 'bg-periwinkle'
                       : 'bg-powder-blush'
                     : 'bg-foreground/70';
-                const isSelectableLine =
-                  isSelectedRow &&
-                  isActive &&
-                  validSegmentStarts.some(
-                    (start) =>
-                      itemIndex >= start && itemIndex < start + removeCount
-                  );
+                const isSelectableLine = isPlaying && isActive && (
+                  selectedRow === null ||
+                  isLineInSelectedGroup(rowIndex, itemIndex)
+                );
+                const activeGroupClass = isWithinActiveGroup && !isPreviewedSegment
+                  ? 'ring-1 ring-foreground/20'
+                  : '';
 
-                if (isSelectableLine && isPlaying) {
+                if (isSelectableLine) {
                   return (
                     <button
                       key={itemIndex}
@@ -170,24 +198,12 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                       className={`rounded px-1 py-1 ${LINE_FOCUS_CLASSES}`}
                       onClick={(event) => {
                         event.stopPropagation();
-                        const nextStart = getSegmentStartForLine(itemIndex);
-                        if (nextStart !== null) {
-                          setRemoveStart(nextStart);
-                        }
+                        handleLineCrossOut(rowIndex, itemIndex);
                       }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'ArrowLeft') {
-                          event.preventDefault();
-                          moveSegmentSelection(-1);
-                        } else if (event.key === 'ArrowRight') {
-                          event.preventDefault();
-                          moveSegmentSelection(1);
-                        }
-                      }}
-                      aria-label={`Select segment using line ${itemIndex + 1}`}
+                      aria-label={`Cross out line ${itemIndex + 1} in row ${rowIndex + 1}`}
                     >
                       <span
-                        className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${lineColorClass}`}
+                        className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${lineColorClass} ${activeGroupClass}`}
                         aria-hidden="true"
                       />
                     </button>
@@ -197,7 +213,7 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
                 return (
                   <span
                     key={itemIndex}
-                    className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${lineColorClass}`}
+                    className={`${LINE_SIZE_CLASSES} inline-block rounded-full ${lineColorClass} ${activeGroupClass}`}
                     aria-hidden="true"
                   />
                 );
@@ -207,68 +223,33 @@ export function Board({ gameState, onMove, player1Name, player2Name }: BoardProp
         );
       })}
 
-      {isPlaying && selectedRow !== null && gameState.rows[selectedRow] > 0 && (
+      {isPlaying && (
         <div className="w-full max-w-md rounded-lg border border-foreground/20 bg-background p-3 md:p-4">
           <p className="mb-3 text-center text-sm text-foreground/60">
-            {currentPlayerName}: row {selectedRow + 1}
+            {currentPlayerName}
           </p>
           <p className="mb-3 text-center text-xs text-foreground/50">
-            Tap a line in the selected row to choose where this segment starts.
+            {selectedRow === null
+              ? 'Tap/click any active line to start crossing out that group.'
+              : `Select any line in row ${selectedRow + 1}'s active group, then end your turn.`}
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div
+            className="mb-3 text-center text-sm font-medium"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {selectedCount > 0 && selectedRow !== null
+              ? `Crossed out ${selectedCount} line${selectedCount === 1 ? '' : 's'} in row ${selectedRow + 1}`
+              : 'No lines crossed out this turn yet'}
+          </div>
+          <div className="flex items-center justify-center">
             <Button
               type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const nextCount = Math.max(1, removeCount - 1);
-                setRemoveCount(nextCount);
-                const nextStart =
-                  getFirstValidSegmentStart(
-                    gameState.rowStates[selectedRow],
-                    nextCount
-                  ) ?? 0;
-                setRemoveStart(nextStart);
-              }}
-              disabled={removeCount === 1}
-              aria-label="Remove one fewer line"
+              onClick={handleDone}
+              disabled={selectedCount < 1}
+              aria-label="I'm done with my turn"
             >
-              −
-            </Button>
-            <span
-              className="min-w-24 text-center text-sm font-medium"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              Cross Out {removeCount}
-            </span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const nextCount = Math.min(gameState.rows[selectedRow], removeCount + 1);
-                setRemoveCount(nextCount);
-                const nextStart =
-                  getFirstValidSegmentStart(
-                    gameState.rowStates[selectedRow],
-                    nextCount
-                  ) ?? 0;
-                setRemoveStart(nextStart);
-              }}
-              disabled={removeCount === gameState.rows[selectedRow]}
-              aria-label="Remove one more line"
-            >
-              +
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleRemove}
-              disabled={!validSegmentStarts.includes(removeStart)}
-              aria-label={`Confirm crossing out ${removeCount} lines from row ${selectedRow + 1}`}
-            >
-              Cross Out
+              I&apos;m done
             </Button>
           </div>
         </div>
