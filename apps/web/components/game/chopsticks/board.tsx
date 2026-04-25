@@ -168,11 +168,11 @@ export function Board({
 
   const isPlaying = gameState.status === 'playing';
   const currentPlayer = gameState.currentPlayer;
-  const opponentIndex = currentPlayer === 1 ? 1 : 0;
-  const currentPlayerIndex = currentPlayer - 1;
 
-  const currentHands = gameState.hands[currentPlayerIndex];
-  const opponentHands = gameState.hands[opponentIndex];
+  // Fixed layout: Player 2 always on top, Player 1 always on bottom
+  const player1Hands = gameState.hands[0];
+  const player2Hands = gameState.hands[1];
+  const currentHands = currentPlayer === 1 ? player1Hands : player2Hands;
 
   const validSplits = isPlaying ? (() => {
     const { left, right } = currentHands;
@@ -231,25 +231,24 @@ export function Board({
     setSelectedHand(null);
   }, []);
 
-  // Reset local state when game state changes (e.g. after a move)
   const currentPlayerName = currentPlayer === 1 ? player1Name : player2Name;
   const opponentName = currentPlayer === 1 ? player2Name : player1Name;
 
   const player1Color = 'bg-periwinkle';
   const player2Color = 'bg-powder-blush';
-  const currentColor = currentPlayer === 1 ? player1Color : player2Color;
 
   return (
     <div className="flex flex-col items-center gap-6 p-4 md:p-8">
-      {/* Opponent's hands */}
+      {/* Player 2 — always on top */}
       <PlayerHands
-        hands={opponentHands}
-        playerLabel={opponentName}
-        isCurrentPlayer={false}
+        hands={player2Hands}
+        playerLabel={player2Name}
+        isCurrentPlayer={currentPlayer === 2}
         selectedHand={selectedHand}
         phase={phase}
+        onSelectAttacker={handleSelectAttacker}
         onSelectTarget={handleSelectTarget}
-        colorClass={currentPlayer === 1 ? player2Color : player1Color}
+        colorClass={player2Color}
         isAttacking={phase === 'attacking'}
       />
 
@@ -269,16 +268,17 @@ export function Board({
         )}
       </div>
 
-      {/* Current player's hands */}
+      {/* Player 1 — always on bottom */}
       <PlayerHands
-        hands={currentHands}
-        playerLabel={currentPlayerName}
-        isCurrentPlayer={true}
+        hands={player1Hands}
+        playerLabel={player1Name}
+        isCurrentPlayer={currentPlayer === 1}
         selectedHand={selectedHand}
         phase={phase}
         onSelectAttacker={handleSelectAttacker}
-        colorClass={currentColor}
-        isAttacking={false}
+        onSelectTarget={handleSelectTarget}
+        colorClass={player1Color}
+        isAttacking={phase === 'attacking'}
       />
 
       {/* Action buttons */}
