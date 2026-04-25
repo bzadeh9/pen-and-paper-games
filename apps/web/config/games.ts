@@ -78,6 +78,14 @@ export const games: GameMetadata[] = [
     tags: ['2-Player', 'Quick'],
   },
   {
+    id: 'chopsticks',
+    name: 'Chopsticks',
+    description: 'Tap hands to transfer fingers — eliminate both of your opponent\'s hands to win!',
+    href: '/games/chopsticks',
+    category: 'Strategy',
+    tags: ['2-Player', 'Quick'],
+  },
+  {
     id: 'black-hole',
     name: 'Black Hole',
     description: 'A game of reverse-area control',
