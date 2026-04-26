@@ -23,6 +23,7 @@ export const gameColors: Record<string, { bg: string; text: string }> = {
   sim: { bg: 'bg-electric-aqua/20', text: 'text-electric-aqua' },
   'row-call': { bg: 'bg-powder-blush/20', text: 'text-powder-blush' },
   nim: { bg: 'bg-powder-blush/20', text: 'text-powder-blush' },
+  chopsticks: { bg: 'bg-apricot-cream/20', text: 'text-apricot-cream' },
   scribbl: { bg: 'bg-tea-green/20', text: 'text-tea-green' },
   'bee-game': { bg: 'bg-apricot-cream/20', text: 'text-apricot-cream' },
   'hide-and-seek': { bg: 'bg-electric-aqua/20', text: 'text-electric-aqua' },
@@ -239,6 +240,39 @@ const iconPaths: Record<string, React.ReactNode> = {
       {/* Cross-out mark on one line */}
       <line x1="18.4" y1="13.1" x2="21.6" y2="16.9" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
       <line x1="21.6" y1="13.1" x2="18.4" y2="16.9" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" />
+    </>
+  ),
+
+  /**
+   * Chopsticks – two pairs of stylised hands (circles) with short lines
+   * representing fingers, one pair above and one below a central dividing
+   * line, evoking the two-player hand-tapping game.
+   */
+  chopsticks: (
+    <>
+      {/* Player 1 hands (bottom) – left and right circles */}
+      <circle cx="7" cy="18" r="3.5" fill="currentColor" opacity={0.2} stroke="currentColor" strokeWidth={1.5} />
+      <circle cx="17" cy="18" r="3.5" fill="currentColor" opacity={0.2} stroke="currentColor" strokeWidth={1.5} />
+      {/* Finger lines on player 1 left hand */}
+      <line x1="5.5" y1="14.8" x2="5.5" y2="13.2" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="7" y1="14.5" x2="7" y2="12.9" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="8.5" y1="14.8" x2="8.5" y2="13.2" strokeWidth={1.2} strokeLinecap="round" />
+      {/* Finger lines on player 1 right hand */}
+      <line x1="15.5" y1="14.8" x2="15.5" y2="13.2" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="17" y1="14.5" x2="17" y2="12.9" strokeWidth={1.2} strokeLinecap="round" />
+      <line x1="18.5" y1="14.8" x2="18.5" y2="13.2" strokeWidth={1.2} strokeLinecap="round" />
+      {/* Player 2 hands (top) */}
+      <circle cx="7" cy="6" r="3.5" fill="currentColor" opacity={0.15} stroke="currentColor" strokeWidth={1.5} />
+      <circle cx="17" cy="6" r="3.5" fill="currentColor" opacity={0.15} stroke="currentColor" strokeWidth={1.5} />
+      {/* Finger lines on player 2 hands (pointing down) */}
+      <line x1="5.5" y1="9.2" x2="5.5" y2="10.8" strokeWidth={1.2} strokeLinecap="round" opacity={0.5} />
+      <line x1="7" y1="9.5" x2="7" y2="11.1" strokeWidth={1.2} strokeLinecap="round" opacity={0.5} />
+      <line x1="8.5" y1="9.2" x2="8.5" y2="10.8" strokeWidth={1.2} strokeLinecap="round" opacity={0.5} />
+      <line x1="15.5" y1="9.2" x2="15.5" y2="10.8" strokeWidth={1.2} strokeLinecap="round" opacity={0.5} />
+      <line x1="17" y1="9.5" x2="17" y2="11.1" strokeWidth={1.2} strokeLinecap="round" opacity={0.5} />
+      <line x1="18.5" y1="9.2" x2="18.5" y2="10.8" strokeWidth={1.2} strokeLinecap="round" opacity={0.5} />
+      {/* Central dividing line */}
+      <line x1="3" y1="12" x2="21" y2="12" strokeWidth={1} strokeLinecap="round" opacity={0.2} />
     </>
   ),
 
